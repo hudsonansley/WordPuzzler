@@ -241,7 +241,7 @@ export const stats = (words: string[], numWordStr: string) => {
 export const withAtLeastLetterCount = (words, letter_count) => {
 	const let_count = letter_count.split("_");
 	if (let_count.length != 2) {
-		console.log("second param of withAtLeastLetterCount should be of the form <letter>_<count>");
+		console.error("second param of withAtLeastLetterCount should be of the form <letter>_<count>");
 		return
 	}
 	console.log(`checking for at least ${let_count[1]} '${let_count[0]}'s`);
@@ -300,7 +300,7 @@ export const wordle = (words, clues) => {
 				} else {
 					ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				}
-			} else if (mod == "?") {
+			} else if (mod == "?" || mod == "/") {
 				ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				ArrayUtils.addNoRepeats(somewhereLetters, letter);
 				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);

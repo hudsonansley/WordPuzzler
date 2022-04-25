@@ -26,12 +26,6 @@ export const runChecks = (words: string[], mArgs:string[], verbose = false):stri
 	return WordUtils.runFilterList(words, funcs, paramLists, verbose);
 }
 
-console.dir(WordUtils);
-
-let name = "matches";
-console.log(WordUtils[name]);
-console.log(Object.keys(WordUtils));
-
 const words = english3().filter(word => word.length > 2);
 console.log(words.length);
 // console.dir(words);
