@@ -1,0 +1,7 @@
+{
+	"module": "commonjs",
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"downlevelIteration": true,
+	}
+}
