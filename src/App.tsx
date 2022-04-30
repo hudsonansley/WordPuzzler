@@ -50,15 +50,13 @@ const App = () => {
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
-    // setCurLetterLoc({rowIndex: curLetterLoc.rowIndex + 1, letterIndex: 0});
-  
 
     // get stats and update stats panel
-    console.log(board);
+    // console.log(board);
     const wordleClueString = getClueStringFromBoard(board);
-    WordUtils.setVerbose(true);
+    // WordUtils.setVerbose(true);
     const wordsLeft = WordUtils.wordle(wordsAll, wordleClueString);
-    console.log(wordsLeft);
+    // console.log(wordsLeft);
     setWords(wordsLeft);
   }
 

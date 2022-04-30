@@ -23,7 +23,8 @@ test('Wordle.wordleAll has wordle some picks and decoys and not other words', ()
     expect(wordleDecoys).not.toContain("yutes");
 });
 // test('Wordle.wordleAll has all wordle picks and decoys exactly both combined', () => {
-    // only uncomment if want to check updated dictionaries, these take a few minutes to run
+    // only uncomment if want to check updated dictionaries,
+    //  these take a few minutes to run
     // expect(wordleAll).toEqual(
     //     expect.arrayContaining(wordlePicks),
     // );
