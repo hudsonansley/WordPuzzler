@@ -25,7 +25,7 @@ test('WordUtils.wordle properly reduces wordlist', () => {
 })
 
 test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () => {
-  const words = WordleDict.wordleAll();
+  const words = WordleDict.wordlePicks();
   let palendroms = WordUtils.palendroms(words);
   const expected =  {
     civic: 'civic',
@@ -52,7 +52,7 @@ test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () =
 })
 
 test('WordUtils.rotagrams finds rotagrams properly in worlde dictionary', () => {
-  const words = WordleDict.wordleAll();
+  const words = WordleDict.wordlePicks();
   let palendroms = WordUtils.rotagrams(words);
   const expected = {
       "alloy": ["loyal"],"anger": ["range"],"angle": ["glean"],"arson": ["sonar"],"bowel": ["elbow"],"earth": ["heart"],"easel": ["lease"],"ether": ["there"],"ethos": ["those"],"ought": ["tough"],"outer": ["route"],"setup": ["upset"],"sever": ["verse"]

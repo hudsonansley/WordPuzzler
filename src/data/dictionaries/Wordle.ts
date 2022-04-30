@@ -1,6 +1,5 @@
 export const wordleAll = ():string[] => {
-    const result = wordlePicks();
-    result.concat(wordleDecoys());
+    const result = wordlePicks().concat(wordleDecoys());
     result.sort();
     return result;
 }
