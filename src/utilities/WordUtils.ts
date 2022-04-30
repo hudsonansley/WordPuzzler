@@ -1,7 +1,14 @@
 import * as ArrayUtils from './ArrayUtils';
-import { wordlePicksList } from '../data/dictionaries/Wordle'
+import * as WordleDict from '../data/dictionaries/Wordle'
+
+let gVerbose = false;
 
 export interface StringMap {[key: string]: string; }
+export interface StringToNumberMap {[key: string]: number; }
+
+export const setVerbose = (verbose:boolean):void => {
+	gVerbose = verbose;
+}
 
 const makeLookupMap = (words:string[]):{[key: string]: boolean} => {
 	const results = {};
@@ -21,8 +28,8 @@ const makeLookupMap = (words:string[]):{[key: string]: boolean} => {
 export const prePals = (words: string[]): string[] => {
 	const results = [];
 	words.forEach( word => {
-		let rev = word.split('').rotate(1).reverse().join('')
-		if (word == rev) {
+		let rev = ArrayUtils.rotate(word.split(''), 1).reverse().join('')
+		if (word === rev) {
 			results.push(word)
 		}
 		results.sort((w1, w2) => {return w2.length - w1.length})
@@ -39,8 +46,8 @@ export const prePals = (words: string[]): string[] => {
 export const postPals = (words: string[]): string[] => {
 	const results = [];
 	words.forEach( word => {
-		let rev = word.split('').rotate(-1).reverse().join('')
-		if (word == rev) {
+		let rev = ArrayUtils.rotate(word.split(''), -1).reverse().join('')
+		if (word === rev) {
 			results.push(word)
 		}
 		results.sort((w1, w2) => {return w2.length - w1.length})
@@ -62,7 +69,7 @@ export const rotagrams = (words: string[]):{[key: string]: string[] } => {
 			let len = word.length;
 			let letters = word.split('')
 			for (var i = 0; i < len -1; i++) {
-				let rot = letters.rotate(1).join('');
+				let rot = ArrayUtils.rotate(letters, 1).join('');
 				if (wordLU[rot]) {
 					if (!results[word]) {
 						results[word] = []
@@ -84,8 +91,6 @@ export const rotagrams = (words: string[]):{[key: string]: string[] } => {
  */
 export const piglatins = (words: string[]):string[] => {
 	const results = words.map(piglatin);
-	console.log('piglatins');
-	console.dir(results);
 	return results;
 }
 
@@ -131,12 +136,11 @@ export const palendroms = (words: string[]):StringMap => {
  * Filters the words in given array to those that have no duplicate letters
  */
 export const unique = (words: string[]):string[] => {
-	console.log(`words with unique letters of '${words.length}'`);
 	const results:string[] = [];
 	words.forEach( word => {
 		const letters = word.split('');
 		const uniq = [...new Set(letters)];
-		if (letters.length == uniq.length) {
+		if (letters.length === uniq.length) {
 			results.push(word);
 		}
 	})
@@ -149,7 +153,6 @@ export const unique = (words: string[]):string[] => {
  * Filters for words that match the given regex string
  */
 export const matches = (words: string[], regex:string):string[] => {
-	console.log(`words matching '${regex}'`);
 	const results:string[] = [];
 	const re = new RegExp(regex);
 	words.forEach( word => {
@@ -162,19 +165,17 @@ export const matches = (words: string[], regex:string):string[] => {
 
 export type WordFilterFunc = (words: string[], ...args : string[]) => string[];
 
-export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists:string[][], verbose: Boolean = false):string[] => {
+export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists:string[][]):string[] => {
 	let results = words.slice();
 	let n = funcs.length;
-	if (n != paramLists.length) {
+	if (n !== paramLists.length) {
 		console.error("list of funcs and paramLists have differnt lengths");
 		return results;
 	}
 	for (let i =0; i<n; i++) {
 		results = funcs[i](results, ...paramLists[i]);
-		if (verbose) {
-			console.log(`${funcs[i].name} returned`)
-			console.dir(results);
-			console.log(results.length);
+		if (gVerbose) {
+			console.log(`${funcs[i].name} ${paramLists[i].join(' ')} returned ${results.length}`);
 		}
 		if (!results || results.length === 0) {
 			return [];
@@ -183,11 +184,9 @@ export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists
 	return results;
 }
 
-export const stats = (words: string[], numWordStr: string) => {
-	let numWords = parseInt(numWordStr);
-	if (isNaN(numWords)) {
-		numWords = 10;
-	}
+export type wordPercentagesType = [number, string, number, number[]][];
+
+export const stats = (words: string[]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
 	let letters;
 	let lettersUnique;
 	const placements = [];
@@ -213,10 +212,8 @@ export const stats = (words: string[], numWordStr: string) => {
 		percentageByLetter[letter] = freq;
 	}
 	percentages.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0);
-	console.log(letterFreq);
-	console.log(percentages);
 	// now get the percentages per word
-	const wordPercentages = [];
+	const wordPercentages:wordPercentagesType = [];
 	words.forEach( (word) => {
 		let wordPercent = 0;
 		letters = word.split("");
@@ -228,23 +225,23 @@ export const stats = (words: string[], numWordStr: string) => {
 		letters.forEach( (letter, i) => {
 			placement[i] = placements[i]?.[letter] ?? 0;
 		})
-		wordPercentages.push([wordPercent, word, placement.reduce( (a, b) => a + b), placement.join(",")]);
+		wordPercentages.push([wordPercent, word, placement.reduce( (a, b) => a + b), placement]);
 	})
 	wordPercentages.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : a[2] < b[2] ? 1 : a[2] > b[2] ? -1 : 0);
-	let n = Math.min(words.length, numWords);
-	for (let i = 0; i < n; i++) {
-		console.log(wordPercentages[i]);
-	}
-	return words; //for chaining
+	return [letterFreq, percentages, wordPercentages];
 }
-
-export const withAtLeastLetterCount = (words, letter_count) => {
+/**
+ * @param  {string[]} words
+ * @param  {string} letter_count a string consisting of a letter and a count delimited by "_"
+ * @returns {string[]} words filtered for words that have at least count of letter, e.g.:
+ *  letter_count === "e_3" will return only those words with 3 or more "e"s
+ */
+export const withAtLeastLetterCount = (words:string[], letter_count:string):string[] => {
 	const let_count = letter_count.split("_");
-	if (let_count.length != 2) {
+	if (let_count.length !== 2) {
 		console.error("second param of withAtLeastLetterCount should be of the form <letter>_<count>");
 		return
 	}
-	console.log(`checking for at least ${let_count[1]} '${let_count[0]}'s`);
 	const letter = let_count[0];
 	const count = parseInt(let_count[1]);
 	const result = words.filter( word => {
@@ -260,12 +257,20 @@ export const withAtLeastLetterCount = (words, letter_count) => {
 		} while (index >= 0)
 		return letterCount >= count;
 	});
-	// console.log(result);
 	return result;
 }
-
-export const wordle = (words, clues) => {
-	console.log(`words matching wordle clues '${clues}'`);
+/**
+ * @param  {string[]} words
+ * @param  {string} clues
+ * @returns {string[]} filters words based on the wordle clues string given
+ * clues is a "_" delimited list of letter/wordle state character pairs where
+ *  "-" means the letter is wrong (gray)
+ *  "/" or "?" means the letter is in the word but not in that location (yellow)
+ *  "=" means the letter is correct
+ * e.g.: "r-a-i-s/e=_s/l-e/p-t/" means first word raise had s somewhere and e in the right place,
+ *  second work slept had s e and t somewhere (but not in the right place) 
+ */
+export const wordle = (words:string[], clues:string):string[] => {
 	const notLetters = [];
 	const somewhereLetters = [];
 	const correctLetters = [];
@@ -276,31 +281,31 @@ export const wordle = (words, clues) => {
 	for (const clue of rows) {
 		const atLeastLettersForClue = {};
 		const letters = clue.split("");
-		if (n > 0 && n != letters.length) {
+		if (n > 0 && n !== letters.length) {
 			console.error(`clue length incorrect: '${clue}'`);
 			error = true;
 			break;
 		}
 		n = letters.length;
-		for (i=0; i < n; i += 2) {
+		for (let i=0; i < n; i += 2) {
 			const letIndex = i/2;
 			const letter = letters[i];
 			const mod = letters[i+1];
-			if (mod == "=") {
+			if (mod === "=") {
 				correctLetters[letIndex] = letter;
 				ArrayUtils.removeFromArray(notLetters[letIndex], letter);
 				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
-			} else if (mod == "-") {
+			} else if (mod === "-") {
 				if (somewhereLetters.indexOf(letter) === -1 || correctLetters.indexOf(letter) >= 0) {
 					for (let j=0; j < n/2; j++) {
-						if (correctLetters[j] != letter) {
+						if (correctLetters[j] !== letter) {
 							ArrayUtils.addNoRepeatsArrays(notLetters, letter, j);
 						}
 					}
 				} else {
 					ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				}
-			} else if (mod == "?" || mod == "/") {
+			} else if (mod === "?" || mod === "/") {
 				ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				ArrayUtils.addNoRepeats(somewhereLetters, letter);
 				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
@@ -323,30 +328,28 @@ export const wordle = (words, clues) => {
 	const wFuncs: WordFilterFunc[] = [];
 	const wParamLists: string[][] = [];
 	const wordLen = notLetters.length;
-	var regex = "^";
-	for (i=0; i < wordLen; i++) {
+	let regex = "^";
+	for (let i=0; i < wordLen; i++) {
 		const correctLet = correctLetters[i];
-		if (typeof correctLet == "string" && correctLet.length > 0) {
+		if (typeof correctLet === "string" && correctLet.length > 0) {
 			regex += correctLet;
 		} else {
 			const letters = notLetters[i];
 			regex += "[";
-			letters.forEach( letter => {
-				regex += "^" + letter;
-			})
+			for (let j=0; j< letters.length; j++) {
+				regex += "^" + letters[j];
+			}
 			regex += "]";
 		}
 	}
 	regex += "$";
 	wFuncs.push(matches);
 	wParamLists.push([regex]);
-	var i = 0;
 	somewhereLetters.forEach( letter => {
 		if (letter) {
 			wFuncs.push(matches);
 			wParamLists.push([letter]);
 		}
-		i++;
 	})
 	Object.entries(atLeastLetters).forEach( (letterCount) => {
 		if (letterCount[1] > 1) {
@@ -354,24 +357,18 @@ export const wordle = (words, clues) => {
 			wParamLists.push([letterCount.join("_")]);
 		}
 	})
-	if (wordLen == 5) {
+	if (wordLen === 5) {
 		wFuncs.push(wordlePicks);
 		wParamLists.push([]);
 	}
-	wFuncs.push(stats);
-	wParamLists.push(["20"]);
-	wFuncs.push(unique);
-	wParamLists.push([]);
 	return runFilterList(words, wFuncs, wParamLists);
 }
-
-export const wordlePicks = (words) => {
-	console.log( `wordle picks from ${words.length}`);
-	const results = [];
-	words.forEach (word => {
-		if (wordlePicksList().indexOf(word) >= 0) {
-			results.push(word);
-		}
-	})
-	return results;
+/**
+ * @param  {string[]} words
+ * @returns {string[]} 
+ * filters the given words for those in the wordle picks list
+ */
+export const wordlePicks = (words:string[]):string[] => {
+	const wordlePicks = WordleDict.wordlePicks();
+	return words.filter(word => wordlePicks.indexOf(word) >= 0);
 }

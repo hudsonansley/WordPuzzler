@@ -6,7 +6,7 @@ import { english3 } from './src/data/dictionaries/English'
 // 	return fs.readFileSync(`${path}${file}`, 'utf8');
 // }
 
-export const runChecks = (words: string[], mArgs:string[], verbose = false):string[] => {
+export const runChecks = (words: string[], mArgs:string[]):string[] => {
 	let results = words;
 	let funcs: WordUtils.WordFilterFunc[] = [];
 	let paramLists: string[][] = [];
@@ -17,23 +17,41 @@ export const runChecks = (words: string[], mArgs:string[], verbose = false):stri
 		const wordFunc = WordUtils[funcName];
 		if (typeof wordFunc == "function") {
 			funcs.push(wordFunc);
-			let params = mArgs.slice(0, wordFunc.length - 1);
+			let params = mArgs.splice(0, wordFunc.length - 1);
 			paramLists.push(params);
 		} else {
 			console.log("did not recognize "+funcName);
 		}
 	}
-	return WordUtils.runFilterList(words, funcs, paramLists, verbose);
+	return WordUtils.runFilterList(words, funcs, paramLists);
 }
 
+const verbose = true;
+const numWords = 20; //TODO: set these with options
+WordUtils.setVerbose(verbose);
 const words = english3().filter(word => word.length > 2);
-console.log(words.length);
-// console.dir(words);
+if (verbose) {
+    console.log(words.length);
+}
 
 let args = process.argv.slice(2);
-runChecks(words, args, true);
-
-
-// for (let i = 0; i < functions.length(); i++) {
-
-// }
+console.log(args);
+let firstCmd = args[0];
+const results = runChecks(words, args);
+if (verbose) {
+	if (firstCmd === "wordle") {
+		const [letterFreq, percentages, wordPercentages] = WordUtils.stats(results);
+		console.log(letterFreq);
+		console.log(percentages);
+		let n = Math.min(results.length, numWords);
+		for (let i = 0; i < n; i++) {
+			console.log(wordPercentages[i]);
+		}
+	} else {
+		console.dir(results);
+		console.log(results.length);
+	}
+	const uniqueWords = WordUtils.unique(results);
+	console.dir(uniqueWords);
+	console.log(uniqueWords.length);
+}

@@ -1,24 +1,21 @@
-
-declare global {
-    interface Array<T> {
-        rotate(n: Number): T[];
-    }
-}
 /**
+ * @param  {T[]} array
  * @param  {number} n
- * Extends Array with "rotate" that shifts the array elements by n and 
+ * @returns the array passed in (for chaining)
+ * shifts the array elements by n and 
  *  adds the overflow to the front of the array
  * Array is modified in place
- * E.g.: [1,2,3,4,5,6].rotate(2) => [3,4,5,6,7,1,2]
+ * E.g.: const list = [1,2,3,4,5,6]; ArrayUtils.rotate(list, 2);
+ * list now equals [3,4,5,6,7,1,2]
  */
-Array.prototype.rotate = function(n: number ) {
-	const len = this.length;
+export const rotate = <T>(array: T[], n:number):T[] => {
+	const len = array.length;
 	n = n % len;
 	if (n < 0) {
 		n += len
 	}
-	this.unshift.apply( this, this.splice( n, len ) );
-	return this;
+	array.unshift( ...array.splice( n, len ) );
+	return array;
 }
 /**
  * @param  {T[]} array 

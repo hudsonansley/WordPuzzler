@@ -1,7 +1,11 @@
 {
 	"module": "commonjs",
 	"compilerOptions": {
+		"types": ["node"],
+		"target": "es6",
+		"lib": ["es6", "dom"],
 		"esModuleInterop": true,
 		"downlevelIteration": true,
-	}
+		"jsx": "react",
+	},
 }
