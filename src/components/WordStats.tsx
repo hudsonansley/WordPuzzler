@@ -49,22 +49,3 @@ const WordStats = ():JSX.Element => {
 }
 
 export default WordStats;
-
-/*
-        <ReactFragment>
-        <div className="stats" id="statsTable">
-        <table>
-        {wordPercentages.map( wordInfo => {
-            return (
-                <tr>
-                    <td>{wordInfo[1]}</td>
-                    <td>{wordInfo[0].toFixed(4)}</td>
-                    <td>{wordInfo[2]}</td>
-                </tr>
-                );
-            });
-        };
-        </table>
-        </div>
-        </ReactFragment>
-*/
