@@ -15,6 +15,12 @@ let currentBoardIndex = 0;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
+//TODO: make storage button background respond to tap, indicate button currently selected 
+// with background color
+//TODO? make storage buttons reflect clues
+//TODO? add partitioning information to stats
+//TODO? allow stats to sort when clicked on column top
+
 const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
