@@ -275,7 +275,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 	const somewhereLetters = [];
 	const correctLetters = [];
 	const atLeastLetters = {};
-	const rows = clues.split("_");
+	const rows = clues.toLowerCase().split("_");
 	let n = 0;
 	let error = false;
 	for (const clue of rows) {

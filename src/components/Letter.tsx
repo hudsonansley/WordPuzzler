@@ -1,9 +1,10 @@
 import React, { useContext }  from "react";
 import { AppContext } from "../App";
+import * as BoardData from "../data/BoardData"
 
 const Letter = ({ rowIndex, letterIndex }) => {
-    const { board, onRotateLetterState } = useContext(AppContext);
-    const letter = board[rowIndex][letterIndex];
+    const { boardStr, onRotateLetterState } = useContext(AppContext);
+    const letter = BoardData.getLetterInBoardString(boardStr, { rowIndex, letterIndex });
 
     const rotateLetterState = () => {
         onRotateLetterState({rowIndex:rowIndex, letterIndex:letterIndex});
