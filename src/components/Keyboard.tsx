@@ -39,7 +39,7 @@ const Keyboard = () => {
         })});
       }
     },
-    [curLetterLoc]
+    [curLetterLoc, keys, onDelete, onEnter, onRotateLetterState, onSelectLetter, onShowHelp]
   );
   useEffect(() => {
     document.addEventListener("keydown", handleKeyboard);

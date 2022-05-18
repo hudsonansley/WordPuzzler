@@ -28,7 +28,7 @@ export const getLetterLoc = (board: BoardDataType): LetterLocType => {
     let letterIndex = lettersPerWord;
     do {
         rowIndex -= 1;
-    } while (rowIndex >= 0 && board[rowIndex][0].letter == blankLetter);
+    } while (rowIndex >= 0 && board[rowIndex][0].letter === blankLetter);
 
     do {
         letterIndex -= 1;

@@ -1,4 +1,4 @@
-import React, { ReactFragment, useContext}  from "react";
+import React, { useContext }  from "react";
 import { AppContext } from "../App";
 import { stats, wordPercentagesType } from '../utilities/WordUtils';
 
@@ -7,8 +7,8 @@ const WordStats = ():JSX.Element => {
     const wordCount = words?.length;
     
     if (curLetterLoc.rowIndex >= 0 && words !== null) {
-        let _, wordPercentages:wordPercentagesType;    
-        [_, _, wordPercentages] = stats(words);
+        let wordPercentages:wordPercentagesType;    
+        [ , , wordPercentages] = stats(words);
         
         return (
             <div className="stats" id="statsTable">
