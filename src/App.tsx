@@ -15,8 +15,6 @@ let currentBoardIndex = 0;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
-//TODO: make storage button background respond to tap, indicate button currently selected 
-// with background color
 //TODO? make storage buttons reflect clues
 //TODO? add partitioning information to stats
 //TODO? allow stats to sort when clicked on column top
@@ -98,6 +96,16 @@ const App = () => {
     onShowHelp();
   }
 
+  const memoryButton = (index) => {
+    const bgClassName = (index === currentBoardIndex) ? "bg-gray-600" : "bg-gray-500";
+    return (
+      <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
+        <div className={`${bgClassName} text-center rounded-lg box-border pl-2.5 pr-4 border-2`}>{index}</div>
+      </button>
+    )
+  }
+
+//{`${selectedMemButton(0)}
   return (
     <div className="App">
       <nav>
@@ -110,19 +118,11 @@ const App = () => {
         </div>
         <h1>Wordle Helper</h1>
         <div>
-          <div className="grid gap-0 grid-cols-2">
-              <div className="rounded-lg bg-gray-500 box-border px-3 border-2">
-                <button id="memory0" onClick={() => switchToBoard(0)} tabIndex={-1}>0</button>
-              </div>
-              <div className="rounded-lg bg-gray-500 box-border px-3 border-2">
-                <button id="memory1" onClick={() => switchToBoard(1)} tabIndex={-1}>1</button>
-              </div>
-              <div className="rounded-lg bg-gray-500 box-border px-3 border-2">
-                <button id="memory2" onClick={() => switchToBoard(2)} tabIndex={-1}>2</button>
-              </div>
-              <div className="rounded-lg bg-gray-500 box-border px-3 border-2">
-                <button id="memory3" onClick={() => switchToBoard(3)} tabIndex={-1}>3</button>
-              </div>
+          <div className="grid gap-0 px-4 grid-cols-2">
+            {memoryButton(0)}
+            {memoryButton(1)}
+            {memoryButton(2)}
+            {memoryButton(3)}
           </div>
         </div>
       </nav>
