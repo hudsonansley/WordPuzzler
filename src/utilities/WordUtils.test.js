@@ -22,6 +22,9 @@ test('WordUtils.wordle properly reduces wordlist', () => {
   words = WordUtils.wordle(allWords, 'r-a-i-s/e-_s=n/o=u-t-');
   expect(words.length).toEqual(3);
   expect(words[0]).toEqual("shown", "swoon", "spoon");
+  words = WordUtils.wordle(allWords, 'a/l/t=e=r=');
+  expect(words.length).toEqual(1);
+  expect(words[0]).toEqual("later");
 })
 
 test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () => {
