@@ -277,6 +277,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 	const atLeastLetters = {};
 	const rows = clues.toLowerCase().split("_");
 	let n = 0;
+	let wordLen = 0;
 	let error = false;
 	for (const clue of rows) {
 		const atLeastLettersForClue = {};
@@ -285,8 +286,10 @@ export const wordle = (words:string[], clues:string):string[] => {
 			console.error(`clue length incorrect: '${clue}'`);
 			error = true;
 			break;
+		} else {
+			n = letters.length;
+			wordLen = n / 2;
 		}
-		n = letters.length;
 		for (let i=0; i < n; i += 2) {
 			const letIndex = i/2;
 			const letter = letters[i];
@@ -327,7 +330,6 @@ export const wordle = (words:string[], clues:string):string[] => {
 	if (error) { return};
 	const wFuncs: WordFilterFunc[] = [];
 	const wParamLists: string[][] = [];
-	const wordLen = notLetters.length;
 	let regex = "^";
 	for (let i=0; i < wordLen; i++) {
 		const correctLet = correctLetters[i];

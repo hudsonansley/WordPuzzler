@@ -11,6 +11,7 @@ import * as WordUtils from './utilities/WordUtils';
 export const AppContext = createContext(undefined);
 const initBoardStr = "";
 const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
+const storedBoardDirty = [false, false, false, false];
 let currentBoardIndex = 0;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
@@ -33,6 +34,8 @@ const App = () => {
       alert("Fill in full word to calculate words remaining")
       return;
     }
+    storedBoardDirty[currentBoardIndex] = false;
+
     let curWord = "";
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
@@ -71,6 +74,7 @@ const App = () => {
     for (let index = 0; index < storedBoardStates.length; index++) {
       const storedBoard = storedBoardStates[index];
       storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, loc, letter);
+      storedBoardDirty[index] = true;
     }
     const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     setBoardStr(storedBoardStates[currentBoardIndex]);
@@ -93,7 +97,12 @@ const App = () => {
     setBoardStr(newBoardStr);
     const newBoard = BoardData.getBoardFromString(newBoardStr);
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
-    onShowHelp();
+    if (storedBoardDirty[currentBoardIndex]) {
+      storedBoardDirty[currentBoardIndex] = false;
+      onShowHelp();
+    } else {
+      onEnter();
+    }
   }
 
   const memoryButton = (index) => {
@@ -136,6 +145,7 @@ const App = () => {
           onDelete,
           onEnter,
           onRotateLetterState,
+          switchToBoard,
           onShowHelp,
           words,
           setWords,

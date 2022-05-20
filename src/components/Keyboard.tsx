@@ -16,6 +16,7 @@ const Keyboard = () => {
     onEnter,
     onDelete,
     onRotateLetterState,
+    switchToBoard,
     onShowHelp,
   } = useContext(AppContext);
 
@@ -31,6 +32,8 @@ const Keyboard = () => {
         onRotateLetterState(curLetterLoc);
       } else if (event.key === "?" || event.key === "/") {
         onShowHelp();
+      } else if (event.key >= "0" && event.key <= "3") {
+        switchToBoard(parseInt(event.key));
       } else {
         keys.forEach(row => { row.forEach(key => {
           if (event.key.toLowerCase() === key.toLowerCase()) {
@@ -39,7 +42,7 @@ const Keyboard = () => {
         })});
       }
     },
-    [curLetterLoc, keys, onDelete, onEnter, onRotateLetterState, onSelectLetter, onShowHelp]
+    [curLetterLoc, keys, onDelete, onEnter, onRotateLetterState, onSelectLetter, switchToBoard, onShowHelp]
   );
   useEffect(() => {
     document.addEventListener("keydown", handleKeyboard);
