@@ -1,4 +1,4 @@
-import React, { ReactFragment, useContext}  from "react";
+import React, { useContext }  from "react";
 import { AppContext } from "../App";
 import { stats, wordPercentagesType } from '../utilities/WordUtils';
 
@@ -7,8 +7,8 @@ const WordStats = ():JSX.Element => {
     const wordCount = words?.length;
     
     if (curLetterLoc.rowIndex >= 0 && words !== null) {
-        let _, wordPercentages:wordPercentagesType;    
-        [_, _, wordPercentages] = stats(words);
+        let wordPercentages:wordPercentagesType;    
+        [ , , wordPercentages] = stats(words);
         
         return (
             <div className="stats" id="statsTable">
@@ -43,6 +43,9 @@ const WordStats = ():JSX.Element => {
                 (max of 1.0, based on the frequency of each unique letter of the word in the current word list) 
                 and breaks ties with the letter placement 
                 (max of 5.0. based on how many of the current word list share the same letter location)
+                <p/>
+                You can use "0" to "3" to switch between four boards with the same words but 
+                different target words, for use with a variation like Quordle.
             </div>
         )
     }
