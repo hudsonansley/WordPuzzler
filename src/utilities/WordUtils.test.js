@@ -21,10 +21,10 @@ test('WordUtils.wordle properly reduces wordlist', () => {
   expect(words[0]).toEqual("heist");
   words = WordUtils.wordle(allWords, 'r-a-i-s/e-_s=n/o=u-t-');
   expect(words.length).toEqual(3);
-  expect(words[0]).toEqual("shown", "swoon", "spoon");
+  expect(words).toEqual(["shown", "spoon", "swoon"]);
 })
 
-test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () => {
+test('WordUtils.palendroms finds palendrom pairs properly in worlde dictionary', () => {
   const words = WordleDict.wordlePicks();
   let palendroms = WordUtils.palendroms(words);
   const expected =  {
@@ -39,15 +39,58 @@ test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () =
     radar: 'radar',
     rebut: 'tuber',
     refer: 'refer',
-    regal: 'lager',
     remit: 'timer',
-    repel: 'leper',
-    revel: 'lever',
     rotor: 'rotor',
     tenet: 'tenet',
-    timer: 'remit',
-    tuber: 'rebut'
   };
+  expect(palendroms).toEqual(expected);
+})
+
+test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () => {
+  const words = WordleDict.wordleAll();
+  let palendroms = WordUtils.filterPalendroms(words);
+  const expected =  [
+    "alula",
+    "anana",
+    "ayaya",
+    "civic",
+    "deked",
+    "deled",
+    "dered",
+    "dewed",
+    "kaiak",
+    "kayak",
+    "lahal",
+    "laval",
+    "lemel",
+    "level",
+    "madam",
+    "malam",
+    "minim",
+    "qajaq",
+    "radar",
+    "refer",
+    "rotor",
+    "sagas",
+    "samas",
+    "sedes",
+    "seles",
+    "semes",
+    "senes",
+    "seres",
+    "sexes",
+    "shahs",
+    "simis",
+    "siris",
+    "solos",
+    "stats",
+    "stets",
+    "stots",
+    "sulus",
+    "susus",
+    "tenet",
+    "torot",
+   ];
   expect(palendroms).toEqual(expected);
 })
 

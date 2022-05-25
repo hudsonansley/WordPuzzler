@@ -114,6 +114,30 @@ const piglatin = (word:string):string => {
 	return letters.join("");
 }
 /**
+ * @param  {} str
+ * @returns boolean
+ * returns true if the input string is a palendrom
+ */
+export const isPalendrom = (str):boolean => {
+	let result = true;
+	const letters = str.split("");
+	const n = letters.length;
+	for (let i=0; i<(n/2); i++) {
+		if (letters[i] !== letters[n-i-1]) {
+			result = false;
+		} 
+	}
+	return result;
+}
+/**
+ * @param  {string[]} words
+ * @returns string[] - a list of words that are palendroms
+ */
+export const filterPalendroms = (words: string[]):string[] => {
+	return words.filter(isPalendrom);
+}
+
+/**
  * @param  {string[]} words
  * @returns StringMap
  * Finds and returns all the palendroms (words that form another word when letters are reversed)
@@ -122,10 +146,12 @@ const piglatin = (word:string):string => {
 export const palendroms = (words: string[]):StringMap => {
 	const wordLU = makeLookupMap(words);
 	const results = {};
+	const skipRev = {};
 	words.forEach( word => {
 		let rev = word.split('').reverse().join('')
-		if (!results.hasOwnProperty(word) && wordLU[rev]) {
-			results[word] = rev
+		if (!results.hasOwnProperty(word) && !results.hasOwnProperty(rev) && wordLU[rev]) {
+			results[word] = rev;
+			skipRev[rev] = true;
 		}
 	})
 	return results;
