@@ -391,6 +391,38 @@ export const wordle = (words:string[], clues:string):string[] => {
 	}
 	return runFilterList(words, wFuncs, wParamLists);
 }
+
+const getWordleClues = (wordLets:string[], pickLets:string[]):string => {
+	let n = wordLets.length;
+	if (n !== pickLets.length) {
+		return "";
+	}
+	let clues = "";
+	for (let i = 0; i < n; i++) {
+		if (wordLets[i] === pickLets[i]) {
+			clues += "e";
+		} else if (pickLets.indexOf(wordLets[i])) {
+			clues += "p";
+		} else {
+			clues += "n";
+		}
+	}
+	return clues;
+}
+
+export const getWordlePartitions = (words:string[], picks:string[]):{[key: string]: StringToNumberMap; } => {
+	const result:{[key: string]: StringToNumberMap; } = {};
+	for (let word of words) {
+		result[word] = {};
+		const wordLets = word.split("");
+		for (let pick of picks) {
+			const clues = getWordleClues(wordLets, pick.split(""));
+			ArrayUtils.keyCountIncrement(result[word], clues);
+		}
+	}
+	return result;
+}
+
 /**
  * @param  {string[]} words
  * @returns {string[]} 

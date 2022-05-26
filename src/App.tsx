@@ -114,7 +114,6 @@ const App = () => {
     )
   }
 
-//{`${selectedMemButton(0)}
   return (
     <div className="App">
       <nav>
