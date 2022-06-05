@@ -5,6 +5,8 @@ let gVerbose = false;
 
 export interface StringMap {[key: string]: string; }
 export interface StringToNumberMap {[key: string]: number; }
+export interface StringToArrayMap {[key: string]: string[]; }
+export interface StringToStringToArrayMap {[key: string]: StringToArrayMap; }
 
 export const setVerbose = (verbose:boolean):void => {
 	gVerbose = verbose;
@@ -326,7 +328,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
 			} else if (mod === "-") {
 				if (somewhereLetters.indexOf(letter) === -1 || correctLetters.indexOf(letter) >= 0) {
-					for (let j=0; j < n/2; j++) {
+					for (let j=0; j < wordLen; j++) {
 						if (correctLetters[j] !== letter) {
 							ArrayUtils.addNoRepeatsArrays(notLetters, letter, j);
 						}
@@ -392,32 +394,44 @@ export const wordle = (words:string[], clues:string):string[] => {
 	return runFilterList(words, wFuncs, wParamLists);
 }
 
-const getWordleClues = (wordLets:string[], pickLets:string[]):string => {
+export const getWordleClues = (word:string, pick:string):string => {
+	const wordLets = word.split("");
+	const pickLets = pick.split("");
 	let n = wordLets.length;
 	if (n !== pickLets.length) {
 		return "";
 	}
-	let clues = "";
+	const clues = [];
+	for (let i = 0; i < n; i++) {
+		clues[i] = "n";
+	}
 	for (let i = 0; i < n; i++) {
 		if (wordLets[i] === pickLets[i]) {
-			clues += "e";
-		} else if (pickLets.indexOf(wordLets[i])) {
-			clues += "p";
-		} else {
-			clues += "n";
+			clues[i] = "e";
+			pickLets[i] = ""; // so we don't refind this letter for wrong place
+		} 
+	}
+	for (let i = 0; i < n; i++) {
+		const pickLetIndex = pickLets.indexOf(wordLets[i]);
+		if (pickLetIndex >= 0 && clues[i] !== "e") {
+			clues[i] = "p";
+			pickLets[pickLetIndex] = "";
 		}
 	}
-	return clues;
+	return clues.join("");
 }
 
-export const getWordlePartitions = (words:string[], picks:string[]):{[key: string]: StringToNumberMap; } => {
-	const result:{[key: string]: StringToNumberMap; } = {};
+export const getWordlePartitions = (words:string[], picks:string[]):StringToStringToArrayMap => {
+	const result:StringToStringToArrayMap = {};
 	for (let word of words) {
 		result[word] = {};
-		const wordLets = word.split("");
 		for (let pick of picks) {
-			const clues = getWordleClues(wordLets, pick.split(""));
-			ArrayUtils.keyCountIncrement(result[word], clues);
+			const clues = getWordleClues(word, pick);
+			if (result[word][clues]) {
+				result[word][clues].push(pick);
+			} else {
+				result[word][clues] = [pick];
+			}
 		}
 	}
 	return result;

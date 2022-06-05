@@ -1,5 +1,7 @@
 import * as WordUtils from './src/utilities/WordUtils';
 import { english3 } from './src/data/dictionaries/English'
+import { wordlePicks, wordleDecoys } from './src/data/dictionaries/Wordle'
+import fs from 'fs'
 
 // function readTextFile(file, path = "dictionaries/") {
 // 	var fs = require('fs');
@@ -25,6 +27,13 @@ export const runChecks = (words: string[], mArgs:string[]):string[] => {
 	}
 	return WordUtils.runFilterList(words, funcs, paramLists);
 }
+
+/* generate the wordle partition json files
+const pWords = wordleDecoys(); //.slice(0, 100);
+const picks = wordlePicks();
+const parts = WordUtils.getWordlePartitions(pWords, picks);
+fs.writeFileSync('parts_decoys.json', JSON.stringify(parts), 'utf8');
+*/
 
 const verbose = true;
 const numWords = 20; //TODO: set these with options
