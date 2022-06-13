@@ -1,20 +1,58 @@
-import React, { useContext }  from "react";
+import React, { useContext, useState, useEffect }  from "react";
 import { AppContext } from "../App";
-import { stats, wordPercentagesType } from '../utilities/WordUtils';
+import { wordleFreqStats } from '../utilities/WordUtils';
+import * as ArrayUtils from "../utilities/ArrayUtils";
 
-const WordStats = ():JSX.Element => {
-    const { words, curLetterLoc } = useContext(AppContext);
+const WordStats = ({words}) => {
+    const sortOrder: ArrayUtils.sortOrderType[] = [{index: 0, decending: false}, {index: 2, decending: false}, {index: 1, decending: true}];
+    // const { curLetterLoc } = useContext(AppContext);
+    const [ wordPercentages, setWordPercentages] = useState([]);
     const wordCount = words?.length;
+
+    useEffect (() => {
+        if (words) { 
+            setWordPercentages(wordleFreqStats(words, sortOrder)[2]);
+        } else {
+            setWordPercentages([]);
+        }
+    }, [words]);
+
+    const changeSortOrder = (primaryIndex) => {
+        let i;
+        for (i=0; i < sortOrder.length; i++) {
+            if (sortOrder[i].index === primaryIndex) {
+                break;
+            }
+        }
+        const [item] = sortOrder.splice(i, 1);
+        sortOrder.unshift(item);
+        const newWordPercentages = wordPercentages.slice();
+        ArrayUtils.sortArrayOfArrays(newWordPercentages, sortOrder);
+        setWordPercentages(newWordPercentages);
+    }
     
-    if (curLetterLoc.rowIndex >= 0 && words !== null) {
-        let wordPercentages:wordPercentagesType;    
-        [ , , wordPercentages] = stats(words);
-        
+    if (wordPercentages.length > 0) {
         return (
             <div className="stats" id="statsTable">
             <table className="statTable">
                 <thead>
-                <tr><th>words<br/>({wordCount})</th><th>letter<br/>scores</th><th>place<br/>scores</th></tr>
+                <tr>
+                    <th>
+                        <button onClick={() => {changeSortOrder(1)}} >
+                            words<br/>({wordCount})
+                        </button>
+                    </th>
+                    <th>
+                        <button onClick={() => {changeSortOrder(0)}} >
+                            letter<br/>scores
+                        </button>
+                    </th>
+                    <th>
+                        <button onClick={() => {changeSortOrder(2)}} >
+                            place<br/>scores
+                        </button>
+                    </th>
+                </tr>
                 </thead>
                 <tbody>
                 {wordPercentages.map( wordInfo => {

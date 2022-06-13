@@ -146,8 +146,6 @@ const App = () => {
           onRotateLetterState,
           switchToBoard,
           onShowHelp,
-          words,
-          setWords,
         }}
       >
         <div className='row'>
@@ -156,7 +154,7 @@ const App = () => {
             <Keyboard />
           </div>
           <div className='stats collumn'>
-            <WordStats />
+            <WordStats words={words}/>
           </div>
         </div>
       </AppContext.Provider>

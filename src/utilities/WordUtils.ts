@@ -2,11 +2,19 @@ import * as ArrayUtils from './ArrayUtils';
 import * as WordleDict from '../data/dictionaries/Wordle'
 
 let gVerbose = false;
+let wordlePicksPartitions: StringToStringToArrayMap;
 
 export interface StringMap {[key: string]: string; }
 export interface StringToNumberMap {[key: string]: number; }
 export interface StringToArrayMap {[key: string]: string[]; }
 export interface StringToStringToArrayMap {[key: string]: StringToArrayMap; }
+export interface StringToStringToNumberMap {[key: string]: StringToNumberMap; }
+export interface partitionWordStat {
+	numberOfGroups : number,
+	averageGroupSize : number,
+	largestGroup : number,
+}
+export type partionStats = [string, partitionWordStat];
 
 export const setVerbose = (verbose:boolean):void => {
 	gVerbose = verbose;
@@ -213,8 +221,8 @@ export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists
 }
 
 export type wordPercentagesType = [number, string, number, number[]][];
-
-export const stats = (words: string[]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
+export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderType[] = [{index: 0, decending: false}, {index: 2, decending: true}, {index: 1, decending: false}]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
+	if (!words) { words = []};
 	let letters;
 	let lettersUnique;
 	const placements = [];
@@ -255,7 +263,7 @@ export const stats = (words: string[]):[StringToNumberMap, [number, string][], w
 		})
 		wordPercentages.push([wordPercent, word, placement.reduce( (a, b) => a + b), placement]);
 	})
-	wordPercentages.sort((a, b) => a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : a[2] < b[2] ? 1 : a[2] > b[2] ? -1 : 0);
+	ArrayUtils.sortArrayOfArrays(wordPercentages, sortOrder);
 	return [letterFreq, percentages, wordPercentages];
 }
 /**
@@ -436,6 +444,73 @@ export const getWordlePartitions = (words:string[], picks:string[]):StringToStri
 	}
 	return result;
 }
+
+export const getWordlePicksPartitions = (words:string[] = null):StringToStringToArrayMap => {
+	if (!wordlePicksPartitions) {
+		const picks = WordleDict.wordlePicks();
+		wordlePicksPartitions = getWordlePartitions(picks, picks);
+	}
+	return filterWordlePicksPartitions(words, wordlePicksPartitions);
+}
+
+export const filterWordlePicksPartitions = (words:string[], wpp:StringToStringToArrayMap):StringToStringToArrayMap => {
+	let result:StringToStringToArrayMap = {};
+	if (!wpp) {
+		console.error("no base word partion passed in");
+		return result;
+	}
+	if (words) {
+		const wordsLU = makeLookupMap(words);
+		for(const word in wpp) {
+			const wordPartition = {};
+			for(const clues in wpp[word]) {
+				const newPartition = wpp[word][clues].filter(word => wordsLU[word]);
+				if (newPartition.length > 0) {
+					wordPartition[clues] = newPartition;
+				}
+			}
+			if (Object.keys(wordPartition).length > 0) {
+				result[word] = wordPartition;
+			}
+		}
+		return result;
+	} else {
+		return wpp;
+	}
+}
+
+export const getStatsFromPartition = (wpp:StringToStringToArrayMap):partionStats[] => {
+	const result:partionStats[] = [];
+	for (const word in wpp) {
+		let wordCount = 0;
+		let partitionCount = 0;
+		let largestGroup = 0;
+		for(const clues in wpp[word]) {
+			partitionCount++;
+			const groupCount = wpp[word][clues].length;
+			wordCount += groupCount;
+			if (largestGroup < groupCount) {
+				largestGroup = groupCount;
+			}
+		}
+		result.push( [word, {
+				numberOfGroups : partitionCount,
+				averageGroupSize : wordCount / partitionCount,
+				largestGroup : largestGroup,
+			}]);
+	}
+	result.sort((a:partionStats, b:partionStats) => {
+		const numberOfGroupsCmp = b[1].numberOfGroups - a[1].numberOfGroups;
+		return numberOfGroupsCmp === 0 ? a[1].largestGroup - b[1].largestGroup : numberOfGroupsCmp
+	})
+	return result;
+}
+
+// type wordleDisplayStatsType = [string, number, number, number, number, number]
+// export const wordleDisplayStats = (maxWords:number = 0):wordleDisplayStatsType[] {
+	
+
+// }
 
 /**
  * @param  {string[]} words

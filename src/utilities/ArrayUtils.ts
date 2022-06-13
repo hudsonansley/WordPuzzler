@@ -78,3 +78,22 @@ export const keyCountIncrement = (keys:{[key:string]: number}, key:string):void 
 	}
 }
 
+export type sortOrderType = {index: number, decending: boolean};
+/**
+ * @param  {[][]} array
+ * @param  {sortOrderType[]} sortOrder
+ */
+export const sortArrayOfArrays = (array, sortOrder) => {
+	array.sort((a, b) => {
+		let result = 0;
+		let index = 0;
+		while (result === 0 && index < sortOrder.length) {
+			const sortIndex = sortOrder[index].index;
+			const orderMod = sortOrder[index].decending ? -1 : 1;
+			result = orderMod * (a[sortIndex] > b[sortIndex] ? -1 : a[sortIndex] < b[sortIndex] ? 1 : 0);
+			index++;
+		}
+		return result;
+	});
+}
+

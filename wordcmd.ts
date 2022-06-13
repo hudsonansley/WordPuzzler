@@ -1,7 +1,7 @@
 import * as WordUtils from './src/utilities/WordUtils';
 import { english3 } from './src/data/dictionaries/English'
 import { wordlePicks, wordleDecoys } from './src/data/dictionaries/Wordle'
-import fs from 'fs'
+// import fs from 'fs'
 
 // function readTextFile(file, path = "dictionaries/") {
 // 	var fs = require('fs');
@@ -29,10 +29,18 @@ export const runChecks = (words: string[], mArgs:string[]):string[] => {
 }
 
 /* generate the wordle partition json files
-const pWords = wordleDecoys(); //.slice(0, 100);
+
+// const pWords = WordUtils.wordle(wordlePicks(), "t/r-a/c-e-_s-n-o=u-t=");
+const pWords0 = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s=l-a-i/n-");
+const pWords1 = WordUtils.wordle(wordlePicks(), "t-r-a=c-e-_s-l-a=i-n-");
+const pWords2 = WordUtils.wordle(wordlePicks(), "t-r-a-c-e=_s-l-a-i/n/");
+const pWords3 = WordUtils.wordle(wordlePicks(), "t-r-a/c-e=_s-l/a/i-n-");
+const pWords = [...new Set([...pWords0, ...pWords1, ...pWords2, ...pWords3])]; //])]; //
 const picks = wordlePicks();
-const parts = WordUtils.getWordlePartitions(pWords, picks);
-fs.writeFileSync('parts_decoys.json', JSON.stringify(parts), 'utf8');
+const parts = WordUtils.getWordlePartitions(picks, pWords);
+// const parts = WordUtils.getWordlePicksPartitions();
+const stats = WordUtils.getStatsFromPartition(parts);
+fs.writeFileSync('partqStats.json', JSON.stringify(stats), 'utf8');
 */
 
 const verbose = true;
@@ -49,7 +57,7 @@ let firstCmd = args[0];
 const results = runChecks(words, args);
 if (verbose) {
 	if (firstCmd === "wordle") {
-		const [letterFreq, percentages, wordPercentages] = WordUtils.stats(results);
+		const [letterFreq, percentages, wordPercentages] = WordUtils.wordleFreqStats(results);
 		console.log(letterFreq);
 		console.log(percentages);
 		let n = Math.min(results.length, numWords);
