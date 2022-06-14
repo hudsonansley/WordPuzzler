@@ -44,9 +44,7 @@ const App = () => {
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
-
-    // get stats and update stats panel
-    // WordUtils.setVerbose(true);
+    WordUtils.initWordlePartitions(); //TODO: set a wait indication
     const wordsLeft = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
     setWords(wordsLeft);
   }

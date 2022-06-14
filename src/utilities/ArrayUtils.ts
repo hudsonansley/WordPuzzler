@@ -96,4 +96,26 @@ export const sortArrayOfArrays = (array, sortOrder) => {
 		return result;
 	});
 }
-
+/**
+ * @param  {T[]} a1 
+ * @param  {T[]} a2
+ * a1 and a2 must both be sorted in the same direction
+ *  and contain the same type of items
+ * takes O(n) time
+ */
+export const sortedArraysIntersection = <T>(a1:T[], a2:T[]) => {
+	let i = 0, j = 0;
+	const result:T[] = [];
+	while (i < a1.length && j < a2.length) {
+		if (a1[i] === a2[j]) {
+			result.push(a1[i]);
+			i++;
+			j++;
+		} else if (a1[i] < a2[j]) {
+			i++;
+		} else {
+			j++;
+		}
+	}
+	return result;
+}

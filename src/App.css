@@ -100,7 +100,12 @@ tr {
   min-height: 0;
   height: 0;
 }
-tr:nth-child(odd) {background-color: #404040;}
+.possible {
+  background-color: #008000;
+}
+.impossible {
+  background-color: #800000;
+}
 
 td th {
   line-height: 14px;
@@ -158,9 +163,9 @@ tbody {
 }
 
 .key {
-  width: 40px;
-  height: 40px;
-  margin: 3px;
+  width: 30px;
+  height: 30px;
+  margin: 2px;
   border-radius: 3px;
   display: grid;
   place-items: center;
@@ -172,10 +177,10 @@ tbody {
 }
 
 .big {
-  width: 100px;
+  width: 75px;
 }
 .spacebar {
-  width: 300px;
+  width: 225px;
 }
 .disabled {
   background-color: #3a393c;

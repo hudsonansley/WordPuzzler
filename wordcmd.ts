@@ -1,7 +1,7 @@
 import * as WordUtils from './src/utilities/WordUtils';
 import { english3 } from './src/data/dictionaries/English'
 import { wordlePicks, wordleDecoys } from './src/data/dictionaries/Wordle'
-// import fs from 'fs'
+import fs from 'fs'
 
 // function readTextFile(file, path = "dictionaries/") {
 // 	var fs = require('fs');
@@ -30,19 +30,20 @@ export const runChecks = (words: string[], mArgs:string[]):string[] => {
 
 /* generate the wordle partition json files
 
-// const pWords = WordUtils.wordle(wordlePicks(), "t/r-a/c-e-_s-n-o=u-t=");
-const pWords0 = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s=l-a-i/n-");
-const pWords1 = WordUtils.wordle(wordlePicks(), "t-r-a=c-e-_s-l-a=i-n-");
-const pWords2 = WordUtils.wordle(wordlePicks(), "t-r-a-c-e=_s-l-a-i/n/");
-const pWords3 = WordUtils.wordle(wordlePicks(), "t-r-a/c-e=_s-l/a/i-n-");
-const pWords = [...new Set([...pWords0, ...pWords1, ...pWords2, ...pWords3])]; //])]; //
+const pWords = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s-u-r/l-y-");
+// const pWords0 = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s=l-a-i/n-");
+// const pWords1 = WordUtils.wordle(wordlePicks(), "t-r-a=c-e-_s-l-a=i-n-");
+// const pWords2 = WordUtils.wordle(wordlePicks(), "t-r-a-c-e=_s-l-a-i/n/");
+// const pWords3 = WordUtils.wordle(wordlePicks(), "t-r-a/c-e=_s-l/a/i-n-");
+// const pWords = [...new Set([...pWords0, ...pWords1, ...pWords2, ...pWords3])]; //])]; //
 const picks = wordlePicks();
 const parts = WordUtils.getWordlePartitions(picks, pWords);
 // const parts = WordUtils.getWordlePicksPartitions();
 const stats = WordUtils.getStatsFromPartition(parts);
-fs.writeFileSync('partqStats.json', JSON.stringify(stats), 'utf8');
+fs.writeFileSync('partStats.json', JSON.stringify(stats), 'utf8');
 */
 
+// /*
 const verbose = true;
 const numWords = 20; //TODO: set these with options
 WordUtils.setVerbose(verbose);
@@ -72,3 +73,4 @@ if (verbose) {
 	console.dir(uniqueWords);
 	console.log(uniqueWords.length);
 }
+// */

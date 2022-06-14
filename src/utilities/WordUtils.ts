@@ -2,7 +2,7 @@ import * as ArrayUtils from './ArrayUtils';
 import * as WordleDict from '../data/dictionaries/Wordle'
 
 let gVerbose = false;
-let wordlePicksPartitions: StringToStringToArrayMap;
+export let wordlePicksPartitions: StringToStringToArrayMap;
 
 export interface StringMap {[key: string]: string; }
 export interface StringToNumberMap {[key: string]: number; }
@@ -445,11 +445,15 @@ export const getWordlePartitions = (words:string[], picks:string[]):StringToStri
 	return result;
 }
 
-export const getWordlePicksPartitions = (words:string[] = null):StringToStringToArrayMap => {
+export function initWordlePartitions() {
 	if (!wordlePicksPartitions) {
 		const picks = WordleDict.wordlePicks();
 		wordlePicksPartitions = getWordlePartitions(picks, picks);
 	}
+}
+
+export function getWordlePicksPartitions(words: string[] = null): StringToStringToArrayMap {
+	initWordlePartitions();
 	return filterWordlePicksPartitions(words, wordlePicksPartitions);
 }
 
@@ -506,11 +510,45 @@ export const getStatsFromPartition = (wpp:StringToStringToArrayMap):partionStats
 	return result;
 }
 
-// type wordleDisplayStatsType = [string, number, number, number, number, number]
-// export const wordleDisplayStats = (maxWords:number = 0):wordleDisplayStatsType[] {
-	
-
-// }
+type wordleDisplayStatsType = [string, number, number, number];
+export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderType[], maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
+	if (!wordlePicksPartitions) {
+		console.error("getWordleDisplayStats before partitions resolved");
+		return [];
+	}
+	const partitions = filterWordlePicksPartitions(words, wordlePicksPartitions);
+	const partStats = getStatsFromPartition(partitions);
+	const freqStats = {};
+	wordleFreqStats(words)[2].forEach(stat => {
+		freqStats[stat[1]] = stat[0];
+	});
+	const result:wordleDisplayStatsType[] = [];
+	const wordCount = words.length;
+	for (let i = 0; i < partStats.length; i++) {
+		const partStat = partStats[i];
+		const word = partStat[0];
+		const freqStat:number = freqStats[word] ?? 0;
+		if (freqStat > 0) {
+			result.push([word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat]);
+		}
+	}
+	if (result[0] && result[0][1] - 1 > 0.000001) {
+		let n = Math.min(wordCount, maxNonPickWords);
+		let i = 0;
+		while (n > 0) {
+			const partStat = partStats[i];
+			const word = partStat[0];
+			const freqStat:number = freqStats[word] ?? 0;
+			if (freqStat === 0) {
+				n--;
+				result.push([word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat]);
+			}
+			i++;
+		}
+	}
+	ArrayUtils.sortArrayOfArrays(result, sortOrder);
+	return result;
+}
 
 /**
  * @param  {string[]} words

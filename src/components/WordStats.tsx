@@ -1,19 +1,17 @@
 import React, { useContext, useState, useEffect }  from "react";
-import { AppContext } from "../App";
-import { wordleFreqStats } from '../utilities/WordUtils';
+import { getWordleDisplayStats } from '../utilities/WordUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
 
 const WordStats = ({words}) => {
-    const sortOrder: ArrayUtils.sortOrderType[] = [{index: 0, decending: false}, {index: 2, decending: false}, {index: 1, decending: true}];
-    // const { curLetterLoc } = useContext(AppContext);
-    const [ wordPercentages, setWordPercentages] = useState([]);
+    const sortOrder: ArrayUtils.sortOrderType[] = [{index: 1, decending: true}, {index: 2, decending: true}, {index: 3, decending: false}, {index: 0, decending: true}];
+    const [ wordleDisplayStats, setWordleDisplayStats ] = useState([]);
     const wordCount = words?.length;
 
     useEffect (() => {
         if (words) { 
-            setWordPercentages(wordleFreqStats(words, sortOrder)[2]);
+            setWordleDisplayStats(getWordleDisplayStats(words, sortOrder));
         } else {
-            setWordPercentages([]);
+            setWordleDisplayStats([]);
         }
     }, [words]);
 
@@ -26,49 +24,63 @@ const WordStats = ({words}) => {
         }
         const [item] = sortOrder.splice(i, 1);
         sortOrder.unshift(item);
-        const newWordPercentages = wordPercentages.slice();
-        ArrayUtils.sortArrayOfArrays(newWordPercentages, sortOrder);
-        setWordPercentages(newWordPercentages);
+        const newWordleDisplayStats = wordleDisplayStats.slice();
+        ArrayUtils.sortArrayOfArrays(newWordleDisplayStats, sortOrder);
+        setWordleDisplayStats(newWordleDisplayStats);
     }
     
-    if (wordPercentages.length > 0) {
-        return (
-            <div className="stats" id="statsTable">
-            <table className="statTable">
-                <thead>
-                <tr>
-                    <th>
-                        <button onClick={() => {changeSortOrder(1)}} >
-                            words<br/>({wordCount})
-                        </button>
-                    </th>
-                    <th>
-                        <button onClick={() => {changeSortOrder(0)}} >
-                            letter<br/>scores
-                        </button>
-                    </th>
-                    <th>
-                        <button onClick={() => {changeSortOrder(2)}} >
-                            place<br/>scores
-                        </button>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {wordPercentages.map( wordInfo => {
-                    return (
-                        <tr key={wordInfo[1]}>
-                            <td key="word">{wordInfo[1]}</td>
-                            <td key="score">{wordInfo[0].toFixed(4)}</td>
-                            <td key="placement">{(wordInfo[2] / wordCount).toFixed(4)}</td>
+    if (words) {
+        if (wordleDisplayStats.length > 0) {
+            return (
+                    <div className="stats" id="statsTable">
+                    <table className="statTable">
+                        <thead>
+                        <tr>
+                            <th>
+                                <button onClick={() => {changeSortOrder(0)}} >
+                                    words<br/>({wordCount})
+                                </button>
+                            </th>
+                            <th>
+                                <button onClick={() => {changeSortOrder(1)}} >
+                                    average<br/>group size
+                                </button>
+                            </th>
+                            <th>
+                                <button onClick={() => {changeSortOrder(2)}} >
+                                    max<br/>group size
+                                </button>
+                            </th>
+                            <th>
+                                <button onClick={() => {changeSortOrder(3)}} >
+                                    letter<br/>scores
+                                </button>
+                            </th>
                         </tr>
-                        )
-                    })
-                }
-                </tbody>
-            </table>
-            </div>
-        )
+                        </thead>
+                        <tbody>
+                        {wordleDisplayStats.map( wordInfo => {
+                            return (
+                                <tr className={wordInfo[3] > 0 ? "possible" : "impossible"} key={wordInfo[0]} >
+                                    <td key="word">{wordInfo[0]}</td>
+                                    <td key="avgGrpSize">{wordInfo[1].toFixed(3)}</td>
+                                    <td key="maxGrpSize">{wordInfo[2].toFixed(3)}</td>
+                                    <td key="placementScore">{Math.round(1000 * wordInfo[3])}</td>
+                                </tr>
+                                )
+                            })
+                        }
+                        </tbody>
+                    </table>
+                    </div>
+                )
+            } else {
+                return (
+                    <div className="stats help">
+                        The list resulting from the entries has zero words. There likely is a contradiction that needs to be corrected.
+                    </div>
+                )
+            }
     } else {
         return (
             <div className="stats help">
