@@ -77,7 +77,8 @@ const WordStats = ({words}) => {
             } else {
                 return (
                     <div className="stats help">
-                        The list resulting from the entries has zero words. There likely is a contradiction that needs to be corrected.
+                        The list resulting from the entries has zero words.
+                        There likely is a contradiction that needs to be corrected.
                     </div>
                 )
             }

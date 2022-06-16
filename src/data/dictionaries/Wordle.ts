@@ -1,10 +1,4 @@
-export const wordleAll = ():string[] => {
-    const result = wordlePicks().concat(wordleDecoys());
-    result.sort();
-    return result;
-}
-
-export const wordlePicks = ():string[] => {
+const getWordlePicks = ():string[] => {
     return [
 "aback",
 "abase",
@@ -2324,7 +2318,7 @@ export const wordlePicks = ():string[] => {
     ]
 }
 
-export const wordleDecoys = ():string[] => {
+const getWordleDecoys = ():string[] => {
     return [
 "aahed",
 "aalii",
@@ -12985,3 +12979,15 @@ export const wordleDecoys = ():string[] => {
 "zymic",
     ]
 }
+
+export const wordlePicks = getWordlePicks();
+export const wordleDecoys = getWordleDecoys();
+
+const getWordleAll = ():string[] => {
+    const result = wordlePicks.concat(wordleDecoys);
+    result.sort();
+    return result;
+}
+
+export const wordleAll = getWordleAll();
+

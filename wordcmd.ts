@@ -30,17 +30,18 @@ export const runChecks = (words: string[], mArgs:string[]):string[] => {
 
 /* generate the wordle partition json files
 
-const pWords = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s-u-r/l-y-");
-// const pWords0 = WordUtils.wordle(wordlePicks(), "t-r/a-c-e-_s=l-a-i/n-");
-// const pWords1 = WordUtils.wordle(wordlePicks(), "t-r-a=c-e-_s-l-a=i-n-");
-// const pWords2 = WordUtils.wordle(wordlePicks(), "t-r-a-c-e=_s-l-a-i/n/");
-// const pWords3 = WordUtils.wordle(wordlePicks(), "t-r-a/c-e=_s-l/a/i-n-");
+// const pWords = WordUtils.wordle(wordlePicks, "t-r/a-c-e-_s-u-r/l-y-");
+// const pWords0 = WordUtils.wordle(wordlePicks, "t-r/a-c-e-_s=l-a-i/n-");
+// const pWords1 = WordUtils.wordle(wordlePicks, "t-r-a=c-e-_s-l-a=i-n-");
+// const pWords2 = WordUtils.wordle(wordlePicks, "t-r-a-c-e=_s-l-a-i/n/");
+// const pWords3 = WordUtils.wordle(wordlePicks, "t-r-a/c-e=_s-l/a/i-n-");
 // const pWords = [...new Set([...pWords0, ...pWords1, ...pWords2, ...pWords3])]; //])]; //
-const picks = wordlePicks();
-const parts = WordUtils.getWordlePartitions(picks, pWords);
+const picks = wordlePicks;
+// const parts = WordUtils.getWordlePartitions(picks, pWords);
 // const parts = WordUtils.getWordlePicksPartitions();
-const stats = WordUtils.getStatsFromPartition(parts);
-fs.writeFileSync('partStats.json', JSON.stringify(stats), 'utf8');
+// const stats = WordUtils.getStatsFromPartition(parts);
+const partsByIndex = WordUtils.getWordleIndexPartitions(picks, picks);
+fs.writeFileSync('partsByIndex.json', JSON.stringify(partsByIndex), 'utf8');
 */
 
 // /*

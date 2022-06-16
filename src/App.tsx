@@ -17,8 +17,6 @@ const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardInd
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
 //TODO? make storage buttons reflect clues
-//TODO? add partitioning information to stats
-//TODO? allow stats to sort when clicked on column top
 
 const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
@@ -40,11 +38,11 @@ const App = () => {
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
 
-    const wordsAll = WordleDict.wordleAll();
+    const wordsAll = WordleDict.wordleAll;
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
-    WordUtils.initWordlePartitions(); //TODO: set a wait indication
+    WordUtils.initWordleIndexPartitions(); //TODO: set a wait indication
     const wordsLeft = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
     setWords(wordsLeft);
   }

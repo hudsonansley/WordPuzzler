@@ -1,9 +1,9 @@
 import * as WordleDict from './Wordle'
 
 test('Wordle.wordleAll has wordle some picks and decoys and not other words', () => {
-    const wordleAll = WordleDict.wordleAll();
-    const wordlePicks = WordleDict.wordlePicks();
-    const wordleDecoys = WordleDict.wordleDecoys();
+    const wordleAll = WordleDict.wordleAll;
+    const wordlePicks = WordleDict.wordlePicks;
+    const wordleDecoys = WordleDict.wordleDecoys;
 
     expect(wordleDecoys).toContain("orate");
     expect(wordlePicks).not.toContain("orate");
