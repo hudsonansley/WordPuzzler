@@ -1,6 +1,7 @@
 import './App.css';
 
 import React, { useState, createContext } from 'react';
+
 import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
@@ -22,7 +23,8 @@ const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [words, setWords] = useState(null);
-
+  const [ready, setReady] = useState(true);
+ 
   const onShowHelp = () => {
     setWords(null);
   }
@@ -42,9 +44,17 @@ const App = () => {
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
-    WordUtils.initWordleIndexPartitions(); //TODO: set a wait indication
-    const wordsLeft = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
-    setWords(wordsLeft);
+    
+    if (WordUtils.wordlePicksIndexPartitions) {
+      setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
+    } else {
+      setReady(false);
+      setTimeout(() => {
+        WordUtils.calcWordleIndexPartitions();
+        setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
+        setReady(true);
+      })
+    }
   }
 
   const onDelete = () => {
@@ -149,9 +159,16 @@ const App = () => {
             <Board />
             <Keyboard />
           </div>
-          <div className='stats collumn'>
-            <WordStats words={words}/>
-          </div>
+          { ready ? (
+            <div className='stats collumn'>
+              <WordStats words={words}/>
+            </div>
+           ) : (
+            <div className='stats collumn'>
+              creating initial wordle partitions...
+            </div>
+           )
+          }
         </div>
       </AppContext.Provider>
     </div>

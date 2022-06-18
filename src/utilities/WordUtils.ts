@@ -1,8 +1,5 @@
 import * as ArrayUtils from './ArrayUtils';
 import * as WordleDict from '../data/dictionaries/Wordle';
-// import { wordlePicksIndexPartitions } from '../data/PartitionsByIndex.js';
-
-// let wordlePicksIndexPartitions = require('../data/partsByIndex.json');
 
 let gVerbose = false;
 let wordlePicksPartitions: StringToStringToArrayMap;
@@ -448,11 +445,14 @@ export const getWordleClues = (word:string, pick:string):string => {
 	return clues.join("");
 }
 
-let wordlePicksIndexPartitions: number[][][];
+export let wordlePicksIndexPartitions: number[][][];
+export function calcWordleIndexPartitions() {
+	const picks = WordleDict.wordlePicks;
+	wordlePicksIndexPartitions = getWordleIndexPartitions(picks, picks);
+}
 export function initWordleIndexPartitions() {
 	if (!wordlePicksIndexPartitions) {
-		const picks = WordleDict.wordlePicks;
-		wordlePicksIndexPartitions = getWordleIndexPartitions(picks, picks);
+		calcWordleIndexPartitions();
 	}
 }
 

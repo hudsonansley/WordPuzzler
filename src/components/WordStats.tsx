@@ -1,9 +1,10 @@
-import React, { useContext, useState, useEffect }  from "react";
+import React, { useState, useEffect }  from "react";
 import { getWordleDisplayStats } from '../utilities/WordUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
 
+const sortOrder: ArrayUtils.sortOrderType[] = [{index: 1, decending: true}, {index: 2, decending: true}, {index: 3, decending: false}, {index: 0, decending: true}];
+
 const WordStats = ({words}) => {
-    const sortOrder: ArrayUtils.sortOrderType[] = [{index: 1, decending: true}, {index: 2, decending: true}, {index: 3, decending: false}, {index: 0, decending: true}];
     const [ wordleDisplayStats, setWordleDisplayStats ] = useState([]);
     const wordCount = words?.length;
 
