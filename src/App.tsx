@@ -44,7 +44,7 @@ const App = () => {
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
-    
+
     if (WordUtils.wordlePicksIndexPartitions) {
       setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
     } else {
@@ -115,7 +115,7 @@ const App = () => {
     const bgClassName = (index === currentBoardIndex) ? "bg-gray-600" : "bg-gray-500";
     return (
       <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
-        <div className={`${bgClassName} text-center rounded-lg box-border pl-2.5 pr-4 border-2`}>{index}</div>
+        <div className={`${bgClassName} text-center rounded-lg box-border pl-2.5 pr-4 border-2`}>{index + 1}</div>
       </button>
     )
   }

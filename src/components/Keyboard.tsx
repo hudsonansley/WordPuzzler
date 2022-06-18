@@ -33,8 +33,8 @@ const Keyboard = () => {
         onRotateLetterState(curLetterLoc);
       } else if (event.key === "?" || event.key === "/") {
         onShowHelp();
-      } else if (event.key >= "0" && event.key <= "3") {
-        switchToBoard(parseInt(event.key));
+      } else if (event.key >= "1" && event.key <= "4") {
+        switchToBoard(parseInt(event.key) - 1);
       } else {
         keys.forEach(row => { row.forEach(key => {
           if (event.key.toLowerCase() === key.toLowerCase()) {
