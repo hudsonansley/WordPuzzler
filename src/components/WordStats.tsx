@@ -91,12 +91,13 @@ const WordStats = ({words}) => {
                 Toggle the letter placement color to match your wordle entries with the space bar for the last letter entered, or by tapping a letter.
                 <p/>
                 A list of the possible words will be shown here, 
-                sorted by their letter score 
-                (max of 1.0, based on the frequency of each unique letter of the word in the current word list) 
-                and breaks ties with the letter placement 
-                (max of 5.0. based on how many of the current word list share the same letter location)
+                sorted by their group score
+                (the number of words remaining devided by the number of groups)
                 <p/>
-                You can use "0" to "3" to switch between four boards with the same words but 
+                Rows in red are not in the list of possible answers, those 
+                in green are.
+                <p/>
+                You can use "1" to "4" to switch between four boards with the same words but 
                 different target words, for use with a variation like Quordle.
             </div>
         )

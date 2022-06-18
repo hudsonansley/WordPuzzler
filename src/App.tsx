@@ -165,7 +165,7 @@ const App = () => {
             </div>
            ) : (
             <div className='stats collumn'>
-              creating initial wordle partitions...
+              calculating initial wordle groups...
             </div>
            )
           }
