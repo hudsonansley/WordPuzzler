@@ -30,6 +30,16 @@ const App = () => {
   }
 
   const onEnter = () => {
+    const wordsAll = WordleDict.wordleAll;
+    if (storedBoardStates[currentBoardIndex] === "") {
+      setReady(false);
+      setTimeout(() => {
+        WordUtils.calcWordleMaxIndexPartitions();
+        setWords(WordleDict.wordlePicks);
+        setReady(true);
+      }, 100);
+      return;
+    }
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
       alert("Fill in full word to calculate words remaining")
       return;
@@ -40,7 +50,6 @@ const App = () => {
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
 
-    const wordsAll = WordleDict.wordleAll;
     if (wordsAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
@@ -53,7 +62,7 @@ const App = () => {
         WordUtils.calcWordleIndexPartitions();
         setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
         setReady(true);
-      })
+      }, 100)
     }
   }
 

@@ -46,7 +46,6 @@ nav h1 {
   flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
-  overflow: hidden;
 }
 
 .column {
