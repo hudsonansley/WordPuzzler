@@ -54,14 +54,11 @@ export const addNoRepeatsArrays = <T>(arrays: T[][], item: T, i: number):void =>
  * Adds given item to the given array if the item does not already exist in the array
  */
 export const addNoRepeats = <T>(array: T[], item: T):boolean => {
-	if (array) {
-		if (array.indexOf(item) < 0) {
-			array.push(item);
-			return true;
-		} else {
-			return false;
-		}
+	if (array && array.indexOf(item) < 0) {
+		array.push(item);
+		return true;
 	}
+	return false;
 }
 /**
  * @param  {{[key:string]:number}} keys
@@ -83,8 +80,8 @@ export type sortOrderType = {index: number, decending: boolean};
  * @param  {[][]} array
  * @param  {sortOrderType[]} sortOrder
  */
-export const sortArrayOfArrays = (array, sortOrder) => {
-	array.sort((a, b) => {
+export const sortArrayOfArrays = (array:any[][], sortOrder:sortOrderType[]) => {
+	array.sort((a:any[], b:any[]) => {
 		let result = 0;
 		let index = 0;
 		while (result === 0 && index < sortOrder.length) {
@@ -117,5 +114,51 @@ export const sortedArraysIntersection = <T>(a1:T[], a2:T[]) => {
 			j++;
 		}
 	}
+	return result;
+}
+
+export const nestedArrayOfNumberToInt16Array = (array:number[][][]):Int16Array => {
+	let requiredSize = 0;
+	array.forEach( wordSet => {
+		requiredSize += wordSet.length + 1;
+		wordSet.forEach( group => {
+			requiredSize += group.length;
+		})
+	});
+	const result = new Int16Array( requiredSize);
+	let i = 0;
+	array.forEach( wordSet => {
+		result[i] = -1;
+		i++;
+		wordSet.forEach( group => {
+			result[i] = -2;
+			i++;
+			group.forEach( item => {
+				result[i] = item;
+				i++;
+			});
+		});
+	});
+
+	return result;
+}
+
+export const Int16ArrayToNestedArrayOfNumber = (array:Int16Array):number[][][] => {
+	const result:number[][][] = [];
+	let j:number, i:number = -1;
+	array.forEach( item => {
+		if (item < 0) {
+			if (item === -1) {
+				j = -1;
+				result.push([]);
+				i++;
+			} else if (item === -2) {
+				result[i].push([]);
+				j++;
+			}
+		} else {
+			result[i][j].push(item);
+		}
+	});
 	return result;
 }

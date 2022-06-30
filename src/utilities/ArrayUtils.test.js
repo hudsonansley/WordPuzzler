@@ -37,3 +37,12 @@ test('Array.sortedArraysIntersection properly returns array intersection', () =>
     expect(result === a1).toBeFalsy;
     expect(result === a2).toBeFalsy;
 })
+
+test('Array convert to from Int16Array', () => {
+    let int16Array = new Int16Array( [-1, -2, 1,2,3, -2, 4,5, -2, 6, -1, -2, 7, 8, -2, 9, -2, 10, 11, -1, -2, 12, 13]);
+    let array = ArrayUtils.Int16ArrayToNestedArrayOfNumber(int16Array);
+    let expected = [[[ 1,2,3], [4,5], [6]], [[7, 8], [9], [10, 11]], [[12, 13]]];
+    expect(array).toEqual(expected);
+    array = ArrayUtils.nestedArrayOfNumberToInt16Array(expected);
+    expect(array).toEqual(int16Array);
+})

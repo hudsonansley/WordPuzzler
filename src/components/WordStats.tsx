@@ -1,11 +1,11 @@
 import React, { useState, useEffect }  from "react";
-import { getWordleDisplayStats, filterWordlePicks } from '../utilities/WordUtils';
+import { getWordleDisplayStats, filterWordlePicks, wordleDisplayStatsType } from '../utilities/WordUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
 
 const sortOrder: ArrayUtils.sortOrderType[] = [{index: 1, decending: true}, {index: 2, decending: true}, {index: 3, decending: false}, {index: 0, decending: true}];
 
 const WordStats = ({words}) => {
-    const [ wordleDisplayStats, setWordleDisplayStats ] = useState([]);
+    const [ wordleDisplayStats, setWordleDisplayStats ] = useState<wordleDisplayStatsType[]>([]);
     const wordCount = words ? filterWordlePicks(words).length : 0;
 
     useEffect (() => {

@@ -22,9 +22,9 @@ const initLetterLoc = BoardData.getLetterLoc(initBoard);
 const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
-  const [words, setWords] = useState(null);
+  const [words, setWords] = useState<string[]|null>([]);
   const [ready, setReady] = useState(true);
- 
+
   const onShowHelp = () => {
     setWords(null);
   }
@@ -96,7 +96,7 @@ const App = () => {
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
   }
 
-  const onRotateLetterState = (letterLoc) => {
+  const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
     const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     const letter = newBoard[letterLoc.rowIndex][letterLoc.letterIndex];
     if (BoardData.letterIsBlank(letter)) return;
@@ -106,7 +106,7 @@ const App = () => {
     setBoardStr(newBoardStr);
   }
 
-  const switchToBoard = (boardIndex) => {
+  const switchToBoard = (boardIndex:number) => {
     currentBoardIndex = boardIndex;
     const newBoardStr = storedBoardStates[currentBoardIndex];
     setBoardStr(newBoardStr);
@@ -120,7 +120,7 @@ const App = () => {
     }
   }
 
-  const memoryButton = (index) => {
+  const memoryButton = (index:number) => {
     const bgClassName = (index === currentBoardIndex) ? "bg-gray-600" : "bg-gray-500";
     return (
       <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>

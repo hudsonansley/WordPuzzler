@@ -1,10 +1,12 @@
 import * as ArrayUtils from './ArrayUtils';
 import * as WordleDict from '../data/dictionaries/Wordle';
 
+// import { urlToBuffer } from "../utilities/FileUtils"
+
 let gVerbose = false;
-let wordlePicksPartitions: StringToStringToArrayMap;
 
 export interface StringMap {[key: string]: string; }
+export interface StringToBooleanMap {[key: string]: boolean; }
 export interface StringToNumberMap {[key: string]: number; }
 export interface StringToArrayMap {[key: string]: string[]; }
 export interface StringToStringToArrayMap {[key: string]: StringToArrayMap; }
@@ -20,19 +22,19 @@ export const setVerbose = (verbose:boolean):void => {
 	gVerbose = verbose;
 }
 
-const makeLookupMap = (words:string[]):{[key: string]: boolean} => {
-	const results = {};
+const makeLookupMap = (words:string[]):StringToBooleanMap => {
+	const results: StringToBooleanMap = {};
 	words.forEach( word => {
 		results[word] = true;
-	})
+	});
 	return results;
 }
 
-const makeIndexLookupMap = (words:string[]):{[key: string]: number} => {
-	const results = {};
+export const makeIndexLookupMap = (words:string[]):StringToNumberMap => {
+	const results: StringToNumberMap = {};
 	words.forEach( (word, index) => {
 		results[word] = index;
-	})
+	});
 	return results;
 }
 
@@ -44,7 +46,7 @@ const makeIndexLookupMap = (words:string[]):{[key: string]: number} => {
  * E.g.: abcdef => edcbaf
  */
 export const prePals = (words: string[]): string[] => {
-	const results = [];
+	const results: string[] = [];
 	words.forEach( word => {
 		let rev = ArrayUtils.rotate(word.split(''), 1).reverse().join('')
 		if (word === rev) {
@@ -62,7 +64,7 @@ export const prePals = (words: string[]): string[] => {
  * E.g.: abcdef => afedcb
  */
 export const postPals = (words: string[]): string[] => {
-	const results = [];
+	const results: string[] = [];
 	words.forEach( word => {
 		let rev = ArrayUtils.rotate(word.split(''), -1).reverse().join('')
 		if (word === rev) {
@@ -78,10 +80,10 @@ export const postPals = (words: string[]): string[] => {
  * Finds words that can be rotated and still be in the word list
  * Returns a map of words with rotograms and their list of rotograms
  */
-export const rotagrams = (words: string[]):{[key: string]: string[] } => {
+export const rotagrams = (words: string[]):StringToArrayMap => {
 	const wordLU = makeLookupMap(words);
-	const usedWords = {};
-	const results = {};
+	const usedWords: StringToBooleanMap = {};
+	const results:StringToArrayMap = {};
 	words.forEach( word => {
 		if (!usedWords[word]) {
 			let len = word.length;
@@ -118,16 +120,16 @@ export const piglatins = (words: string[]):string[] => {
  * returns a string based on the given word, modifying it using pig latin rules
  */
 const piglatin = (word:string):string => {
-	const isVowel = (letter) => {
+	const isVowel = (letter:string) => {
 		return ["a", "e", "i", "o", "u"].indexOf(letter) >= 0;
 	}
-	const letters = word.split("");
+	const letters:string[] = word.split("");
 	if (isVowel(letters[0])) {
 		letters.push("w", "a", "y");
 	} else if (!isVowel(letters[1])) {
-		letters.push(letters.shift(), letters.shift(), "a", "y");
+		letters.push(letters.shift()!, letters.shift()!, "a", "y");
 	} else { // first letter is consonant, second is vowel
-		letters.push(letters.shift(), "a", "y");
+		letters.push(letters.shift()!, "a", "y");
 	}
 	return letters.join("");
 }
@@ -136,7 +138,7 @@ const piglatin = (word:string):string => {
  * @returns boolean
  * returns true if the input string is a palendrom
  */
-export const isPalendrom = (str):boolean => {
+export const isPalendrom = (str:string):boolean => {
 	let result = true;
 	const letters = str.split("");
 	const n = letters.length;
@@ -163,8 +165,8 @@ export const filterPalendroms = (words: string[]):string[] => {
  */
 export const palendroms = (words: string[]):StringMap => {
 	const wordLU = makeLookupMap(words);
-	const results = {};
-	const skipRev = {};
+	const results:StringMap = {};
+	const skipRev:StringToBooleanMap = {};
 	words.forEach( word => {
 		let rev = word.split('').reverse().join('')
 		if (!results.hasOwnProperty(word) && !results.hasOwnProperty(rev) && wordLU[rev]) {
@@ -233,8 +235,8 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderT
 	if (!words) { words = []};
 	let letters;
 	let lettersUnique;
-	const placements = [];
-	const letterFreq = {};
+	const placements:StringToNumberMap[] = [];
+	const letterFreq:StringToNumberMap = {};
 	let letterCount = 0;
 	words.forEach( word => {
 		letters = word.split("");
@@ -248,8 +250,8 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderT
 			ArrayUtils.keyCountIncrement(placements[i], letter);
 		})
 	})
-	const percentages = [];
-	const percentageByLetter = {};
+	const percentages:[number, string][] = [];
+	const percentageByLetter:StringToNumberMap = {};
 	for (const letter in letterFreq) {
 		let freq = letterFreq[letter] / letterCount;
 		percentages.push([100 * freq, letter]);
@@ -265,7 +267,7 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderT
 		lettersUnique.forEach( letter => {
 			wordPercent += percentageByLetter[letter];
 		})
-		let placement = [];
+		let placement: number[] = [];
 		letters.forEach( (letter, i) => {
 			placement[i] = placements[i]?.[letter] ?? 0;
 		})
@@ -284,7 +286,7 @@ export const withAtLeastLetterCount = (words:string[], letter_count:string):stri
 	const let_count = letter_count.split("_");
 	if (let_count.length !== 2) {
 		console.error("second param of withAtLeastLetterCount should be of the form <letter>_<count>");
-		return
+		return [];
 	}
 	const letter = let_count[0];
 	const count = parseInt(let_count[1]);
@@ -312,22 +314,22 @@ export const withAtLeastLetterCount = (words:string[], letter_count:string):stri
  *  "/" or "?" means the letter is in the word but not in that location (yellow)
  *  "=" means the letter is correct
  * e.g.: "r-a-i-s/e=_s/l-e/p-t/" means first word raise had s somewhere and e in the right place,
- *  second work slept had s e and t somewhere (but not in the right place) 
+ *  second word slept had s e and t somewhere (but not in the right place) 
  */
 export const wordle = (words:string[], clues:string):string[] => {
 	if (clues === "") {
 		return words;
 	}
-	const notLetters = [];
-	const somewhereLetters = [];
-	const correctLetters = [];
-	const atLeastLetters = {};
+	const notLetters:string[][] = [];
+	const somewhereLetters:string[] = [];
+	const correctLetters:string[] = [];
+	const atLeastLetters:StringToNumberMap = {};
 	const rows = clues.toLowerCase().split("_");
 	let n = 0;
 	let wordLen = 0;
 	let error = false;
 	for (const clue of rows) {
-		const atLeastLettersForClue = {};
+		const atLeastLettersForClue:StringToNumberMap = {};
 		const letters = clue.split("");
 		if (n > 0 && n !== letters.length) {
 			console.error(`clue length incorrect: '${clue}'`);
@@ -374,7 +376,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 			}
 		}
 	}
-	if (error) { return};
+	if (error) { return []};
 	const wFuncs: WordFilterFunc[] = [];
 	const wParamLists: string[][] = [];
 	let regex = "^";
@@ -440,9 +442,36 @@ export const getWordleClues = (word:string, pick:string):string => {
 	return clues.join("");
 }
 
-let wordleIndexLUmap;
-let wordleBaseDictionary;
+function checkStatus(response) {
+	if (!response.ok) {
+	  throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+	}
+	return response;
+  }
+
+export async function loadPartitionData() {
+	// this is getting an error that the headers are too big for this file
+	const url = "./data/partsByIndex.ba";
+	fetch(url)
+		.then(response => checkStatus(response) && response.arrayBuffer())
+		.then(buffer => {
+			const wpp = ArrayUtils.Int16ArrayToNestedArrayOfNumber(new Int16Array(buffer));
+			setWordleIndexPartitions(wpp);
+			console.log("partition data set");
+		})
+		.catch(err => console.error(err));
+}
+
+let wordleIndexLUmap:StringToNumberMap;
+let wordleBaseDictionary: string[];
 export let wordlePicksIndexPartitions: number[][][];
+export function setWordleIndexPartitions(wpp:number[][][]) { //for testing
+	if (!wordleIndexLUmap) {
+		wordleBaseDictionary = WordleDict.wordlePicks;
+		wordleIndexLUmap = makeIndexLookupMap(wordleBaseDictionary);
+	}
+	wordlePicksIndexPartitions = wpp;
+}
 export function calcWordleMaxIndexPartitions() {
 	if (!wordleIndexLUmap) {
 		wordleBaseDictionary = WordleDict.wordleAll;
@@ -463,8 +492,12 @@ export function initWordleIndexPartitions() {
 	}
 }
 
-export function getWordlePicksIndexPartitions(words: string[] = null): number[][][] {
-	initWordlePartitions();
+export function setWordleIndexPartitionFromInt16Array(int16Ary:Int16Array) {
+	wordlePicksIndexPartitions = ArrayUtils.Int16ArrayToNestedArrayOfNumber(int16Ary);
+}
+
+export function getWordlePicksIndexPartitions(words: string[]|null = null): number[][][] {
+	initWordleIndexPartitions();
 	return filterWordleIndexPartitions(words, wordlePicksIndexPartitions);
 }
 
@@ -473,7 +506,7 @@ export const getWordleIndexPartitions = (words:string[], picks:string[]):number[
 	for (let word of words) {
 		const wordIndex = wordleIndexLUmap[word];
 		result[wordIndex] = [];
-		const cluesMap = {};
+		const cluesMap:StringToNumberMap = {};
 		for (let pick of picks) {
 			const pickIndex = wordleIndexLUmap[pick];
 			const clues = getWordleClues(word, pick);
@@ -489,9 +522,13 @@ export const getWordleIndexPartitions = (words:string[], picks:string[]):number[
 	return result;
 }
 
-export const filterWordleIndexPartitions = (words:string[], wpp:number[][][]):number[][][] => {
+export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][]):number[][][] => {
 	if (!wpp) {
 		console.error("no base word partion passed in");
+		return [];
+	}
+	if (!wordleIndexLUmap) {
+		console.error("wordleIndexLUmap null");
 		return [];
 	}
 	const n = wpp.length;
@@ -539,89 +576,11 @@ export const getStatsFromIndexPartition = (wpp:number[][][]):partionStats[] => {
 	return result;
 }
 
-export const getWordlePartitions = (words:string[], picks:string[]):StringToStringToArrayMap => {
-	const result:StringToStringToArrayMap = {};
-	for (let word of words) {
-		result[word] = {};
-		for (let pick of picks) {
-			const clues = getWordleClues(word, pick);
-			if (result[word][clues]) {
-				result[word][clues].push(pick);
-			} else {
-				result[word][clues] = [pick];
-			}
-		}
-	}
-	return result;
-}
-
-export function initWordlePartitions() {
-	if (!wordlePicksPartitions) {
-		const picks = WordleDict.wordlePicks;
-		wordlePicksPartitions = getWordlePartitions(picks, picks);
-	}
-}
-
-export function getWordlePicksPartitions(words: string[] = null): StringToStringToArrayMap {
-	initWordlePartitions();
-	return filterWordlePicksPartitions(words, wordlePicksPartitions);
-}
-
-export const filterWordlePicksPartitions = (words:string[], wpp:StringToStringToArrayMap):StringToStringToArrayMap => {
-	let result:StringToStringToArrayMap = {};
-	if (!wpp) {
-		console.error("no base word partion passed in");
-		return result;
-	}
-	if (words) {
-		const wordsLU = makeLookupMap(words);
-		for(const word in wpp) {
-			const wordPartition = {};
-			for(const clues in wpp[word]) {
-				const newPartition = wpp[word][clues].filter(word => wordsLU[word]);
-				if (newPartition.length > 0) {
-					wordPartition[clues] = newPartition;
-				}
-			}
-			if (Object.keys(wordPartition).length > 0) {
-				result[word] = wordPartition;
-			}
-		}
-		return result;
-	} else {
-		return wpp;
-	}
-}
-
-export const getStatsFromPartition = (wpp:StringToStringToArrayMap):partionStats[] => {
-	const result:partionStats[] = [];
-	for (const word in wpp) {
-		let wordCount = 0;
-		let partitionCount = 0;
-		let largestGroup = 0;
-		for(const clues in wpp[word]) {
-			partitionCount++;
-			const groupCount = wpp[word][clues].length;
-			wordCount += groupCount;
-			if (largestGroup < groupCount) {
-				largestGroup = groupCount;
-			}
-		}
-		result.push( [word, {
-				numberOfGroups : partitionCount,
-				averageGroupSize : wordCount / partitionCount,
-				largestGroup : largestGroup,
-			}]);
-	}
-	result.sort((a:partionStats, b:partionStats) => {
-		const numberOfGroupsCmp = b[1].numberOfGroups - a[1].numberOfGroups;
-		return numberOfGroupsCmp === 0 ? a[1].largestGroup - b[1].largestGroup : numberOfGroupsCmp
-	})
-	return result;
-}
-
-type wordleDisplayStatsType = [string, number, number, number];
+export type wordleDisplayStatsType = [string, number, number, number];
 export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderType[], maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
+	if (words.length === 0) {
+		return [];
+	}
 	if (!wordlePicksIndexPartitions) {
 		console.error("getWordleDisplayStats before partitions resolved");
 		return [];
@@ -633,7 +592,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 		partitions = filterWordleIndexPartitions(words, wordlePicksIndexPartitions);
 	}
 	const partStats = getStatsFromIndexPartition(partitions);
-	const freqStats = {};
+	const freqStats:StringToNumberMap = {};
 	wordleFreqStats(words)[2].forEach(stat => {
 		freqStats[stat[1]] = stat[0];
 	});
