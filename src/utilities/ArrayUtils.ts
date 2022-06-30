@@ -139,7 +139,6 @@ export const nestedArrayOfNumberToInt16Array = (array:number[][][]):Int16Array =
 			});
 		});
 	});
-
 	return result;
 }
 

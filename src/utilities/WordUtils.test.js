@@ -173,6 +173,12 @@ test('WordUtils.getWordleClues gets clues properly', () => {
   expected = 'epppp';
   clues = WordUtils.getWordleClues("eaeae", "eeaea");
   expect(clues).toEqual(expected);
+  expected = 'npnpp';
+  clues = WordUtils.getWordleClues("aecde", "edebd");
+  expect(clues).toEqual(expected);
+  expected = 'pppnn';
+  clues = WordUtils.getWordleClues("edebd", "aecde");
+  expect(clues).toEqual(expected);
 })
 
 test('WordUtils.loadWordlePicksPartitions works properly', () => {
