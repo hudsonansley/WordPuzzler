@@ -265,7 +265,7 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderT
 		letters = word.split("");
 		lettersUnique = [...new Set(letters)];
 		lettersUnique.forEach( letter => {
-			wordPercent += percentageByLetter[letter];
+			wordPercent += percentageByLetter[letter] ?? 0;
 		})
 		let placement: number[] = [];
 		letters.forEach( (letter, i) => {
@@ -597,27 +597,37 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 		freqStats[stat[1]] = stat[0];
 	});
 	const result:wordleDisplayStatsType[] = [];
+	const nonAnswerPicks:wordleDisplayStatsType[] = [];
+	const nonAnswerNotPicks:wordleDisplayStatsType[] = [];
 	const wordCount = words.length;
-	for (let i = 0; i < partStats.length; i++) {
+	const picksLU = makeLookupMap(WordleDict.wordlePicks);
+	const wordsLU = makeLookupMap(words);
+for (let i = 0; i < partStats.length; i++) {
 		const partStat = partStats[i];
 		const word = partStat[0];
 		const freqStat:number = freqStats[word] ?? 0;
-		if (freqStat > 0) {
-			result.push([word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat]);
+		const item:wordleDisplayStatsType = [word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat];
+		if (wordsLU[word]) {
+			result.push(item);
+		} else if (picksLU[word]) {
+			nonAnswerPicks.push(item);
+		} else {
+			nonAnswerNotPicks.push(item);
 		}
 	}
+	const dummyBadChoice:wordleDisplayStatsType = ["dummybadchoice", 1000, 10000, 0];
+	nonAnswerPicks.push(dummyBadChoice);
+	nonAnswerNotPicks.push(dummyBadChoice);
+	// only add non-answer words if best possible average group size > 1
 	if (result[0] && result[0][1] - 1 > 0.000001) {
-		let n = Math.min(wordCount, maxNonPickWords);
-		let i = 0;
-		while (n > 0) {
-			const partStat = partStats[i];
-			const word = partStat[0];
-			const freqStat:number = freqStats[word] ?? 0;
-			if (freqStat === 0) {
-				n--;
-				result.push([word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat]);
+		let n = Math.min(2 * wordCount, maxNonPickWords);
+		while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
+			n--;
+			if (nonAnswerPicks[0][1] <= nonAnswerNotPicks[0][1]) {
+				result.push(nonAnswerPicks.shift());
+			} else {
+				result.push(nonAnswerNotPicks.shift());
 			}
-			i++;
 		}
 	}
 	ArrayUtils.sortArrayOfArrays(result, sortOrder);
