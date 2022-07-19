@@ -5,7 +5,7 @@ import React, { useState, createContext } from 'react';
 import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
-import WordStats from "./components/WordStats";
+import { WordStats, StatsState } from "./components/WordStats";
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordUtils from './utilities/WordUtils';
 
@@ -22,22 +22,26 @@ const initLetterLoc = BoardData.getLetterLoc(initBoard);
 const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
-  const [words, setWords] = useState<string[]|null>([]);
-  const [ready, setReady] = useState(true);
+  const [words, setWords] = useState<string[]>([]);
+  const [wordStatsState, setWordStatsState] = useState<StatsState>("help");
+
+  const setWordsAndStatsState = (newWords) => {
+    setWords(newWords);
+    setWordStatsState(newWords.length > 0 ? "normal" : "empty");
+  }
 
   const onShowHelp = () => {
-    setWords(null);
+    setWordStatsState("help");
   }
 
   const onEnter = () => {
     const wordsAll = WordleDict.wordleAll;
     if (storedBoardStates[currentBoardIndex] === "") {
-      setReady(false);
+      setWordStatsState("calculating");
       setTimeout(() => {
         WordUtils.calcWordleMaxIndexPartitions();
-        setWords(WordleDict.wordlePicks);
-        setReady(true);
-      }, 100);
+        setWordsAndStatsState(WordleDict.wordlePicks);
+      }, 1);
       return;
     }
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
@@ -55,14 +59,15 @@ const App = () => {
     }
 
     if (WordUtils.wordlePicksIndexPartitions) {
-      setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
-    } else {
-      setReady(false);
+      const newWords = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
+      setWordsAndStatsState(newWords);
+  } else {
+      setWordStatsState("calculating");
       setTimeout(() => {
         WordUtils.calcWordleIndexPartitions();
-        setWords(WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]));
-        setReady(true);
-      }, 100)
+        const newWords = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
+        setWordsAndStatsState(newWords);
+      }, 1)
     }
   }
 
@@ -168,16 +173,9 @@ const App = () => {
             <Board />
             <Keyboard />
           </div>
-          { ready ? (
-            <div className='stats collumn'>
-              <WordStats words={words}/>
-            </div>
-           ) : (
-            <div className='stats collumn'>
-              calculating initial wordle groups...
-            </div>
-           )
-          }
+          <div className='stats collumn'>
+            <WordStats words={words} wordStatsState={wordStatsState}/>
+          </div>
         </div>
       </AppContext.Provider>
     </div>
