@@ -17,8 +17,6 @@ let currentBoardIndex = 0;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
-//TODO? make storage buttons reflect clues
-
 const App = () => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
@@ -125,6 +123,14 @@ const App = () => {
     }
   }
 
+  const onReset = () => {
+    for (let i = 0; i < storedBoardStates.length; i++) {
+      storedBoardStates[i] = initBoardStr;
+      storedBoardDirty[i] = true;
+    }
+    switchToBoard(0);
+  }
+
   const memoryButton = (index:number) => {
     const bgClassName = (index === currentBoardIndex) ? "bg-gray-600" : "bg-gray-500";
     return (
@@ -134,14 +140,43 @@ const App = () => {
     )
   }
 
+  const navButtonStyle = {
+    display:"flex",
+    direction: "row",
+    alighnItems: "center",
+    padding: 4,
+  }
+
+  const resetButtonStyle = {
+    fontWeight: "bold",
+    fontSize: 24,
+    padding: 8,
+  }
+
+  const helpButtonStyle = {
+    paddingTop: 5,
+  }
+
   return (
     <div className="App">
       <nav>
-        <div>
-          <button id="help-button" onClick={onShowHelp} tabIndex={-1} >
+        <div style={navButtonStyle}>
+          <button 
+            style={helpButtonStyle}
+            id="help-button" 
+            onClick={onShowHelp} 
+            tabIndex={-1} >
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
               <path fill="#ffffff" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></path>
             </svg>
+          </button>
+          <button 
+            style={resetButtonStyle}
+            id="reset-button" 
+            onClick={onReset} 
+            tabIndex={-1} 
+          >
+          &#x27F3;
           </button>
         </div>
         <h1>Wordle Helper</h1>
