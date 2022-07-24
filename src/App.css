@@ -105,6 +105,12 @@ tr {
 .impossible {
   background-color: #800000;
 }
+.groupBg {
+  background-color: #202020;
+}
+.altGroupBg {
+  background-color: #606060;
+}
 
 td th {
   line-height: 14px;

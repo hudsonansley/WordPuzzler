@@ -15,6 +15,7 @@ export interface partitionWordStat {
 	numberOfGroups : number,
 	averageGroupSize : number,
 	largestGroup : number,
+	wordleClues : string,
 }
 export type partionStats = [string, partitionWordStat];
 
@@ -548,10 +549,16 @@ export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][
 	return result;
 }
 
-export const getStatsFromIndexPartition = (wpp:number[][][]):partionStats[] => {
+export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string = ""):partionStats[] => {
 	const n = wpp.length;
 	const result:partionStats[] = Array(n);
+	let wordleClues = "";
+	let word = "";
 	for(let i = 0; i < n; i++) {
+		word = wordleBaseDictionary[i];
+		if (targetWord.length > 0) {
+			wordleClues = getWordleClues(targetWord, word);
+		}
 		const wordGroups = wpp[i];
 		const partitionCount = wordGroups.length;
 		let wordCount = 0;
@@ -563,10 +570,11 @@ export const getStatsFromIndexPartition = (wpp:number[][][]):partionStats[] => {
 				largestGroup = groupCount;
 			}
 		}
-		result[i] = [wordleBaseDictionary[i], {
+		result[i] = [word, {
 			numberOfGroups : partitionCount,
 			averageGroupSize : wordCount / partitionCount,
 			largestGroup : largestGroup,
+			wordleClues : wordleClues,
 		}];
 	}
 	result.sort((a:partionStats, b:partionStats) => {
@@ -576,8 +584,8 @@ export const getStatsFromIndexPartition = (wpp:number[][][]):partionStats[] => {
 	return result;
 }
 
-export type wordleDisplayStatsType = [string, number, number, number];
-export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderType[], maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
+export type wordleDisplayStatsType = [string, string, number, number, number, number, number];
+export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
 	if (words.length === 0) {
 		return [];
 	}
@@ -591,7 +599,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 	} else {
 		partitions = filterWordleIndexPartitions(words, wordlePicksIndexPartitions);
 	}
-	const partStats = getStatsFromIndexPartition(partitions);
+	const partStats = getStatsFromIndexPartition(partitions, targetWord);
 	const freqStats:StringToNumberMap = {};
 	wordleFreqStats(words)[2].forEach(stat => {
 		freqStats[stat[1]] = stat[0];
@@ -602,31 +610,35 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 	const wordCount = words.length;
 	const picksLU = makeLookupMap(WordleDict.wordlePicks);
 	const wordsLU = makeLookupMap(words);
-for (let i = 0; i < partStats.length; i++) {
+	for (let i = 0; i < partStats.length; i++) {
 		const partStat = partStats[i];
 		const word = partStat[0];
 		const freqStat:number = freqStats[word] ?? 0;
-		const item:wordleDisplayStatsType = [word, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat];
+		const item:wordleDisplayStatsType = [word, partStat[1].wordleClues, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat, 0, 0];
 		if (wordsLU[word]) {
 			result.push(item);
-		} else if (picksLU[word]) {
-			nonAnswerPicks.push(item);
-		} else {
-			nonAnswerNotPicks.push(item);
+		} else if (targetWord === "") {
+			if (picksLU[word]) {
+				nonAnswerPicks.push(item);
+			} else {
+				nonAnswerNotPicks.push(item);
+			}
 		}
 	}
-	const dummyBadChoice:wordleDisplayStatsType = ["dummybadchoice", 1000, 10000, 0];
-	nonAnswerPicks.push(dummyBadChoice);
-	nonAnswerNotPicks.push(dummyBadChoice);
-	// only add non-answer words if best possible average group size > 1
-	if (result[0] && result[0][1] - 1 > 0.000001) {
-		let n = Math.min(2 * wordCount, maxNonPickWords);
-		while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
-			n--;
-			if (nonAnswerPicks[0][1] <= nonAnswerNotPicks[0][1]) {
-				result.push(nonAnswerPicks.shift());
-			} else {
-				result.push(nonAnswerNotPicks.shift());
+	if (targetWord === "") {
+		const dummyBadChoice:wordleDisplayStatsType = ["dummybadchoice", "", 1000, 10000, 0, 0, 0];
+		nonAnswerPicks.push(dummyBadChoice);
+		nonAnswerNotPicks.push(dummyBadChoice);
+		// only add non-answer words if best possible average group size > 1
+		if (result[0] && result[0][3] - 1 > 0.000001) {
+			let n = Math.min(Math.floor(1.5 * wordCount), maxNonPickWords);
+			while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
+				n--;
+				if (nonAnswerPicks[0][3] <= nonAnswerNotPicks[0][3]) {
+					result.push(nonAnswerPicks.shift());
+				} else {
+					result.push(nonAnswerNotPicks.shift());
+				}
 			}
 		}
 	}
