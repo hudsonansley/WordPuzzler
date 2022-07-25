@@ -93,6 +93,27 @@ export const sortArrayOfArrays = (array:any[][], sortOrder:sortOrderType[]) => {
 		return result;
 	});
 }
+
+export interface StringToAnyMap {[key: string]: any; }
+export type sortOrderObjType = {index: string, decending: boolean};
+/**
+ * @param  {[][]} array
+ * @param  {sortOrderType[]} sortOrder
+ */
+export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:sortOrderObjType[]) => {
+	array.sort((a:StringToAnyMap, b:StringToAnyMap) => {
+		let result = 0;
+		let index = 0;
+		while (result === 0 && index < sortOrder.length) {
+			const sortIndex = sortOrder[index].index;
+			const orderMod = sortOrder[index].decending ? -1 : 1;
+			result = orderMod * (a[sortIndex] > b[sortIndex] ? -1 : a[sortIndex] < b[sortIndex] ? 1 : 0);
+			index++;
+		}
+		return result;
+	});
+}
+
 /**
  * @param  {T[]} a1 
  * @param  {T[]} a2

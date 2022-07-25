@@ -1,57 +1,64 @@
 import React, { useState, useEffect }  from "react";
-import { getWordleDisplayStats, filterWordlePicks, wordleDisplayStatsType } from '../utilities/WordUtils';
+import { getWordleDisplayStats, filterWordlePicks, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
 
 export type StatsState = "help" | "calculating" | "empty" | "normal";
 type StatsType = "partitions" | "normal";
 
-const initialSortOrder: ArrayUtils.sortOrderType[] = [{index: 2, decending: true}, {index: 3, decending: true}, {index: 4, decending: false}, {index: 0, decending: true}, {index: 1, decending: true}, {index: 5, decending: true}];
-let sortOrder:ArrayUtils.sortOrderType[] = initialSortOrder.slice(); 
+type statsSortOrder = {index: wordleDisplayStatsKeys, decending: boolean};
+const initialSortOrder: statsSortOrder[] = [
+    {index: "avgGroupSize", decending: true}, 
+    {index: "maxGroupSize", decending: true}, 
+    {index: "letterFrequency", decending: false}, 
+    {index: "word", decending: true}, 
+    {index: "clues", decending: true}, 
+    {index: "cluesGroupCount", decending: true}];
+let sortOrder:statsSortOrder[] = initialSortOrder.slice(); 
 let wordCount = 0;
 let statsType:StatsType = "normal";
 let lastTargetWord = "";
 
 export const WordStats = ({words, wordStatsState}) => {
     const [ wordleDisplayStats, setWordleDisplayStats ] = useState<wordleDisplayStatsType[]>([]);
-    const [ primaryIndex, setPimaryIndex ] = useState(2);
+    const [ primaryIndex, setPimaryIndex ] = useState<wordleDisplayStatsKeys>("avgGroupSize");
     const [ targetWord, setTargetWord ] = useState("");
     // const [ sortOrder, setSortOrder ] = useState<ArrayUtils.sortOrderType[]>(initialSortOrder)
 
     useEffect (() => {
         const updateStats = () => {
-            const newWordleDisplayStats = getWordleDisplayStats(words, sortOrder, targetWord);
+            const newWordleDisplayStats:wordleDisplayStatsType[] = getWordleDisplayStats(words, sortOrder, targetWord);
             if (targetWord === "") {
                 statsType = "normal";
                 changeSortOrder(primaryIndex, targetWord);
-                ArrayUtils.sortArrayOfArrays(newWordleDisplayStats, sortOrder);
+                ArrayUtils.sortArrayOfStringToAnyMaps(newWordleDisplayStats, sortOrder);
             } else {
                 statsType = "partitions";
-                changeSortOrder(1, targetWord);
-                ArrayUtils.sortArrayOfArrays(newWordleDisplayStats, sortOrder);
+                changeSortOrder("clues", targetWord);
+                ArrayUtils.sortArrayOfStringToAnyMaps(newWordleDisplayStats, sortOrder);
                 let lastWordClues = "eeeee"; //always sorted to top
                 let sameCluesCount = 0;
                 const lastIndex = newWordleDisplayStats.length - 1;
                 for (let i = 0; i <= lastIndex; i++) {
                     const item = newWordleDisplayStats[i];
-                    if (item[1] !== lastWordClues) {
+                    if (item["clues"] !== lastWordClues) {
                         let j = sameCluesCount;
                         while (j > 0) {
-                            newWordleDisplayStats[i - j][5] = sameCluesCount;
+                            newWordleDisplayStats[i - j]["cluesGroupCount"] = sameCluesCount;
                             j--;
                         }
                         sameCluesCount = 1;
                     } else {
                         sameCluesCount++;
                     }
-                    lastWordClues = item[1];
+                    lastWordClues = item["clues"];
                 }
                 let j = sameCluesCount;
                 while (j > 0) {
-                    newWordleDisplayStats[lastIndex + 1 - j][5] = sameCluesCount;
+                    newWordleDisplayStats[lastIndex + 1 - j]["cluesGroupCount"] = sameCluesCount;
                     j--;
                 }
-                changeSortOrder(5, targetWord);
-                ArrayUtils.sortArrayOfArrays(newWordleDisplayStats, sortOrder);
+                changeSortOrder("cluesGroupCount", targetWord);
+                ArrayUtils.sortArrayOfStringToAnyMaps(newWordleDisplayStats, sortOrder);
             }
             setWordleDisplayStats(newWordleDisplayStats);
         }
@@ -63,7 +70,7 @@ export const WordStats = ({words, wordStatsState}) => {
         updateStats();
     }, [words, wordStatsState, primaryIndex, targetWord]);
 
-    const changeSortOrder = (primaryIndex, targetWord) => {
+    const changeSortOrder = (primaryIndex:wordleDisplayStatsKeys, targetWord:string) => {
         let newSortOrder;
         if (lastTargetWord !== "" && targetWord === "") {
             newSortOrder = initialSortOrder.slice();
@@ -94,22 +101,22 @@ export const WordStats = ({words, wordStatsState}) => {
                                 {targetWord}
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(0);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("word");setTargetWord("")}} >
                                     words<br/>({wordCount})
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(2);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("avgGroupSize");setTargetWord("")}} >
                                     average<br/>group size
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(3);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("maxGroupSize");setTargetWord("")}} >
                                     max<br/>group size
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(4);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("letterFrequency");setTargetWord("")}} >
                                     letter<br/>scores
                                 </button>
                             </th>
@@ -118,28 +125,28 @@ export const WordStats = ({words, wordStatsState}) => {
                         <tbody>
                         {wordleDisplayStats.map( (wordInfo, i, stats) => {
                             if (i > 0) {
-                                if (wordInfo[1] === stats[i-1][1]) {
-                                    wordInfo[6] = stats[i-1][6];
+                                if (wordInfo["clues"] === stats[i-1]["clues"]) {
+                                    wordInfo["cluesGroupDivider"] = stats[i-1]["cluesGroupDivider"];
                                 } else {
-                                    wordInfo[6] = 1 - stats[i-1][6];
+                                    wordInfo["cluesGroupDivider"] = 1 - stats[i-1]["cluesGroupDivider"];
                                 }
                             }
                             return (
-                                <tr className={wordInfo[4] > 0 ? "possible" : "impossible"} key={wordInfo[0]} >
+                                <tr className={wordInfo["letterFrequency"] > 0 ? "possible" : "impossible"} key={wordInfo["word"]} >
                                     <td 
                                         key="clues"
-                                        className={wordInfo[6] > 0 ? "altGroupBg" : "groupBg"}
+                                        className={wordInfo["cluesGroupDivider"] > 0 ? "altGroupBg" : "groupBg"}
                                     >
-                                        {`${wordInfo[1]}${wordInfo[5]}`}
+                                        {`${wordInfo["clues"]}${wordInfo["cluesGroupCount"]}`}
                                     </td>
                                     <td key="word">
-                                        <button onClick={() => {setTargetWord(wordInfo[0])}} >
-                                            {wordInfo[0]}
+                                        <button onClick={() => {setTargetWord(wordInfo["word"])}} >
+                                            {wordInfo["word"]}
                                         </button>
                                     </td>
-                                    <td key="avgGrpSize">{wordInfo[2].toFixed(3)}</td>
-                                    <td key="maxGrpSize">{wordInfo[3].toFixed(3)}</td>
-                                    <td key="placementScore">{Math.round(1000 * wordInfo[4])}</td>
+                                    <td key="avgGrpSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
+                                    <td key="maxGrpSize">{wordInfo["maxGroupSize"].toFixed(3)}</td>
+                                    <td key="placementScore">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
                                 </tr>
                                 )
                             })
@@ -155,22 +162,22 @@ export const WordStats = ({words, wordStatsState}) => {
                         <thead>
                         <tr>
                             <th>
-                                <button onClick={() => {setPimaryIndex(0);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("word");setTargetWord("")}} >
                                     words<br/>({wordCount})
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(2);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("avgGroupSize");setTargetWord("")}} >
                                     average<br/>group size
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(3);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("maxGroupSize");setTargetWord("")}} >
                                     max<br/>group size
                                 </button>
                             </th>
                             <th>
-                                <button onClick={() => {setPimaryIndex(4);setTargetWord("")}} >
+                                <button onClick={() => {setPimaryIndex("letterFrequency");setTargetWord("")}} >
                                     letter<br/>scores
                                 </button>
                             </th>
@@ -179,15 +186,15 @@ export const WordStats = ({words, wordStatsState}) => {
                         <tbody>
                         {wordleDisplayStats.map( wordInfo => {
                             return (
-                                <tr className={wordInfo[4] > 0 ? "possible" : "impossible"} key={wordInfo[0]} >
+                                <tr className={wordInfo["letterFrequency"] > 0 ? "possible" : "impossible"} key={wordInfo["word"]} >
                                     <td key="word">
-                                        <button onClick={() => {setTargetWord(wordInfo[0])}} >
-                                            {wordInfo[0]}
+                                        <button onClick={() => {setTargetWord(wordInfo["word"])}} >
+                                            {wordInfo["word"]}
                                         </button>
                                     </td>
-                                    <td key="avgGrpSize">{wordInfo[2].toFixed(3)}</td>
-                                    <td key="maxGrpSize">{wordInfo[3].toFixed(3)}</td>
-                                    <td key="placementScore">{Math.round(1000 * wordInfo[4])}</td>
+                                    <td key="avgGrpSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
+                                    <td key="maxGrpSize">{wordInfo["maxGroupSize"].toFixed(3)}</td>
+                                    <td key="placementScore">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
                                 </tr>
                                 )
                             })

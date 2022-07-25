@@ -584,8 +584,9 @@ export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string =
 	return result;
 }
 
-export type wordleDisplayStatsType = [string, string, number, number, number, number, number];
-export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
+export type wordleDisplayStatsType = {word:string, clues:string, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
+export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
+export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
 	if (words.length === 0) {
 		return [];
 	}
@@ -614,7 +615,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 		const partStat = partStats[i];
 		const word = partStat[0];
 		const freqStat:number = freqStats[word] ?? 0;
-		const item:wordleDisplayStatsType = [word, partStat[1].wordleClues, partStat[1].averageGroupSize, partStat[1].largestGroup, freqStat, 0, 0];
+		const item:wordleDisplayStatsType = {"word":word, "clues":partStat[1].wordleClues, "avgGroupSize":partStat[1].averageGroupSize, "maxGroupSize":partStat[1].largestGroup, "letterFrequency":freqStat, "cluesGroupCount":0, "cluesGroupDivider":0};
 		if (wordsLU[word]) {
 			result.push(item);
 		} else if (targetWord === "") {
@@ -626,15 +627,15 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 		}
 	}
 	if (targetWord === "") {
-		const dummyBadChoice:wordleDisplayStatsType = ["dummybadchoice", "", 1000, 10000, 0, 0, 0];
+		const dummyBadChoice:wordleDisplayStatsType = {"word":"dummybadchoice", "clues":"", "avgGroupSize":1000, "maxGroupSize":10000, "letterFrequency":0, "cluesGroupCount":0, "cluesGroupDivider":0};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
-		if (result[0] && result[0][3] - 1 > 0.000001) {
+		if (result[0] && result[0]["maxGroupSize"] - 1 > 0.000001) {
 			let n = Math.min(Math.floor(1.5 * wordCount), maxNonPickWords);
 			while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
 				n--;
-				if (nonAnswerPicks[0][3] <= nonAnswerNotPicks[0][3]) {
+				if (nonAnswerPicks[0]["maxGroupSize"] <= nonAnswerNotPicks[0]["maxGroupSize"]) {
 					result.push(nonAnswerPicks.shift());
 				} else {
 					result.push(nonAnswerNotPicks.shift());
@@ -642,7 +643,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 			}
 		}
 	}
-	ArrayUtils.sortArrayOfArrays(result, sortOrder);
+	ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
 	return result;
 }
 
