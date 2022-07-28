@@ -1,3 +1,7 @@
+:root {
+  --stats-clues-block-size: 11px;
+}
+
 .App {
   text-align: center;
   font-family: Helvetica, Arial, sans-serif;
@@ -152,6 +156,33 @@ tbody {
 
 .wrong {
   background-color: #3a3a3c;
+}
+
+.clues.correct {
+  background-color: #68a963;
+}
+
+.clues.wrongIndex {
+  background-color: #f0c105;
+}
+
+.clues.wrong {
+  background-color: #787c7e;
+}
+
+.clueBox {
+    width: var(--stats-clues-block-size);
+    height: var(--stats-clues-block-size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    line-height: var(--stats-clues-block-size);
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    box-sizing: border-box;
+    padding-top: 5px;
 }
 
 .keyboard {

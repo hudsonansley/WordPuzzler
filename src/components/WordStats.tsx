@@ -126,10 +126,12 @@ export const WordStats = ({words, wordStatsState}) => {
                         {wordleDisplayStats.map( (wordInfo, i, stats) => {
                             if (i > 0) {
                                 if (wordInfo["clues"] === stats[i-1]["clues"]) {
-                                    wordInfo["cluesGroupDivider"] = stats[i-1]["cluesGroupDivider"];
+                                    wordInfo["cluesGroupDivider"] = Math.sign(stats[i-1]["cluesGroupDivider"]);
                                 } else {
-                                    wordInfo["cluesGroupDivider"] = 1 - stats[i-1]["cluesGroupDivider"];
+                                    wordInfo["cluesGroupDivider"] = - 2 * Math.sign(stats[i-1]["cluesGroupDivider"]);
                                 }
+                            } else {
+                                wordInfo["cluesGroupDivider"] = 2;
                             }
                             return (
                                 <tr className={wordInfo["letterFrequency"] > 0 ? "possible" : "impossible"} key={wordInfo["word"]} >
@@ -137,7 +139,7 @@ export const WordStats = ({words, wordStatsState}) => {
                                         key="clues"
                                         className={wordInfo["cluesGroupDivider"] > 0 ? "altGroupBg" : "groupBg"}
                                     >
-                                        {`${wordInfo["clues"]}${wordInfo["cluesGroupCount"]}`}
+                                        {(Math.abs(wordInfo["cluesGroupDivider"]) > 1) && wordInfo["clues"]}
                                     </td>
                                     <td key="word">
                                         <button onClick={() => {setTargetWord(wordInfo["word"])}} >
@@ -220,16 +222,22 @@ export const WordStats = ({words, wordStatsState}) => {
         case "help":
             return (
                 <div className="stats help">
-                    Set the word(s) based on your wordle game and hit enter.
+                    Set the word(s) based on your wordle game and tap enter.
                     <p/>
                     Toggle the letter placement color to match your wordle entries with the space bar for the last letter entered, or by tapping a letter.
                     <p/>
-                    A list of the possible words will be shown here, 
+                    A list of words will be shown here, 
                     sorted by their group score
                     (the number of words remaining devided by the number of groups)
                     <p/>
                     Rows in red are not in the list of possible answers, those 
-                    in green are.
+                    in green are. 
+                    You can sort by the column by tapping on that column header.
+                    <p/>
+                    You can see the group breakdown for a word by tapping on it.
+                    A new column headed by the selected word will show the groups 
+                    based on the clues that would be shown if the word in that row 
+                    was the answer.
                     <p/>
                     You can use "1" to "4" to switch between four boards with the same words but 
                     different target words, for use with a variation like Quordle.
