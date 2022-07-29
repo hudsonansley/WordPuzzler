@@ -284,9 +284,40 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderT
  *  letter_count === "e_3" will return only those words with 3 or more "e"s
  */
 export const withAtLeastLetterCount = (words:string[], letter_count:string):string[] => {
-	const let_count = letter_count.split("_");
+	const compFunc = (a:number, b:number) => a >= b;
+	return withLetterCount(words, letter_count, compFunc);
+}
+/**
+ * @param  {string[]} words
+ * @param  {string} letter_count a string consisting of a letter and a count delimited by "_"
+ * @returns {string[]} words filtered for words that have at most count of letter, e.g.:
+ *  letter_count === "e_3" will return only those words with 3 or fewer "e"s
+ */
+export const withAtMostLetterCount = (words:string[], letter_count:string):string[] => {
+	const compFunc = (a:number, b:number) => a <= b;
+	return withLetterCount(words, letter_count, compFunc);
+}
+/**
+ * @param  {string[]} words
+ * @param  {string} letter_count a string consisting of a letter and a count delimited by "_"
+ * @returns {string[]} words filtered for words that have at most count of letter, e.g.:
+ *  letter_count === "e_3" will return only those words with exactly 3 "e"s
+ */
+export const withExactLetterCount = (words:string[], letter_count:string):string[] => {
+	const compFunc = (a:number, b:number) => a === b;
+	return withLetterCount(words, letter_count, compFunc);
+}
+/**
+ * @param  {string[]} words
+ * @param  {string} letter_count
+ * @param  {(a:number,b:number)=>boolean} compFunc
+ * @returns {string[]} words filterd based on letter count and the comparison function passed in
+ * 	
+ */
+export const withLetterCount = (words:string[], letter_count:string, compFunc:(a:number, b:number) => boolean):string[] => {
+		const let_count = letter_count.split("_");
 	if (let_count.length !== 2) {
-		console.error("second param of withAtLeastLetterCount should be of the form <letter>_<count>");
+		console.error("second param of withLetterCount should be of the form <letter>_<count>");
 		return [];
 	}
 	const letter = let_count[0];
@@ -302,7 +333,7 @@ export const withAtLeastLetterCount = (words:string[], letter_count:string):stri
 				letters.splice(index, 1);
 			}
 		} while (index >= 0)
-		return letterCount >= count;
+		return compFunc(letterCount, count);
 	});
 	return result;
 }
@@ -323,8 +354,10 @@ export const wordle = (words:string[], clues:string):string[] => {
 	}
 	const notLetters:string[][] = [];
 	const somewhereLetters:string[] = [];
+	const notSomewhereLetters:string[] = [];
 	const correctLetters:string[] = [];
 	const atLeastLetters:StringToNumberMap = {};
+	const atMostLetters:StringToNumberMap = {};
 	const rows = clues.toLowerCase().split("_");
 	let n = 0;
 	let wordLen = 0;
@@ -358,6 +391,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 				} else {
 					ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				}
+				ArrayUtils.addNoRepeats(notSomewhereLetters, letter);
 			} else if (mod === "?" || mod === "/") {
 				ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
 				ArrayUtils.addNoRepeats(somewhereLetters, letter);
@@ -374,6 +408,9 @@ export const wordle = (words:string[], clues:string):string[] => {
 			const count = atLeastLetters[letter] ?? 0;
 			if (count < clueCount) {
 				atLeastLetters[letter] = clueCount;
+				if (notSomewhereLetters.indexOf(letter) >= 0) {
+					atMostLetters[letter] = clueCount;
+				}
 			}
 		}
 	}
@@ -406,6 +443,12 @@ export const wordle = (words:string[], clues:string):string[] => {
 	Object.entries(atLeastLetters).forEach( (letterCount) => {
 		if (letterCount[1] > 1) {
 			wFuncs.push(withAtLeastLetterCount);
+			wParamLists.push([letterCount.join("_")]);
+		}
+	})
+	Object.entries(atMostLetters).forEach( (letterCount) => {
+		if (letterCount[1] > 0) {
+			wFuncs.push(withAtMostLetterCount);
 			wParamLists.push([letterCount.join("_")]);
 		}
 	})

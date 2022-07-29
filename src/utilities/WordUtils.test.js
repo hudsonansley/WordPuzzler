@@ -31,6 +31,9 @@ test('WordUtils.wordle properly reduces wordlist', () => {
   expect(words.length).toEqual(10);
   expect(words).toContain("askew");
   expect(words).toContain("riser");
+  words = WordUtils.wordle(allWords, 'o-t/t-e/r/');
+  expect(words).toContain("trace");
+  expect(words).not.toContain("treat");
 })
 
 test('WordUtils.palendroms finds palendrom pairs properly in worlde dictionary', () => {
