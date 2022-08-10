@@ -1,3 +1,4 @@
+
 /**
  * @param  {T[]} array
  * @param  {number} n
@@ -75,12 +76,31 @@ export const keyCountIncrement = (keys:{[key:string]: number}, key:string):void 
 	}
 }
 
-export type sortOrderType = {index: number, decending: boolean};
+export type SortOrderIndexType = number | string;
+export type SortOrderType = {index: SortOrderIndexType, decending: boolean};
+export type SortOrderArrayType = {index: number, decending: boolean};
+/**
+ * @param  {SortOrderType[]} sortOrder
+ * @param  {SortOrderIndexType} primaryIndex
+ * @returns SortOrderType[]
+ */
+export const updatePrimaryIndex = (sortOrder:SortOrderType[], primaryIndex:SortOrderIndexType):SortOrderType[] => {
+	const result = sortOrder.slice();
+	const i = result.findIndex(item => item.index === primaryIndex);
+	if (i < 0) {
+		console.error(`primary index ${primaryIndex} is not in the sortOrder array provided`);
+		return result;
+	}
+	const [item] = result.splice(i, 1);
+	result.unshift(item);
+return result;
+}
+
 /**
  * @param  {[][]} array
- * @param  {sortOrderType[]} sortOrder
+ * @param  {SortOrderArrayType[]} sortOrder
  */
-export const sortArrayOfArrays = (array:any[][], sortOrder:sortOrderType[]) => {
+export const sortArrayOfArrays = (array:any[][], sortOrder:SortOrderArrayType[]) => {
 	array.sort((a:any[], b:any[]) => {
 		let result = 0;
 		let index = 0;
@@ -95,12 +115,12 @@ export const sortArrayOfArrays = (array:any[][], sortOrder:sortOrderType[]) => {
 }
 
 export interface StringToAnyMap {[key: string]: any; }
-export type sortOrderObjType = {index: string, decending: boolean};
+export type SortOrderObjType = {index: string, decending: boolean};
 /**
  * @param  {[][]} array
- * @param  {sortOrderType[]} sortOrder
+ * @param  {SortOrderObjType[]} sortOrder
  */
-export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:sortOrderObjType[]) => {
+export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:SortOrderObjType[]) => {
 	array.sort((a:StringToAnyMap, b:StringToAnyMap) => {
 		let result = 0;
 		let index = 0;
@@ -114,6 +134,33 @@ export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:sor
 	});
 }
 
+export const getMinIndices = <T>(arrays:T[][], indices:number[], cmp:(a:T, b:T) => number ):number[] => {
+	let n = arrays.length;
+	let minIndex = 0;
+	let result = (arrays[0].length > indices[0]) ? [0] : [];
+	for (let i=1; i<n; i++) {
+		const a0 = arrays[minIndex];
+		const a1 = arrays[i];
+		const i0 = indices[minIndex];
+		const i1 = indices[i];
+		if (i0 < a0.length && i1 < a1.length) {
+			const cmpVal = cmp(a0[i0], a1[i1]);
+			if (cmpVal < 0) {
+				minIndex = i;
+				result = [i];
+			} else if (cmpVal === 0) {
+				result.push(i);
+			}
+		} else if (i1 < a1.length) {
+			result = [i];
+			minIndex = i;
+			// } else if (i0 < a0.length) {
+		// 	result = [minIndex];
+		}
+	}
+	return result;
+}
+
 /**
  * @param  {T[]} a1 
  * @param  {T[]} a2
@@ -121,7 +168,7 @@ export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:sor
  *  and contain the same type of items
  * takes O(n) time
  */
-export const sortedArraysIntersection = <T>(a1:T[], a2:T[]) => {
+ export const sortedArraysIntersection2 = <T>(a1:T[], a2:T[]) => {
 	let i = 0, j = 0;
 	const result:T[] = [];
 	while (i < a1.length && j < a2.length) {
@@ -133,6 +180,91 @@ export const sortedArraysIntersection = <T>(a1:T[], a2:T[]) => {
 			i++;
 		} else {
 			j++;
+		}
+	}
+	return result;
+}
+
+/**
+ * @param  {boolean} ascending true if arrays sorted ascending 
+ * @param  {T[]} a1 
+ * ...
+ * all arrays must be sorted in the given direction
+ *  and contain the same type of items
+ * returns the intersection of all given arrays
+ * takes O(n) time
+ */
+export const sortedArraysIntersection = <T>(ascending, ...arrays:T[][]) => {
+	const cmp = (a:T, b:T) => {
+		return (ascending ? 1 : -1) * (
+			(a === b) ? 0 : 
+			(a < b) ? 1 : -1);
+	}
+	const result:T[] = [];
+	const n = arrays.length;
+	if (n === 0) return result;
+	if (n === 1) return arrays[0].slice();
+	const indices = new Array(n).fill(0);
+	const lengths = [];
+	for (let i=0; i<n; i++) {
+		lengths.push(arrays[i].length);
+	}
+	const isNotDone = () => {
+		let result = true;
+		for (let i=0; i<n; i++) {
+			result = result && indices[i] < lengths[i];
+		}
+		return result;
+	}
+	while (isNotDone()) {
+		const minIndices = getMinIndices(arrays, indices, cmp);
+		const numEqual = minIndices.length;
+		if (numEqual === n) {
+			result.push(arrays[minIndices[0]][indices[minIndices[0]]]);
+		}
+		for (let i=0; i<numEqual; i++) {
+			indices[minIndices[i]] += 1;
+		}
+	}
+	return result;
+}
+
+/**
+ * @param  {boolean} ascending true if arrays sorted ascending 
+ * @param  {T[]} a1 
+ * ...
+ * all arrays must be sorted in the given direction
+ *  and contain the same type of items
+ * combines all arrays without duplicates
+ * takes O(n) time
+ */
+ export const sortedArraysUnion = <T>(ascending, ...arrays:T[][]) => {
+	const cmp = (a:T, b:T) => {
+		return (ascending ? 1 : -1) * (
+			(a === b) ? 0 : 
+			(a < b) ? 1 : -1);
+	}
+	const result:T[] = [];
+	const n = arrays.length;
+	if (n === 0) return result;
+	if (n === 1) return arrays[0].slice();
+	const indices = new Array(n).fill(0);
+	let maxLength = 0;
+	for (let i=0; i<n; i++) {
+		const len = arrays[i].length;
+		if (maxLength < len) {
+			maxLength = len;
+		}
+	}
+	let notDone = true;
+	while (notDone) {
+		const minIndices = getMinIndices(arrays, indices, cmp);
+		notDone = (minIndices.length > 0);
+		if (notDone) {
+			result.push(arrays[minIndices[0]][indices[minIndices[0]]]);
+			for (let i=0; i<minIndices.length; i++) {
+				indices[minIndices[i]] += 1;
+			}
 		}
 	}
 	return result;

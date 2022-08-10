@@ -1,5 +1,8 @@
 :root {
-  --stats-clues-block-size: 11px;
+  --stats-clues-block-size: 9px;
+  --stats-clues-block-padding: 2px;
+  --stats-clues-min-width: 57px;
+  --stats-table-line-height: 15px;
 }
 
 .App {
@@ -61,6 +64,7 @@ nav h1 {
 }
 
 .game {
+  max-width: 60%;
   align-items: center;
   padding-top: 10px;
   flex-grow: 1;
@@ -79,7 +83,7 @@ nav h1 {
   margin: 3px;
 }
 
-.gameRow.active {
+.gameRow--active {
   min-height: 50px;
 }
 
@@ -98,37 +102,51 @@ nav h1 {
   cursor: pointer;
 }
 
-tr {
-  line-height: 14px;
-  min-height: 0;
-  height: 0;
+.letter--correct {
+  background-color: #538d4e;
 }
-.possible {
+
+.letter--wrongIndex {
+  background-color: #b59f3b;
+}
+
+.letter--wrong {
+  background-color: #3a3a3c;
+}
+
+tr {
+  line-height: var(--stats-table-line-height);
+}
+.possibleWordBg {
   background-color: #008000;
 }
-.impossible {
+.impossibleWordBg {
   background-color: #800000;
 }
+
 .groupBg {
   background-color: #202020;
 }
 .altGroupBg {
-  background-color: #606060;
+  background-color: #404040;
 }
 
+
 td th {
-  line-height: 14px;
+  line-height: var(--stats-table-line-height);
+  width: auto;
 }
 
 tbody {
-  line-height: 14px;
+  line-height: var(--stats-table-line-height);
 }
 
 .stats {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  /* margin-left: auto;
+  margin-right: auto; */
   overflow: auto;
+  align-items: center;
   min-width: 260px;
 }
 
@@ -137,52 +155,48 @@ tbody {
   border: 1px solid gray;
   color: white;
   width: 240px;
-  font-size: 14px;
+  font-size: var(--stats-table-line-height);
 }
 
 .help {
-  width: 240px;
-  font-size: 18px;
+  max-width: 360px;
+  font-size: 16px;
   text-align: left;
 }
 
-.correct {
-  background-color: #538d4e;
+p {
+  text-indent: 2em;
 }
 
-.wrongIndex {
-  background-color: #b59f3b;
+.cluesColumn {
+  min-width: var(--stats-clues-min-width);
 }
 
-.wrong {
-  background-color: #3a3a3c;
-}
-
-.clues.correct {
-  background-color: #68a963;
-}
-
-.clues.wrongIndex {
-  background-color: #f0c105;
-}
-
-.clues.wrong {
-  background-color: #787c7e;
+.cluesContainer {
+  display: inline-flex;
+  justify-content: space-around;
+  min-width: 100%;
+  margin-top: 3px;
+  margin-bottom: 2px;
 }
 
 .clueBox {
-    width: var(--stats-clues-block-size);
-    height: var(--stats-clues-block-size);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    line-height: var(--stats-clues-block-size);
-    font-weight: bold;
-    text-transform: uppercase;
-    color: white;
-    box-sizing: border-box;
-    padding-top: 5px;
+  width: var(--stats-clues-block-size);
+  height: var(--stats-clues-block-size);
+  display: inline-flex;
+  border: 0.5px solid white;
+}
+
+.clueBox--correct {
+  background-color: #68a963;
+}
+
+.clueBox--wrongIndex {
+  background-color: #f0c105;
+}
+
+.clueBox--wrong {
+  background-color: #787c7e;
 }
 
 .keyboard {

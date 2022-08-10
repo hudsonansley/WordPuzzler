@@ -138,3 +138,54 @@ test('BoardData.getLetterInBoardString returns expected value', () => {
     expect(BoardData.getLetterInBoardString(boardStr, loc)).toEqual(letter);
 
 })
+
+test('BoardData.setLetterInBoardString returns expected value', () => {
+    let boardStr = "A-B-C-D-E-";
+    let board = BoardData.getBoardFromString(boardStr);
+    let loc = BoardData.getLetterLoc(board);
+    let expected = BoardData.getBlankLetter();
+    let newBoardStr = BoardData.setLetterInBoardString(boardStr, loc, expected);
+    expect(newBoardStr).toEqual("A-B-C-D- -");
+    let letter = BoardData.getLetterInBoardString(newBoardStr, loc);
+    expect(letter.letter).toEqual(expected.letter);
+    expect(letter.state).toEqual(expected.state);
+    boardStr = newBoardStr;
+    board = BoardData.getBoardFromString(boardStr);
+    loc = BoardData.getLetterLoc(board);
+    newBoardStr = BoardData.setLetterInBoardString(boardStr, loc, expected);
+    expect(newBoardStr).toEqual("A-B-C- - -");
+    letter = BoardData.getLetterInBoardString(newBoardStr, loc);
+    expect(letter.letter).toEqual(expected.letter);
+    expect(letter.state).toEqual(expected.state);
+    boardStr = newBoardStr;
+    board = BoardData.getBoardFromString(boardStr);
+    loc = BoardData.getLetterLoc(board);
+    newBoardStr = BoardData.setLetterInBoardString(boardStr, loc, expected);
+    expect(newBoardStr).toEqual("A-B- - - -");
+    letter = BoardData.getLetterInBoardString(newBoardStr, loc);
+    expect(letter.letter).toEqual(expected.letter);
+    expect(letter.state).toEqual(expected.state);
+    boardStr = newBoardStr;
+    board = BoardData.getBoardFromString(boardStr);
+    loc = BoardData.getLetterLoc(board);
+    newBoardStr = BoardData.setLetterInBoardString(boardStr, loc, expected);
+    expect(newBoardStr).toEqual("A- - - - -");
+    letter = BoardData.getLetterInBoardString(newBoardStr, loc);
+    expect(letter.letter).toEqual(expected.letter);
+    expect(letter.state).toEqual(expected.state);
+    boardStr = newBoardStr;
+    board = BoardData.getBoardFromString(boardStr);
+    loc = BoardData.getLetterLoc(board);
+    newBoardStr = BoardData.setLetterInBoardString(boardStr, loc, expected);
+    expect(newBoardStr).toEqual("");
+    letter = BoardData.getLetterInBoardString(newBoardStr, loc);
+    expect(letter.letter).toEqual(expected.letter);
+    expect(letter.state).toEqual(expected.state);
+    boardStr = newBoardStr;
+    board = BoardData.getBoardFromString(boardStr);
+    loc = BoardData.getLetterLoc(board);
+    expect(loc.letterIndex).toEqual(BoardData.lettersPerWord - 1);
+    expect(loc.rowIndex).toEqual(-1);
+    boardStr = BoardData.getBoardString(board);
+    expect(boardStr).toEqual("");
+})

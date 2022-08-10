@@ -115,17 +115,26 @@ export const setLetterInBoardString = (boardString:string, letterLoc:LetterLocTy
     const charIndex = 2 * letterLoc.letterIndex;
     const rows = boardString.split("_");
     let lastRow = rows.pop();
+    const emptyLetterStr = getLetterString(getBlankLetter());
+    let emptyRowStr = "";
+    for (let i=0; i< lettersPerWord; i++) {
+        emptyRowStr += emptyLetterStr;
+    }
     while (lastRow.length < 2 * lettersPerWord) {
-        lastRow += " -";
+        lastRow += emptyLetterStr;
     }
     rows.push(lastRow);
     while (rows.length <= letterLoc.rowIndex) {
-        rows.push(" - - - - -");
+        rows.push(emptyRowStr);
     }
-    rows[letterLoc.rowIndex] = rows[letterLoc.rowIndex].substring(0, charIndex)
+    rows[letterLoc.rowIndex] = rows[letterLoc.rowIndex].slice(0, charIndex)
         + getLetterString(letter) 
-        + rows[letterLoc.rowIndex].substring(charIndex + 2);
-    return rows.join("_");
+        + rows[letterLoc.rowIndex].slice(charIndex + 2);
+    while (rows.length > 0 && (rows[rows.length-1] === emptyRowStr)) {
+        rows.pop();
+    }
+    const result = rows.join("_");
+    return result;
 }
 
 export const getLetterAtLoc = (board:BoardDataType, letterLoc:LetterLocType):LetterType => {
@@ -150,6 +159,29 @@ export const incrementLetterLoc = (letterLoc:LetterLocType):LetterLocType => {
     return {rowIndex, letterIndex};
 }
 
+export const decrementLetterLoc = (letterLoc:LetterLocType):LetterLocType => {
+    let letterIndex = letterLoc.letterIndex - 1;
+    let rowIndex = letterLoc.rowIndex;
+    if (letterIndex < 0) {
+      letterIndex = lettersPerWord - 1;
+      rowIndex -= 1;
+    }
+    return {rowIndex, letterIndex};
+}
+
 export const copyBoard = (board:BoardDataType):BoardDataType => {
     return getBoardFromString(getBoardString(board));
+}
+
+export const boardIsComplete = (board:BoardDataType):boolean => {
+    let loc = getLetterLoc(board);
+    if (loc.letterIndex < 0 || loc.letterIndex !== (lettersPerWord - 1)) {
+        return false;
+    }
+    let result = true;
+    for (let i=0; i<lettersPerWord; i++) {
+        result &&= (getLetterAtLoc(board, loc).state === "correct")
+        loc = decrementLetterLoc(loc);
+    }
+    return result;
 }

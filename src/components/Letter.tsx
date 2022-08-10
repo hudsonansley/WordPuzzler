@@ -11,7 +11,7 @@ const Letter = ({ rowIndex, letterIndex }) => {
     }
 
     return (
-        <div className={`letter ${letter.state}`} 
+        <div className={`letter letter--${letter.state}`} 
             id={letterIndex}
             onClick={rotateLetterState}
         >

@@ -8,12 +8,19 @@ import Keyboard from "./components/Keyboard";
 import { WordStats, StatsState } from "./components/WordStats";
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordUtils from './utilities/WordUtils';
+import * as ArrayUtils from './utilities/ArrayUtils';
+
+//TODO: add column for partitions view that gives which board(s) the word 
+// belongs to. Could just be shown on top of group b/c groups don't overlap
+// unless the clues are the same
 
 export const AppContext = createContext(undefined);
 const initBoardStr = "";
 const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
 const storedBoardDirty = [false, false, false, false];
+const storedBoardCompleted = [false, false, false, false];
 let currentBoardIndex = 0;
+let combinedBoardMode = false;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
@@ -22,6 +29,31 @@ const App = () => {
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [words, setWords] = useState<string[]>([]);
   const [wordStatsState, setWordStatsState] = useState<StatsState>("help");
+
+  const addRowToBoard = (boardRowStr:string) => {
+    if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
+      return;
+    }
+    boardRowStr = boardRowStr.toUpperCase();
+    const otherBoardStrs = boardRowStr.replace(/=/g, '-');
+    // const word = otherBoardStrs.replace(/-/g, '');
+    // navigator.clipboard.writeText(word); // so user can paste into quordle/wordle
+    //  Disabled because pasting does not work in wordle/quordle
+    for (let index = 0; index < storedBoardStates.length; index++) {
+      if (!storedBoardCompleted[index]) {
+        const storedBoard = storedBoardStates[index];
+        storedBoardStates[index] = (storedBoard.length === 0 ? '' : storedBoard + '_')
+          + ((index === currentBoardIndex) ? boardRowStr : otherBoardStrs);
+        storedBoardDirty[index] = true;
+      }
+    }
+    const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
+    setBoardStr(storedBoardStates[currentBoardIndex]);
+    setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    if (BoardData.boardIsComplete(newBoard)) {
+      storedBoardCompleted[currentBoardIndex] = true;
+    }
+  }
 
   const setWordsAndStatsState = (newWords) => {
     setWords(newWords);
@@ -33,7 +65,7 @@ const App = () => {
   }
 
   const onEnter = () => {
-    const wordsAll = WordleDict.wordleAll;
+    combinedBoardMode = false;
     if (storedBoardStates[currentBoardIndex] === "") {
       setWordStatsState("calculating");
       setTimeout(() => {
@@ -52,34 +84,39 @@ const App = () => {
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
 
-    if (wordsAll.indexOf(curWord) < 0) {
+    if (WordleDict.wordleAll.indexOf(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 
     if (WordUtils.wordlePicksIndexPartitions) {
-      const newWords = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
+      const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
       setWordsAndStatsState(newWords);
-  } else {
+    } else {
       setWordStatsState("calculating");
       setTimeout(() => {
         WordUtils.calcWordleIndexPartitions();
-        const newWords = WordUtils.wordle(wordsAll, storedBoardStates[currentBoardIndex]);
+        const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
         setWordsAndStatsState(newWords);
       }, 1)
     }
+      
   }
 
   const onDelete = () => {
     if (curLetterLoc.rowIndex < 0) return;
 
     for (let index = 0; index < storedBoardStates.length; index++) {
-      const blankLetter = BoardData.getBlankLetter();
-      const storedBoard = storedBoardStates[index];
-      storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, curLetterLoc, blankLetter);
+      if (!storedBoardCompleted[index]) {
+        const blankLetter = BoardData.getBlankLetter();
+        const storedBoard = storedBoardStates[index];
+        storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, curLetterLoc, blankLetter);
+      }
     }
-    const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
-    setBoardStr(storedBoardStates[currentBoardIndex]);
-    setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    if (!storedBoardCompleted[currentBoardIndex]) {
+      const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
+      setBoardStr(storedBoardStates[currentBoardIndex]);
+      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    }
   }
 
   const onSelectLetter = (key: string) => {
@@ -90,16 +127,25 @@ const App = () => {
     const letter: BoardData.LetterType = BoardData.getBlankLetter();
     letter.letter = key;
     for (let index = 0; index < storedBoardStates.length; index++) {
-      const storedBoard = storedBoardStates[index];
-      storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, loc, letter);
-      storedBoardDirty[index] = true;
+      if (!storedBoardCompleted[index]) {
+        const storedBoard = storedBoardStates[index];
+        storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, loc, letter);
+        storedBoardDirty[index] = true;
+      }
     }
-    const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
-    setBoardStr(storedBoardStates[currentBoardIndex]);
-    setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    if (!storedBoardCompleted[currentBoardIndex]) {
+      const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
+      setBoardStr(storedBoardStates[currentBoardIndex]);
+      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    }
   }
 
   const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
+    if (combinedBoardMode) {
+      alert(`Switching back to board ${currentBoardIndex + 1}`)
+      switchToBoard (currentBoardIndex);
+      return;
+    }
     const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     const letter = newBoard[letterLoc.rowIndex][letterLoc.letterIndex];
     if (BoardData.letterIsBlank(letter)) return;
@@ -109,17 +155,32 @@ const App = () => {
     setBoardStr(newBoardStr);
   }
 
+  const calcCombinedWords = () => {
+    const boardWords = storedBoardStates.map((boardStr, i) =>
+      storedBoardCompleted[i] ? [] : 
+        WordUtils.wordle(WordleDict.wordlePicks, boardStr)
+    )
+    const newWords = ArrayUtils.sortedArraysUnion(true, ...boardWords);
+    setWordsAndStatsState(newWords);
+  }
+
   const switchToBoard = (boardIndex:number) => {
-    currentBoardIndex = boardIndex;
-    const newBoardStr = storedBoardStates[currentBoardIndex];
-    setBoardStr(newBoardStr);
-    const newBoard = BoardData.getBoardFromString(newBoardStr);
-    setCurLetterLoc(BoardData.getLetterLoc(newBoard));
-    if (storedBoardDirty[currentBoardIndex]) {
-      storedBoardDirty[currentBoardIndex] = false;
-      onShowHelp();
+    if (boardIndex < 0) {
+      combinedBoardMode = true;
+      calcCombinedWords();
     } else {
-      onEnter();
+      combinedBoardMode = false;
+      currentBoardIndex = boardIndex;
+      const newBoardStr = storedBoardStates[currentBoardIndex];
+      setBoardStr(newBoardStr);
+      const newBoard = BoardData.getBoardFromString(newBoardStr);
+      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+      if (storedBoardDirty[currentBoardIndex]) {
+        storedBoardDirty[currentBoardIndex] = false;
+        onShowHelp();
+      } else {
+        onEnter();
+      }
     }
   }
 
@@ -127,12 +188,18 @@ const App = () => {
     for (let i = 0; i < storedBoardStates.length; i++) {
       storedBoardStates[i] = initBoardStr;
       storedBoardDirty[i] = true;
+      storedBoardCompleted[i] = false;
     }
     switchToBoard(0);
   }
 
+  const showQuordleButton = ():boolean => {
+    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && !!WordUtils.wordlePicksIndexPartitions;
+  }
+
   const memoryButton = (index:number) => {
-    const bgClassName = (index === currentBoardIndex) ? "bg-gray-600" : "bg-gray-500";
+    const selected = (index === currentBoardIndex && !combinedBoardMode) || (index < 0 && combinedBoardMode); 
+    const bgClassName = selected ? "bg-gray-600" : "bg-gray-500";
     return (
       <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
         <div className={`${bgClassName} text-center rounded-lg box-border pl-2.5 pr-4 border-2`}>{index + 1}</div>
@@ -180,7 +247,10 @@ const App = () => {
           </button>
         </div>
         <h1>Wordle Helper</h1>
-        <div>
+        <div className="grid content-center gap-x-0 px-2 grid-cols-2">
+          <div className="grid content-center w-3">
+            {showQuordleButton() && memoryButton(-1)}
+          </div>
           <div className="grid gap-0 px-4 grid-cols-2">
             {memoryButton(0)}
             {memoryButton(1)}
@@ -191,6 +261,7 @@ const App = () => {
       </nav>
       <AppContext.Provider
         value={{
+          addRowToBoard,
           boardStr,
           setBoardStr,
           curLetterLoc,

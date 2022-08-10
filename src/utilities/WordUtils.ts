@@ -232,7 +232,7 @@ export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists
 }
 
 export type wordPercentagesType = [number, string, number, number[]][];
-export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.sortOrderType[] = [{index: 0, decending: false}, {index: 2, decending: true}, {index: 1, decending: false}]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
+export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.SortOrderArrayType[] = [{index: 0, decending: false}, {index: 2, decending: true}, {index: 1, decending: false}]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
 	if (!words) { words = []};
 	let letters;
 	let lettersUnique;
@@ -583,7 +583,8 @@ export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][
 		const wordGroups = wpp[i];
 		result[i] = [];
 		for(const group of wordGroups) {
-			const newGroup = ArrayUtils.sortedArraysIntersection(group, wordIndices);
+			// const newGroup = ArrayUtils.sortedArraysIntersection(true, group, wordIndices);
+			const newGroup = ArrayUtils.sortedArraysIntersection2(group, wordIndices);
 			if (newGroup.length > 0) {
 				result[i].push(newGroup);
 			}
@@ -629,7 +630,7 @@ export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string =
 
 export type wordleDisplayStatsType = {word:string, clues:string, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
 export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
-export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
+export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
 	if (words.length === 0) {
 		return [];
 	}
@@ -685,6 +686,33 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.sortO
 				}
 			}
 		}
+	} else {
+		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
+		// changeSortOrder("clues", targetWord);
+		ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
+		let lastWordClues = "eeeee"; //always sorted to top
+		let sameCluesCount = 0;
+		const lastIndex = result.length - 1;
+		for (let i = 0; i <= lastIndex; i++) {
+			const item = result[i];
+			if (item["clues"] !== lastWordClues) {
+				let j = sameCluesCount;
+				while (j > 0) {
+					result[i - j]["cluesGroupCount"] = sameCluesCount;
+					j--;
+				}
+				sameCluesCount = 1;
+			} else {
+				sameCluesCount++;
+			}
+			lastWordClues = item["clues"];
+		}
+		let j = sameCluesCount;
+		while (j > 0) {
+			result[lastIndex + 1 - j]["cluesGroupCount"] = sameCluesCount;
+			j--;
+		}
+		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "cluesGroupCount") as ArrayUtils.SortOrderObjType[];
 	}
 	ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
 	return result;
