@@ -66,6 +66,11 @@ const App = () => {
 
   const onEnter = () => {
     combinedBoardMode = false;
+    if (storedBoardCompleted[currentBoardIndex]) {
+      const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
+      setWordsAndStatsState(newWords);
+      return;
+    }
     if (storedBoardStates[currentBoardIndex] === "") {
       setWordStatsState("calculating");
       setTimeout(() => {
@@ -104,6 +109,15 @@ const App = () => {
 
   const onDelete = () => {
     if (curLetterLoc.rowIndex < 0) return;
+    if (storedBoardCompleted[currentBoardIndex]) {
+      alert("switching board to not complete, please re-delete if desired.");
+      const newBoard = BoardData.getBoardFromString(extendCurBoardStrToLongest());
+      const newBoardStr = BoardData.getBoardString(newBoard);
+      storedBoardStates[currentBoardIndex] = newBoardStr;
+      setBoardStr(newBoardStr);
+      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+      return;
+    }
 
     for (let index = 0; index < storedBoardStates.length; index++) {
       if (!storedBoardCompleted[index]) {
@@ -140,19 +154,34 @@ const App = () => {
     }
   }
 
+  const extendCurBoardStrToLongest = ():string => {
+    let newBoardStr = storedBoardStates[currentBoardIndex];
+    if (storedBoardCompleted[currentBoardIndex]) {
+      storedBoardCompleted[currentBoardIndex] = false;
+      // if completed state is changed, need to sync up with the
+      //  uncompleted boards
+      const longestBoardString = storedBoardStates.reduce((a, b) => a.length > b.length ? a : b);
+      const extension = longestBoardString.slice(newBoardStr.length).replace(/[=/]/g, '-');
+      newBoardStr += extension;
+    }
+    return newBoardStr;
+  }
+
   const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
     if (combinedBoardMode) {
       alert(`Switching back to board ${currentBoardIndex + 1}`)
       switchToBoard (currentBoardIndex);
       return;
     }
-    const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
+    let newBoardStr = extendCurBoardStrToLongest();
+    const newBoard = BoardData.getBoardFromString(newBoardStr);
     const letter = newBoard[letterLoc.rowIndex][letterLoc.letterIndex];
     if (BoardData.letterIsBlank(letter)) return;
     newBoard[letterLoc.rowIndex][letterLoc.letterIndex].state = BoardData.rotateLetterState(letter.state);
-    const newBoardStr = BoardData.getBoardString(newBoard);
+    newBoardStr = BoardData.getBoardString(newBoard);
     storedBoardStates[currentBoardIndex] = newBoardStr;
     setBoardStr(newBoardStr);
+    setCurLetterLoc(BoardData.getLetterLoc(newBoard));
   }
 
   const calcCombinedWords = () => {
