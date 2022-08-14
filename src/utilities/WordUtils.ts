@@ -15,7 +15,7 @@ export interface partitionWordStat {
 	numberOfGroups : number,
 	averageGroupSize : number,
 	largestGroup : number,
-	wordleClues : string,
+	wordleClues : number,
 }
 export type partionStats = [string, partitionWordStat];
 
@@ -459,6 +459,34 @@ export const wordle = (words:string[], clues:string):string[] => {
 	return runFilterList(words, wFuncs, wParamLists);
 }
 
+export const WORDLE_CORRECT = 0b10;
+export const WORDLE_ALL_CORRECT = 0b1010101010;
+export const WORDLE_WRONG_POSITION = 0b01;
+export const WORDLE_WRONG = 0;
+export const getWordleClues_num = (word:string, pick:string):number => {
+	const wordLets = word.split("");
+	const pickLets = pick.split("");
+	let n = wordLets.length;
+	if (n !== pickLets.length) {
+		return 0;
+	}
+	let clues = 0;
+	for (let i = 0; i < n; i++) {
+		if (wordLets[i] === pickLets[i]) {
+			clues |= WORDLE_CORRECT << (2 * i);
+			pickLets[i] = ""; // so we don't refind this letter for wrong place
+		} 
+	}
+	for (let i = 0; i < n; i++) {
+		const pickLetIndex = pickLets.indexOf(wordLets[i]);
+		if (pickLetIndex >= 0 && (clues & (WORDLE_CORRECT << (2 * i))) === 0) {
+			clues |= WORDLE_WRONG_POSITION << (2 * i);
+			pickLets[pickLetIndex] = "";
+		}
+	}
+	return clues;
+}
+
 export const getWordleClues = (word:string, pick:string):string => {
 	const wordLets = word.split("");
 	const pickLets = pick.split("");
@@ -549,19 +577,17 @@ export const getWordleIndexPartitions = (words:string[], picks:string[]):number[
 	const result = Array(words.length);
 	for (let word of words) {
 		const wordIndex = wordleIndexLUmap[word];
-		result[wordIndex] = [];
-		const cluesMap:StringToNumberMap = {};
+		const cluesMap = {};
 		for (let pick of picks) {
 			const pickIndex = wordleIndexLUmap[pick];
-			const clues = getWordleClues(word, pick);
-			const cluesIndex = cluesMap[clues] - 1;
-			if (cluesIndex >= 0) {
-				result[wordIndex][cluesIndex].push(pickIndex);
+			const clues = getWordleClues_num(word, pick);
+			if (cluesMap[clues]) {
+				cluesMap[clues].push(pickIndex);
 			} else {
-				result[wordIndex].push([pickIndex]);
-				cluesMap[clues] = result[wordIndex].length;
+				cluesMap[clues] = [pickIndex];
 			}
 		}
+		result[wordIndex] = Object.values(cluesMap);
 	}
 	return result;
 }
@@ -596,12 +622,12 @@ export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][
 export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string = ""):partionStats[] => {
 	const n = wpp.length;
 	const result:partionStats[] = Array(n);
-	let wordleClues = "";
+	let wordleClues = 0;
 	let word = "";
 	for(let i = 0; i < n; i++) {
 		word = wordleBaseDictionary[i];
 		if (targetWord.length > 0) {
-			wordleClues = getWordleClues(targetWord, word);
+			wordleClues = getWordleClues_num(targetWord, word);
 		}
 		const wordGroups = wpp[i];
 		const partitionCount = wordGroups.length;
@@ -628,7 +654,7 @@ export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string =
 	return result;
 }
 
-export type wordleDisplayStatsType = {word:string, clues:string, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
+export type wordleDisplayStatsType = {word:string, clues:number, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
 export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
 export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
 	if (words.length === 0) {
@@ -659,7 +685,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		const partStat = partStats[i];
 		const word = partStat[0];
 		const freqStat:number = freqStats[word] ?? 0;
-		const item:wordleDisplayStatsType = {"word":word, "clues":partStat[1].wordleClues, "avgGroupSize":partStat[1].averageGroupSize, "maxGroupSize":partStat[1].largestGroup, "letterFrequency":freqStat, "cluesGroupCount":0, "cluesGroupDivider":0};
+		const item:wordleDisplayStatsType = {word:word, clues:partStat[1].wordleClues, avgGroupSize:partStat[1].averageGroupSize, maxGroupSize:partStat[1].largestGroup, letterFrequency:freqStat, cluesGroupCount:0, cluesGroupDivider:0};
 		if (wordsLU[word]) {
 			result.push(item);
 		} else if (targetWord === "") {
@@ -671,7 +697,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		}
 	}
 	if (targetWord === "") {
-		const dummyBadChoice:wordleDisplayStatsType = {"word":"dummybadchoice", "clues":"", "avgGroupSize":1000, "maxGroupSize":10000, "letterFrequency":0, "cluesGroupCount":0, "cluesGroupDivider":0};
+		const dummyBadChoice:wordleDisplayStatsType = {word:"dummybadchoice", clues:0, avgGroupSize:1000, maxGroupSize:10000, letterFrequency:0, cluesGroupCount:0, cluesGroupDivider:0};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
@@ -690,7 +716,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
 		// changeSortOrder("clues", targetWord);
 		ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
-		let lastWordClues = "eeeee"; //always sorted to top
+		let lastWordClues = WORDLE_ALL_CORRECT; //always sorted to top
 		let sameCluesCount = 0;
 		const lastIndex = result.length - 1;
 		for (let i = 0; i <= lastIndex; i++) {

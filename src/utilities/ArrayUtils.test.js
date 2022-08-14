@@ -1,5 +1,92 @@
 import * as ArrayUtils from './ArrayUtils';
+import * as WordUtils from './WordUtils';
+import * as WordleDict from '../data/dictionaries/Wordle';
 
+test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
+    let array = [];
+    let sortOrder = [];
+    let expected = [];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    array = [
+        {a:1, b:"2", c: 2},
+        {a:2, b:"2", c: 3},
+        {a:3, b:"3", c: 3},
+        {a:4, b:"3", c: 4},
+        {a:5, b:"3", c: 4},
+        {a:6, b:"4", c: 3},
+        {a:7, b:"4", c: 3},
+    ];
+    sortOrder = [
+        {index:"a", decending:true},
+        {index:"b", decending:true},
+        {index:"c", decending:true},
+    ];
+    expected = array.slice();
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    sortOrder = [
+        {index:"c", decending:true},
+        {index:"b", decending:true},
+        {index:"a", decending:true},
+    ];
+    expected = [
+        {a:1, b:"2", c: 2},
+        {a:2, b:"2", c: 3},
+        {a:3, b:"3", c: 3},
+        {a:6, b:"4", c: 3},
+        {a:7, b:"4", c: 3},
+        {a:4, b:"3", c: 4},
+        {a:5, b:"3", c: 4},
+    ];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    sortOrder = [
+        {index:"b", decending:true},
+        {index:"c", decending:true},
+        {index:"a", decending:true},
+    ];
+    expected = [
+        {a:1, b:"2", c: 2},
+        {a:2, b:"2", c: 3},
+        {a:3, b:"3", c: 3},
+        {a:4, b:"3", c: 4},
+        {a:5, b:"3", c: 4},
+        {a:6, b:"4", c: 3},
+        {a:7, b:"4", c: 3},
+    ];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+})
+
+test.skip('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
+    const initialSortOrder = [
+        {index: "avgGroupSize", decending: true}, 
+        {index: "maxGroupSize", decending: true}, 
+        {index: "letterFrequency", decending: false}, 
+        {index: "word", decending: true}, 
+        {index: "clues", decending: true}, 
+        {index: "cluesGroupCount", decending: true}];
+    const sortOrder = initialSortOrder.slice();
+    const t0 = new Date().getTime();
+    WordUtils.calcWordleMaxIndexPartitions();
+    const t1 = new Date().getTime();
+    const stats = WordUtils.getWordleDisplayStats(WordleDict.wordleAll, sortOrder, "trace");
+    const t2 = new Date().getTime();
+    sortOrder.reverse();
+    ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
+    const t3 = new Date().getTime();
+    ArrayUtils.sortArrayOfStringToAnyMaps(stats, initialSortOrder);
+    const t4 = new Date().getTime();
+    ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
+    const t5 = new Date().getTime();
+    console.log("stats.length ",stats.length);
+    console.log("initWordleIndexPartitions ", (t1 - t0) / 1000 );
+    console.log("getWordleDisplayStats ", (t2 - t1) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps rev ", (t3 - t2) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps init ", (t4 - t3) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps rev2 ", (t5 - t4) / 1000 );
+})
 
 test('ArrayUtils.getMinIndices works properly', () => {
     let ascending = true;
@@ -253,4 +340,46 @@ test('Array convert to from Int16Array', () => {
     expect(array).toEqual(expected);
     array = ArrayUtils.nestedArrayOfNumberToInt16Array(expected);
     expect(array).toEqual(int16Array);
+})
+
+test('numberToArray works as expected', () => {
+    let num = 0x01020304
+    let expected = [4,3,2,1];
+    let result = ArrayUtils.numberToArray(num, 8);
+    expected = [4,6,8,8];
+    result = ArrayUtils.numberToArray(num, 7);
+    expect(result).toEqual(expected);
+    expected = [4,12,32,0,1];
+    result = ArrayUtils.numberToArray(num, 6);
+    expect(result).toEqual(expected);
+    expected = [4,24,0,4,16];
+    result = ArrayUtils.numberToArray(num, 5);
+    expect(result).toEqual(expected);
+    expected = [4,0,3,0,2,0,1];
+    result = ArrayUtils.numberToArray(num);
+    expect(result).toEqual(expected);
+    expected = [4,0,4,1,0,4,0,0,1];
+    result = ArrayUtils.numberToArray(num, 3);
+    expect(result).toEqual(expected);
+    expected = [0,1,0,0,3,0,0,0,2,0,0,0,1];
+    result = ArrayUtils.numberToArray(num, 2);
+    expect(result).toEqual(expected);
+    expected = [0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1];
+    result = ArrayUtils.numberToArray(num, 1);
+    expect(result).toEqual(expected);
+    expected = [4,3,2,1,0];
+    result = ArrayUtils.numberToArray(num, 8, 5);
+    expect(result).toEqual(expected);
+    num = 0
+    expected = [];
+    result = ArrayUtils.numberToArray(num, 8);
+    expect(result).toEqual(expected);
+    num = 0xffffffff
+    expected = [0xff,0xff,0xff,0xff];
+    result = ArrayUtils.numberToArray(num, 8);
+    expect(result).toEqual(expected);
+    num = 0xffffffff
+    expected = [0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf];
+    result = ArrayUtils.numberToArray(num, 4);
+    expect(result).toEqual(expected);
 })

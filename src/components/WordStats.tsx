@@ -2,6 +2,8 @@ import React, { useState, useMemo, useContext, useRef }  from "react";
 import { getWordleDisplayStats, filterWordlePicks, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordUtils';
 import { AppContext } from "../App";
 import * as ArrayUtils from "../utilities/ArrayUtils";
+import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordUtils";
+import { lettersPerWord } from "../data/BoardData";
 
 export type StatsState = "help" | "calculating" | "empty" | "normal";
 
@@ -12,7 +14,7 @@ const initialSortOrder: StatsSortOrder[] = [
     {index: "maxGroupSize", decending: true}, 
     {index: "letterFrequency", decending: false}, 
     {index: "word", decending: true}, 
-    {index: "clues", decending: true}, 
+    {index: "clues", decending: false}, 
     {index: "cluesGroupCount", decending: true}];
 
 export const WordStats = ({words, wordStatsState}) => {
@@ -109,8 +111,8 @@ export const WordStats = ({words, wordStatsState}) => {
                                         className={`cluesContainer`}
                                     >
                                         {(Math.abs(wordInfo["cluesGroupDivider"]) > 1) && 
-                                            wordInfo["clues"].split("").map(letter => (
-                                                <div className={`clueBox clueBox--${letter==='e' ? 'correct' : letter==='p' ? 'wrongIndex' : 'wrong'}`} />
+                                            ArrayUtils.numberToArray(wordInfo["clues"], 2, lettersPerWord).map(clue => (
+                                                <div className={`clueBox clueBox--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} />
                                             ))
                                         }
                                     </td>

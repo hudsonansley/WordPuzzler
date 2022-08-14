@@ -121,17 +121,20 @@ export type SortOrderObjType = {index: string, decending: boolean};
  * @param  {SortOrderObjType[]} sortOrder
  */
 export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:SortOrderObjType[]) => {
-	array.sort((a:StringToAnyMap, b:StringToAnyMap) => {
+	const cmpFunc = (a:StringToAnyMap, b:StringToAnyMap) => {
 		let result = 0;
-		let index = 0;
-		while (result === 0 && index < sortOrder.length) {
-			const sortIndex = sortOrder[index].index;
-			const orderMod = sortOrder[index].decending ? -1 : 1;
-			result = orderMod * (a[sortIndex] > b[sortIndex] ? -1 : a[sortIndex] < b[sortIndex] ? 1 : 0);
-			index++;
+		let i = 0;
+		const n = sortOrder.length;
+		while (result === 0 && i < n) {
+			const {index, decending} = sortOrder[i];
+			const ai = a[index];
+			const bi = b[index];
+			result = ai === bi ? 0 : ai > bi ? decending ? 1 : -1 : decending ? -1 : 1;
+			i++;
 		}
 		return result;
-	});
+	};
+	array.sort(cmpFunc);
 }
 
 export const getMinIndices = <T>(arrays:T[][], indices:number[], cmp:(a:T, b:T) => number ):number[] => {
@@ -154,12 +157,30 @@ export const getMinIndices = <T>(arrays:T[][], indices:number[], cmp:(a:T, b:T) 
 		} else if (i1 < a1.length) {
 			result = [i];
 			minIndex = i;
-			// } else if (i0 < a0.length) {
-		// 	result = [minIndex];
 		}
 	}
 	return result;
 }
+/**
+ * @param  {number} value
+ * @param  {number=4} bitsPerValue
+ * @param  {number} minLength
+ * @returns {number[]} returns an array of values splitting the given 
+ *  value into bit groups.
+ * NOTE: this only works properly for 32 bit values or less
+ */
+export const numberToArray = (value:number, bitsPerValue:number = 4, minLength:number = 0):number[] => {
+	const result:number[] = [];
+	let bitsMask = (1 << bitsPerValue) - 1;
+	while (value > 0) {
+		result.push(value & bitsMask);
+		value >>>= bitsPerValue;
+	}
+	for (let i = result.length; i < minLength; i++) {
+		result.push(0);
+	}
+	return result;
+} 
 
 /**
  * @param  {T[]} a1 
