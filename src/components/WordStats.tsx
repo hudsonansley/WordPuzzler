@@ -60,7 +60,7 @@ export const WordStats = ({words, wordStatsState}) => {
         case "normal":
             if (hasPartitions()) {
                 return (
-                    <div className="stats" id="statsTable">
+                    <div id="statsTable">
                     <table className="statTable">
                         <thead>
                         <tr>
@@ -134,7 +134,7 @@ export const WordStats = ({words, wordStatsState}) => {
                 )
             } else {
                 return (
-                    <div className="stats" id="statsTable">
+                    <div id="statsTable">
                     <table className="statTable">
                         <thead>
                         <tr>
@@ -189,14 +189,14 @@ export const WordStats = ({words, wordStatsState}) => {
             )
         case "empty":
             return (
-                <div className="stats help">
+                <div className="help">
                     The list resulting from the entries has zero words.
                     There likely is a contradiction that needs to be corrected.
                 </div>
             )
         case "help":
             return (
-                <div className="stats help">
+                <div className="help">
                     Set the word(s) based on your wordle game and tap enter.
                     <p/>
                     Toggle the letter placement color to match your wordle entries with the space bar for the last letter entered, or by tapping a letter.

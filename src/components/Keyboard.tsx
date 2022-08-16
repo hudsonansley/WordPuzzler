@@ -6,7 +6,7 @@ const keys = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
   ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
   ["Z", "X", "C", "V", "B", "N", "M"],
-  ["Change Letter Closeness Color"]
+  ["Change Letter Color"]
 ];
 
 const Keyboard = () => {
@@ -65,7 +65,6 @@ const Keyboard = () => {
         })}
       </div>
       <div className="line" key="line2">
-        <Key keyName={"ENTER"} sizeIndex="1" key="ENTER" />
         {keys[2].map((key) => {
           return <Key keyName={key} key={`_${key}`}/>;
         })}
@@ -73,6 +72,7 @@ const Keyboard = () => {
         </div>
       <div className="line" key="line3">
         <Key keyName=" " keyLabel={keys[3][0]} sizeIndex="2" key="CHANGE" />
+        <Key keyName={"ENTER"} sizeIndex="1" key="ENTER" />
       </div>
     </div>
   );

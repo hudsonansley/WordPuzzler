@@ -228,38 +228,20 @@ const App = () => {
 
   const memoryButton = (index:number) => {
     const selected = (index === currentBoardIndex && !combinedBoardMode) || (index < 0 && combinedBoardMode); 
-    const bgClassName = selected ? "bg-gray-600" : "bg-gray-500";
+    const bgClassName = selected ? "bg-mem-button-selected" : "bg-mem-button-deselected";
     return (
       <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
-        <div className={`${bgClassName} text-center rounded-lg box-border pl-2.5 pr-4 border-2`}>{index + 1}</div>
+        <div className={`${bgClassName} memory-button`}>{index + 1}</div>
       </button>
     )
-  }
-
-  const navButtonStyle = {
-    display:"flex",
-    direction: "row",
-    alighnItems: "center",
-    padding: 4,
-  }
-
-  const resetButtonStyle = {
-    fontWeight: "bold",
-    fontSize: 24,
-    padding: 8,
-  }
-
-  const helpButtonStyle = {
-    paddingTop: 5,
   }
 
   return (
     <div className="App">
       <nav>
-        <div style={navButtonStyle}>
+        <div className='navButtons'>
           <button 
-            style={helpButtonStyle}
-            id="help-button" 
+            id="help" 
             onClick={onShowHelp} 
             tabIndex={-1} >
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -267,8 +249,7 @@ const App = () => {
             </svg>
           </button>
           <button 
-            style={resetButtonStyle}
-            id="reset-button" 
+            id="reset" 
             onClick={onReset} 
             tabIndex={-1} 
           >
@@ -276,11 +257,11 @@ const App = () => {
           </button>
         </div>
         <h1>Wordle Helper</h1>
-        <div className="grid content-center gap-x-0 px-2 grid-cols-2">
-          <div className="grid content-center w-3">
+        <div className="memory-button-container">
+          <div className="quordle-button-container">
             {showQuordleButton() && memoryButton(-1)}
           </div>
-          <div className="grid gap-0 px-4 grid-cols-2">
+          <div className="two-by-two-buttons">
             {memoryButton(0)}
             {memoryButton(1)}
             {memoryButton(2)}

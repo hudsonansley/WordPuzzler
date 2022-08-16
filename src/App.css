@@ -35,17 +35,76 @@ nav h1 {
   text-align: center;
 }
 
-.helpButton {
-  width: 24px;
-  height: 24px;
-  margin: 12px;
-  background-color: #121212;
-  border: none;
+@media screen and (max-width: 600px) {
+  nav h1 {
+    font-size: 38px;
+  }
+}
+@media screen and (max-width: 500px) {
+  nav h1 {
+    font-size: 30px;
+  }
 }
 
-#help-button {
+.navButtons {
+  display: flex;
+  direction: row;
+  align-items: center;
+  padding: 4px;
+}
+
+button#help {
   border: none;
+  padding-top: 5px;
   background-color: #121212;
+}
+
+button#reset {
+  font-weight: bold;
+  font-size: 24px;
+  padding-top: 3px;
+  padding-left: 5px;
+}
+
+.memory-button-container {
+  display: grid; 
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+  align-content: center; 
+  grid-template-columns: 1fr 1fr; 
+  column-gap: 0; 
+  min-width:10rem;
+}
+
+.quordle-button-container {
+  display: grid; 
+  align-content: center; 
+  width: 0.75rem; 
+}
+
+.two-by-two-buttons {
+  display: grid; 
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 0; 
+}
+
+.memory-button {
+  box-sizing: border-box; 
+  padding-left: 0.6rem; 
+  padding-right: 0.65rem; 
+  text-align: center; 
+  border-radius: 0.5rem; 
+  border-width: 2px; 
+  min-width: 2rem;
+}
+
+.bg-mem-button-selected {
+  background-color: #4c515b; 
+}
+.bg-mem-button-deselected {
+  background-color: #6B7280; 
 }
 
 .row {
@@ -58,13 +117,14 @@ nav h1 {
 .column {
   display: flex;
   flex-direction: column;
+  min-width: 50vw;
+  max-width: 50vw;
   flex-basis: 100%;
   flex: 1;
-  align-content: center;
 }
 
 .game {
-  max-width: 60%;
+  /* max-width: 60%; */
   align-items: center;
   padding-top: 10px;
   flex-grow: 1;
@@ -142,26 +202,25 @@ tbody {
 }
 
 .stats {
-  display: block;
-  /* margin-left: auto;
-  margin-right: auto; */
-  overflow: auto;
-  align-items: center;
+  padding-top: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
   min-width: 260px;
 }
 
 .statTable {
-  table-layout:auto;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid gray;
   color: white;
-  width: 240px;
+  line-height: var(--stats-table-line-height);
   font-size: var(--stats-table-line-height);
 }
 
 .help {
   max-width: 360px;
   font-size: 16px;
-  text-align: left;
+  text-align: start;
 }
 
 p {
@@ -227,10 +286,12 @@ p {
 }
 
 .big {
-  width: 75px;
+  min-width: 75px;
+  max-width: 22%;
 }
 .spacebar {
-  width: 225px;
+  min-width: 225px;
+  max-width: 66%;
 }
 .disabled {
   background-color: #3a393c;
