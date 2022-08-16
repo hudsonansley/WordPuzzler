@@ -284,6 +284,7 @@ const App = () => {
           onShowHelp,
         }}
       >
+      <div className='content'>
         <div className='row'>
           <div className='game collumn'>
             <Board />
@@ -293,6 +294,7 @@ const App = () => {
             <WordStats words={words} wordStatsState={wordStatsState}/>
           </div>
         </div>
+      </div>
       </AppContext.Provider>
     </div>
   );

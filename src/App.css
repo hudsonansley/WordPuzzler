@@ -3,23 +3,30 @@
   --stats-clues-block-padding: 2px;
   --stats-clues-min-width: 57px;
   --stats-table-line-height: 15px;
+  --nav-height: 60px;
+}
+
+html {
+  background-color: #121212;
+  height: 100%;
 }
 
 .App {
   text-align: center;
   font-family: Helvetica, Arial, sans-serif;
-  background-color: #121212;
   color: white;
-  min-height: 100vh;
 }
 
 body {
   padding: 0%;
   margin: 0;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
 }
 
 nav {
-  height: 60px;
+  height: var(--nav-height);
   width: 100%;
   margin: 0;
   border-bottom: 1px solid grey;
@@ -42,7 +49,8 @@ nav h1 {
 }
 @media screen and (max-width: 500px) {
   nav h1 {
-    font-size: 30px;
+    font-size: 28px;
+    line-height: 24px;
   }
 }
 
@@ -107,6 +115,11 @@ button#reset {
   background-color: #6B7280; 
 }
 
+.content {
+  flex: 1;
+  overflow: auto;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -117,14 +130,9 @@ button#reset {
 .column {
   display: flex;
   flex-direction: column;
-  min-width: 50vw;
-  max-width: 50vw;
-  flex-basis: 100%;
-  flex: 1;
 }
 
 .game {
-  /* max-width: 60%; */
   align-items: center;
   padding-top: 10px;
   flex-grow: 1;
