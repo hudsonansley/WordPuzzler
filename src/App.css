@@ -35,10 +35,9 @@ nav {
 }
 
 nav h1 {
-  margin: 0;
+  margin: auto;
   color: white;
   font-size: 45px;
-  width: 100vw;
   text-align: center;
 }
 
