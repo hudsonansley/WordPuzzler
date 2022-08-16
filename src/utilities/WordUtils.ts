@@ -241,12 +241,9 @@ export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.SortOrderA
 	let letterCount = 0;
 	words.forEach( word => {
 		letters = word.split("");
-		lettersUnique = [...new Set(word.split(""))];
-		lettersUnique.forEach( letter => {
+		letters.forEach( (letter, i) => {
 			ArrayUtils.keyCountIncrement(letterFreq, letter);
 			letterCount++;
-		})
-		letters.forEach( (letter, i) => {
 			if (!placements[i]) {placements[i] = {}};
 			ArrayUtils.keyCountIncrement(placements[i], letter);
 		})
