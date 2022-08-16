@@ -406,7 +406,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 		for (const letter in atLeastLettersForClue) {
 			const clueCount = atLeastLettersForClue[letter];
 			const count = atLeastLetters[letter] ?? 0;
-			if (count < clueCount) {
+			if (clueCount >= count) {
 				atLeastLetters[letter] = clueCount;
 				if (notSomewhereLetters.indexOf(letter) >= 0) {
 					atMostLetters[letter] = clueCount;
