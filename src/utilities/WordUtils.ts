@@ -211,7 +211,12 @@ export const matches = (words: string[], regex:string):string[] => {
 }
 
 export type WordFilterFunc = (words: string[], ...args : string[]) => string[];
-
+/**
+ * @param  {string[]} words list to be filtered
+ * @param  {WordFilterFunc[]} funcs list of filtering functions
+ * @param  {string[][]} paramLists list of parameter lists to pass to the functions
+ * @returns {string[]} filters the given word list through the given list of functions, one after the other
+ */
 export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists:string[][]):string[] => {
 	let results = words.slice();
 	let n = funcs.length;
@@ -232,6 +237,12 @@ export const runFilterList = (words:string[], funcs:WordFilterFunc[], paramLists
 }
 
 export type wordPercentagesType = [number, string, number, number[]][];
+/**
+ * @param  {string[]} words
+ * @param  {ArrayUtils.SortOrderArrayType[]} sortOrder
+ * @returns the frequency of letters in the given words, the percentage frequency
+ *  for each letter, and the combined letter frequency for each word
+ */
 export const wordleFreqStats = (words: string[], sortOrder:ArrayUtils.SortOrderArrayType[] = [{index: 0, decending: false}, {index: 2, decending: true}, {index: 1, decending: false}]):[StringToNumberMap, [number, string][], wordPercentagesType] => {
 	if (!words) { words = []};
 	let letters;
@@ -460,6 +471,13 @@ export const WORDLE_CORRECT = 0b10;
 export const WORDLE_ALL_CORRECT = 0b1010101010;
 export const WORDLE_WRONG_POSITION = 0b01;
 export const WORDLE_WRONG = 0;
+/**
+ * @param  {string} word
+ * @param  {string} pick
+ * @returns {number} the number representing the letter scores that would
+ *  be returned by Wordle for the given word if the given pick was the
+ *  correct answer. 
+ */
 export const getWordleClues_num = (word:string, pick:string):number => {
 	const wordLets = word.split("");
 	const pickLets = pick.split("");
@@ -483,7 +501,14 @@ export const getWordleClues_num = (word:string, pick:string):number => {
 	}
 	return clues;
 }
-
+/**
+ * @param  {string} word
+ * @param  {string} pick
+ * @returns {string} a string representing the letter scores that would
+ *  be returned by Wordle for the given word if the given pick was the
+ *  correct answer. "e" if in the correct place, "p" if somewhere but wrond place
+ *  and "n" if letter not in the answer
+ */
 export const getWordleClues = (word:string, pick:string):string => {
 	const wordLets = word.split("");
 	const pickLets = pick.split("");
@@ -519,7 +544,8 @@ function checkStatus(response) {
   }
 
 export async function loadPartitionData() {
-	// this is getting an error that the headers are too big for this file
+	// WIP attempt to load the partition data instead of calculate it.
+	// This is getting an error that the headers are too big for this file
 	const url = "./data/partsByIndex.ba";
 	fetch(url)
 		.then(response => checkStatus(response) && response.arrayBuffer())
@@ -569,7 +595,12 @@ export function getWordlePicksIndexPartitions(words: string[]|null = null): numb
 	initWordleIndexPartitions();
 	return filterWordleIndexPartitions(words, wordlePicksIndexPartitions);
 }
-
+/**
+ * @param  {string[]} words all words available
+ * @param  {string[]} picks the words that could be potential answers
+ * @returns {number[][][]} given the word list and picks list, returns a nested array
+ *  representing the breakdown of Wordle parition groups 
+ */
 export const getWordleIndexPartitions = (words:string[], picks:string[]):number[][][] => {
 	const result = Array(words.length);
 	for (let word of words) {
@@ -588,7 +619,12 @@ export const getWordleIndexPartitions = (words:string[], picks:string[]):number[
 	}
 	return result;
 }
-
+/**
+ * @param  {string[]|null} words list of still possible words
+ * @param  {number[][][]} wpp the partitions for all the words
+ * @returns {number[][][]} the partisions filtered down to just the 
+ *  list of words given 
+ */
 export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][]):number[][][] => {
 	if (!wpp) {
 		console.error("no base word partion passed in");
@@ -606,8 +642,7 @@ export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][
 		const wordGroups = wpp[i];
 		result[i] = [];
 		for(const group of wordGroups) {
-			// const newGroup = ArrayUtils.sortedArraysIntersection(true, group, wordIndices);
-			const newGroup = ArrayUtils.sortedArraysIntersection2(group, wordIndices);
+			const newGroup = ArrayUtils.sortedArraysIntersectionDecending(group, wordIndices);
 			if (newGroup.length > 0) {
 				result[i].push(newGroup);
 			}
@@ -615,7 +650,12 @@ export const filterWordleIndexPartitions = (words:string[]|null, wpp:number[][][
 	}
 	return result;
 }
-
+/**
+ * @param  {number[][][]} wpp
+ * @param  {string=""} targetWord
+ * @returns {partionStats[]} returns the partion stats from the given partion data 
+ *  and target word
+ */
 export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string = ""):partionStats[] => {
 	const n = wpp.length;
 	const result:partionStats[] = Array(n);
@@ -653,6 +693,14 @@ export const getStatsFromIndexPartition = (wpp:number[][][], targetWord:string =
 
 export type wordleDisplayStatsType = {word:string, clues:number, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
 export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
+/**
+ * @param  {string[]} words
+ * @param  {ArrayUtils.SortOrderObjType[]} sortOrder
+ * @param  {string=""} targetWord
+ * @param  {number=50} maxNonPickWords
+ * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
+ *  useful for display in the word data table
+ */
 export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
 	if (words.length === 0) {
 		return [];

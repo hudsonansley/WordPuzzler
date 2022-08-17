@@ -185,11 +185,12 @@ export const numberToArray = (value:number, bitsPerValue:number = 4, minLength:n
 /**
  * @param  {T[]} a1 
  * @param  {T[]} a2
- * a1 and a2 must both be sorted in the same direction
+ * a1 and a2 must both be sorted in the same decending direction
  *  and contain the same type of items
- * takes O(n) time
+ * takes O(n) time. This is significantly faster than the 
+ *  one below that allows setting the direction of the sort
  */
- export const sortedArraysIntersection2 = <T>(a1:T[], a2:T[]) => {
+ export const sortedArraysIntersectionDecending = <T>(a1:T[], a2:T[]) => {
 	let i = 0, j = 0;
 	const result:T[] = [];
 	while (i < a1.length && j < a2.length) {
