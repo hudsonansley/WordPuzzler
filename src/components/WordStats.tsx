@@ -111,8 +111,11 @@ export const WordStats = ({words, wordStatsState}) => {
                                         className={`cluesContainer`}
                                     >
                                         {(Math.abs(wordInfo["cluesGroupDivider"]) > 1) && 
-                                            ArrayUtils.numberToArray(wordInfo["clues"], 2, lettersPerWord).map(clue => (
-                                                <div className={`clueBox clueBox--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} />
+                                            ArrayUtils.numberToArray(wordInfo["clues"], 2, lettersPerWord).map((clue, i) => (
+                                                <div 
+                                                    key = {`key_${clue}_${i}`}
+                                                    className={`clueBox clueBox--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} 
+                                                />
                                             ))
                                         }
                                     </td>
