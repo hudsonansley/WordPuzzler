@@ -10,7 +10,7 @@ export type LetterState = typeof letterStates[number];
 export type LetterType = { letter: string, state: LetterState };
 export type BoardDataType = LetterType[][];
 export type LetterLocType = { rowIndex: number, letterIndex: number };
-const blankLetter = " ";
+export const blankLetter = " ";
 
 export const getBlankLetter = (): LetterType => {
     return { letter: blankLetter, state: "wrong" };

@@ -1,21 +1,46 @@
-import React, { useContext }  from "react";
+import React, { useContext, useMemo }  from "react";
 import { AppContext } from "../App";
 import * as BoardData from "../data/BoardData"
 
 const Letter = ({ rowIndex, letterIndex }) => {
-    const { boardStr, onRotateLetterState } = useContext(AppContext);
-    const letter = BoardData.getLetterInBoardString(boardStr, { rowIndex, letterIndex });
+    const { boardStr, onRotateLetterState, combinedBoardMode,
+        storedBoardStates} = useContext(AppContext);
 
     const rotateLetterState = () => {
         onRotateLetterState({rowIndex:rowIndex, letterIndex:letterIndex});
     }
 
+    const [bgStyle, letterChar] = useMemo(() => {
+        let bgStyle:React.CSSProperties;
+        let letterChar:string;
+        const bgCssVals = { 
+            "correct": getComputedStyle(document.documentElement).getPropertyValue('--bg-correct'),
+            "wrongIndex": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong-index'),
+            "wrong": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong'),
+        }
+        if (combinedBoardMode) {
+            const letters:BoardData.LetterType[] = storedBoardStates.map(brdStr => BoardData.getLetterInBoardString(brdStr, { rowIndex, letterIndex }));
+            letterChar = (letters.find(letter => letter.letter !== BoardData.blankLetter) ?? letters[0]).letter;
+            bgStyle = {
+                background: `conic-gradient(rgb(${bgCssVals[letters[1].state]}) 90deg, rgb(${bgCssVals[letters[3].state]}) 90deg 180deg, rgb(${bgCssVals[letters[2].state]}) 180deg 270deg, rgb(${bgCssVals[letters[0].state]}) 270deg)`
+            }
+        } else {
+            const letter:BoardData.LetterType = BoardData.getLetterInBoardString(boardStr, { rowIndex, letterIndex });
+            letterChar = letter.letter;
+            bgStyle = {
+                backgroundColor: `rgb(${bgCssVals[letter.state]})`
+            }
+        }
+        return [bgStyle, letterChar];
+    }, [storedBoardStates, combinedBoardMode, boardStr, rowIndex, letterIndex])
+
     return (
-        <div className={`letter letter--${letter.state}`} 
+        <div className='letter'
+            style={bgStyle}
             id={letterIndex}
             onClick={rotateLetterState}
         >
-            {letter.letter}
+            {letterChar}
         </div>
     );
 }

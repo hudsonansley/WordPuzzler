@@ -4,6 +4,11 @@
   --stats-clues-min-width: 57px;
   --stats-table-line-height: 15px;
   --nav-height: 60px;
+  /* in rgb components for use in rgba() */
+  --bg-correct: 83, 141, 78;
+  --bg-wrong-index: 181, 159, 59;
+  --bg-wrong: 58, 58, 60;
+  --bg-deselect-opacity: 0.5;
 }
 
 html {
@@ -108,10 +113,17 @@ button#reset {
 }
 
 .bg-mem-button-selected {
-  background-color: #4c515b; 
+  background-color: #727278; 
 }
 .bg-mem-button-deselected {
-  background-color: #6B7280; 
+  background-color: #424248; 
+}
+
+.bg-qmem-button-selected {
+  background: conic-gradient(rgb(var(--bg-correct)) 90deg, rgb(var(--bg-wrong-index)) 90deg 180deg, rgb(var(--bg-correct)) 180deg 270deg, rgb(var(--bg-wrong)) 270deg);
+}
+.bg-qmem-button-deselected {
+  background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
 }
 
 .content {
@@ -170,15 +182,13 @@ button#reset {
 }
 
 .letter--correct {
-  background-color: #538d4e;
+  background-color: rgb(var(--bg-correct));
 }
-
 .letter--wrongIndex {
-  background-color: #b59f3b;
+  background-color: rgb(var(--bg-wrong-index));
 }
-
 .letter--wrong {
-  background-color: #3a3a3c;
+  background-color: rgb(var(--bg-wrong));
 }
 
 tr {
