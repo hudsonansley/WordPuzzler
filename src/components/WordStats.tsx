@@ -19,10 +19,12 @@ const initialSortOrder: StatsSortOrder[] = [
 
 export const WordStats = ({words, wordStatsState}) => {
     const { addRowToBoard } = useContext(AppContext);
-    const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
+    const [statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
+    const [wordOverDelayTimoutID, setWordOverDelayTimoutID] = useState(null);
     const targetWordRef = useRef("");
     const wordsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
+    const definitionLookupUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
     const hasPartitions = () => {
         return statsOrderInfo.targetWord !== "";
@@ -54,6 +56,31 @@ export const WordStats = ({words, wordStatsState}) => {
             boardRow += letter + clue;
         })
         addRowToBoard(boardRow);
+    }
+
+    const handleWordMouseEnter = (word:string) => {
+        if (!word || word.length === 0) { return }
+        setWordOverDelayTimoutID( setTimeout(() => {
+            fetch(definitionLookupUrl+word)
+                .then(response => response.json())
+                .then(data => {
+                    const meaning = data?.[0]?.["meanings"]?.[0]?.["definitions"]?.[0]?.["definition"];
+                    if (meaning && meaning.length > 0) {
+                        console.log(meaning);
+                    } else {
+                        console.log(`definition for ${word} not found`);
+                        console.dir(data);
+                    }
+                })
+                .catch(err => {        
+                    console.error(err)
+                  });
+        }, 500))
+             
+    }
+
+    const handleWordMouseLeave = () => {
+        clearTimeout(wordOverDelayTimoutID);
     }
 
     switch (wordStatsState) {
@@ -142,7 +169,9 @@ export const WordStats = ({words, wordStatsState}) => {
                         <thead>
                         <tr>
                             <th key="word">
-                                <button onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} >
+                                <button 
+                                    onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} 
+                                >
                                     words<br/>({wordCount})
                                 </button>
                             </th>
@@ -168,7 +197,11 @@ export const WordStats = ({words, wordStatsState}) => {
                             return (
                                 <tr className={wordInfo["letterFrequency"] > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo["word"]} >
                                     <td key="word">
-                                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} >
+                                        <button 
+                                            onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} 
+                                            onMouseEnter={()=>{handleWordMouseEnter(wordInfo["word"])}}
+                                            onMouseLeave={()=>{handleWordMouseLeave()}}
+                                        >
                                             {wordInfo["word"]}
                                         </button>
                                     </td>
