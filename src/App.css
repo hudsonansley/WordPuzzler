@@ -176,7 +176,6 @@ button#reset {
   font-size: 20px;
   font-weight: bolder;
   color: white;
-  font-family: Arial, Helvetica, sans-serif;
   user-select: none;
   cursor: pointer;
 }
@@ -226,6 +225,8 @@ tbody {
 }
 
 .statTable {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
   min-width: 260px;
   max-width: 340px;
   margin-left: auto;
