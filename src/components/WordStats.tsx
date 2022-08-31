@@ -186,7 +186,7 @@ export const WordStats = ({words, wordStatsState}) => {
             }
         case "calculating":
             return (
-                <div className='stats collumn'>
+                <div className='help'>
                   calculating initial wordle groups...
                 </div>
             )
