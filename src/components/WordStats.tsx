@@ -67,7 +67,7 @@ export const WordStats = ({words, wordStatsState}) => {
                             <th key="clues">
                                 <div className="cluesColumn">
                                     <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord);}} >
-                                        {statsOrderInfo.targetWord}
+                                        {statsOrderInfo.targetWord.toUpperCase()}
                                     </button>
                                 </div>
                             </th>
@@ -121,7 +121,7 @@ export const WordStats = ({words, wordStatsState}) => {
                                     </td>
                                     <td key="word">
                                         <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} >
-                                            {wordInfo["word"]}
+                                            {wordInfo["word"].toUpperCase()}
                                         </button>
                                     </td>
                                     <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
@@ -169,7 +169,7 @@ export const WordStats = ({words, wordStatsState}) => {
                                 <tr className={wordInfo["letterFrequency"] > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo["word"]} >
                                     <td key="word">
                                         <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} >
-                                            {wordInfo["word"]}
+                                            {wordInfo["word"].toUpperCase()}
                                         </button>
                                     </td>
                                     <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
@@ -186,7 +186,7 @@ export const WordStats = ({words, wordStatsState}) => {
             }
         case "calculating":
             return (
-                <div className='stats collumn'>
+                <div className='help'>
                   calculating initial wordle groups...
                 </div>
             )

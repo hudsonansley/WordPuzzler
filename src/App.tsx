@@ -224,8 +224,12 @@ const App = () => {
   }
 
   const memoryButton = (index:number) => {
-    const selected = (index === currentBoardIndex && !combinedBoardMode) || (index < 0 && combinedBoardMode); 
-    const bgClassName = selected ? "bg-mem-button-selected" : "bg-mem-button-deselected";
+    let bgClassName:string;
+    if (index < 0) {
+      bgClassName = (combinedBoardMode) ? "bg-qmem-button-selected" : "bg-qmem-button-deselected";
+    } else {
+      bgClassName = (!combinedBoardMode && index === currentBoardIndex) ? "bg-mem-button-selected" : "bg-mem-button-deselected";
+    }
     return (
       <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
         <div className={`${bgClassName} memory-button`}>{index + 1}</div>
@@ -270,6 +274,8 @@ const App = () => {
       <AppContext.Provider
         value={{
           addRowToBoard,
+          combinedBoardMode,
+          storedBoardStates,
           boardStr,
           setBoardStr,
           curLetterLoc,
