@@ -719,7 +719,6 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		}
 	} else {
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
-		// changeSortOrder("clues", targetWord);
 		ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
 		let lastWordClues = WORDLE_ALL_CORRECT; //always sorted to top
 		let sameCluesCount = 0;
