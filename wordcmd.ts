@@ -17,6 +17,7 @@ export const runChecks = (words: string[], mArgs:string[]):string[] => {
 	while (mArgs.length > 1) {
 		lastWordCount = results.length;
 		const funcName = mArgs.shift();
+		console.log(funcName);
 		const wordFunc = WordUtils[funcName];
 		if (typeof wordFunc == "function") {
 			funcs.push(wordFunc);
@@ -51,7 +52,7 @@ fs.writeFileSync('partsByIndexMax.ba', int16Ary, 'binary');
 const verbose = true;
 const numWords = 20; //TODO: set these with options
 WordUtils.setVerbose(verbose);
-const words = english3().filter(word => word.length > 2);
+const words = wordlePicks;//english3().filter(word => word.length > 2);
 if (verbose) {
     console.log(words.length);
 }

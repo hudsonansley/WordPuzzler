@@ -1,4 +1,5 @@
 import * as WordleDict from './Wordle'
+import { numToWord } from '../../utilities/WordUtils'
 
 test('Wordle.wordleAll has wordle some picks and decoys and not other words', () => {
     const wordleAll = WordleDict.wordleAll;
@@ -21,6 +22,23 @@ test('Wordle.wordleAll has wordle some picks and decoys and not other words', ()
     expect(wordleAll).not.toContain("yutes");
     expect(wordlePicks).not.toContain("yutes");
     expect(wordleDecoys).not.toContain("yutes");
+});
+test('Wordle.wordleAllNums wordlePicksNums wordleDecoysNums have the same words as string lists', () => {
+    const wordleAll = WordleDict.wordleAll;
+    const wordlePicks = WordleDict.wordlePicks;
+    const wordleDecoys = WordleDict.wordleDecoys;
+    const wordlePicksWords = Array.from(WordleDict.wordlePicksNums).map(numToWord);
+    const wordleDecoysWords = Array.from(WordleDict.wordleDecoysNums).map(numToWord);
+    const wordleAllWords = Array.from(WordleDict.wordleAllNums).map(numToWord);
+    wordleAllWords.sort();
+    expect(wordlePicks.length).toEqual(wordlePicksWords.length);
+    expect(wordlePicks[0]).toEqual(numToWord(WordleDict.wordlePicksNums[0]));
+    expect(wordlePicks).toEqual(wordlePicksWords);
+    expect(wordleDecoys.length).toEqual(wordleDecoysWords.length);
+    expect(wordleDecoys).toEqual(wordleDecoysWords);
+    expect(wordleAll.length).toEqual(wordleAllWords.length);
+    expect(wordleAll).toEqual(wordleAllWords);
+
 });
 // test('Wordle.wordleAll has all wordle picks and decoys exactly both combined', () => {
     // only uncomment if want to check updated dictionaries,

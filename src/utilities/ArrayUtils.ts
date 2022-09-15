@@ -75,6 +75,20 @@ export const keyCountIncrement = (keys:{[key:string]: number}, key:string):void 
 		keys[key] = 1;
 	}
 }
+/**
+ * @param  {{[key:number]:number}} keys
+ * @param  {number} key
+ * @returns void
+ * Keeps track of the number each key passed in by 
+ *  modifying the given map, adding a key with value 1 or incrementing if key already exists
+ */
+ export const numKeyCountIncrement = (keys:{[key:number]: number}, key:number):void => {
+	if (keys[key]) {
+		keys[key] += 1;
+	} else {
+		keys[key] = 1;
+	}
+}
 
 export type SortOrderIndexType = number | string;
 export type SortOrderType = {index: SortOrderIndexType, decending: boolean};
@@ -164,22 +178,20 @@ export const getMinIndices = <T>(arrays:T[][], indices:number[], cmp:(a:T, b:T) 
 /**
  * @param  {number} value
  * @param  {number=4} bitsPerValue
- * @param  {number} minLength
+ * @param  {number} length
  * @returns {number[]} returns an array of values splitting the given 
  *  value into bit groups.
  * NOTE: this only works properly for 32 bit values or less
  */
-export const numberToArray = (value:number, bitsPerValue:number = 4, minLength:number = 0):number[] => {
-	const result:number[] = [];
-	let bitsMask = (1 << bitsPerValue) - 1;
-	while (value > 0) {
-		result.push(value & bitsMask);
-		value >>>= bitsPerValue;
+export const numberToArray = (value:number, bitsPerValue:number = 4, length:number = 1):number[] => {
+	const result:number[] = Array(length);
+	const bitsMask = (1 << bitsPerValue) - 1;
+	let i = length;
+	while (i--) {
+		result[length - i - 1] = value & bitsMask;
+		value = value >>> bitsPerValue;
 	}
-	for (let i = result.length; i < minLength; i++) {
-		result.push(0);
-	}
-	return result;
+	return result;  
 } 
 
 /**

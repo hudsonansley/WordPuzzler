@@ -59,7 +59,7 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
     expect(array).toEqual(expected);
 })
 
-test.skip('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
+test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
     const initialSortOrder = [
         {index: "avgGroupSize", decending: true}, 
         {index: "maxGroupSize", decending: true}, 
@@ -69,7 +69,7 @@ test.skip('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
         {index: "cluesGroupCount", decending: true}];
     const sortOrder = initialSortOrder.slice();
     const t0 = new Date().getTime();
-    WordUtils.calcWordleMaxIndexPartitions();
+    WordUtils.initWordleIndexPartitions();
     const t1 = new Date().getTime();
     const stats = WordUtils.getWordleDisplayStats(WordleDict.wordleAll, sortOrder, "trace");
     const t2 = new Date().getTime();

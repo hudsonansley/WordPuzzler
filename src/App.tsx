@@ -8,7 +8,6 @@ import Keyboard from "./components/Keyboard";
 import { WordStats, StatsState } from "./components/WordStats";
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordUtils from './utilities/WordUtils';
-import * as ArrayUtils from './utilities/ArrayUtils';
 
 //TODO: add column for partitions view that gives which board(s) the word 
 // belongs to. Could just be shown on top of group b/c groups don't overlap
@@ -74,7 +73,7 @@ const App = () => {
     if (storedBoardStates[currentBoardIndex] === "") {
       setWordStatsState("calculating");
       setTimeout(() => {
-        WordUtils.calcWordleMaxIndexPartitions();
+        WordUtils.initWordleIndexPartitions();
         setWordsAndStatsState(WordleDict.wordlePicks);
       }, 1);
       return;
@@ -93,13 +92,13 @@ const App = () => {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 
-    if (WordUtils.wordlePicksIndexPartitions) {
+    if (WordUtils.cluesLookUpTable) {
       const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
       setWordsAndStatsState(newWords);
     } else {
       setWordStatsState("calculating");
       setTimeout(() => {
-        WordUtils.calcWordleIndexPartitions();
+        WordUtils.initWordleIndexPartitions();
         const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
         setWordsAndStatsState(newWords);
       }, 1)
@@ -185,11 +184,9 @@ const App = () => {
   }
 
   const calcCombinedWords = () => {
-    const boardWords = storedBoardStates.map((boardStr, i) =>
-      storedBoardCompleted[i] ? [] : 
-        WordUtils.wordle(WordleDict.wordlePicks, boardStr)
-    )
-    const newWords = ArrayUtils.sortedArraysUnion(true, ...boardWords);
+    const newWords = [...new Set(storedBoardStates)]
+      .filter((_, index) => !storedBoardCompleted[index])
+      .reduce((acc, boardStr) => acc.concat(WordUtils.wordle(WordleDict.wordlePicks, boardStr)),[]);
     setWordsAndStatsState(newWords);
   }
 
@@ -223,7 +220,7 @@ const App = () => {
   }
 
   const showQuordleButton = ():boolean => {
-    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && !!WordUtils.wordlePicksIndexPartitions;
+    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && !!WordUtils.cluesLookUpTable;
   }
 
   const memoryButton = (index:number) => {
