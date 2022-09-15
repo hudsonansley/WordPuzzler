@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useContext, useRef }  from "react";
-import { getWordleDisplayStats, filterWordlePicks, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordUtils';
+import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordUtils';
 import { AppContext } from "../App";
 import * as ArrayUtils from "../utilities/ArrayUtils";
 import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordUtils";
@@ -44,7 +44,7 @@ export const WordStats = ({words, wordStatsState}) => {
         },
         [words, statsOrderInfo]
     )
-    const wordCount = useMemo(() => filterWordlePicks(words).length, [words]);
+    const wordCount = words.length;
 
     const addWordToBoard = (word:string) => {
         const letters = word.split("");

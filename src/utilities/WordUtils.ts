@@ -456,10 +456,6 @@ export const wordle = (words:string[], clues:string):string[] => {
 			wParamLists.push([letterCount.join("_")]);
 		}
 	})
-	if (wordLen === 5) {
-		wFuncs.push(filterWordlePicks);
-		wParamLists.push([]);
-	}
 	return runFilterList(words, wFuncs, wParamLists);
 }
 
@@ -481,7 +477,7 @@ const clueNumToString = ["e", "p", "n"];
  *  and "n" if letter not in the answer
  */
  export const getWordleClues = (word:string, pick:string):string => {
-	getWordleCluesFast(wordToNum(word), wordToNum(pick));
+	getWordleCluesFast(WordleDict.wordToNum(word), WordleDict.wordToNum(pick));
 	return clues.reduce((acc, clueNum) => acc + clueNumToString[clueNum], "");
  }
 
@@ -552,7 +548,7 @@ export const initWordleIndexPartitions = ():void => {
 		cluesLookUpTable = new Array(wordCount);
 		groupSizesByClues = new Array(wordCount);
 		for (let i = 0; i < wordCount; i++) {
-			wordToIndexLUTable[numToWord(wordleAll[i])] = i;
+			wordToIndexLUTable[WordleDict.numToWord(wordleAll[i])] = i;
 			cluesLookUpTable[i] = new Uint16Array(cluesLookUpTableBuffer, i * picksCount * 2, picksCount);
 			groupSizesByClues[i] = new Uint16Array(groupSizesByCluesBuffer, i * CLUES_COUNTS_LEN * 2, CLUES_COUNTS_LEN);
 		}
@@ -693,7 +689,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		const partStat = partStats[i];
 		const wordIndex = partStat[0];
 		const freqStat:number = freqStats[wordIndex] ?? 0;
-		const word = numToWord(WordleDict.wordleAllNums[wordIndex]);
+		const word = WordleDict.numToWord(WordleDict.wordleAllNums[wordIndex]);
 		const item:wordleDisplayStatsType = {word:word, clues:partStat[1].wordleClues, avgGroupSize:partStat[1].averageGroupSize, maxGroupSize:partStat[1].largestGroup, letterFrequency:freqStat, cluesGroupCount:0, cluesGroupDivider:0};
 		if (wordsLU[wordIndex]) {
 			result.push(item);
@@ -753,41 +749,4 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 	return result;
 }
 
-/**
- * @param  {string[]} words
- * @returns {string[]} 
- * filters the given words for those in the wordle picks list
- */
-export const filterWordlePicks = (words:string[]):string[] => {
-	const wordlePicks = WordleDict.wordlePicks;
-	return words.filter(word => wordlePicks.indexOf(word) >= 0);
-}
-const WORD_CHAR_CODE_OFFSET = "a".charCodeAt(0) - 1;
-/**
- * @param  {string} word
- * @returns number - assumes word is a string of lower case letters less than
- *  7 characters long
- * 
- */
-export const wordToNum = (word:string):number => {
-    let result = word.toLowerCase().split("").reduce((val, ch) => (val << 5) | (ch.charCodeAt(0) - WORD_CHAR_CODE_OFFSET), 0);
-    return result;
-}
-/**
- * @param  {number} wordNum
- * @returns string - assumes wordNum is a 32 bit integer. Converts each 5 bits
- *  to a character in the return string
- */
-export const numToWord = (wordNum:number):string => {
-	const codes = [];
-	while (wordNum > 0) {
-		codes.unshift((wordNum & 0x0000001f) + WORD_CHAR_CODE_OFFSET)
-		wordNum = wordNum >> 5;
-	}
-    return String.fromCharCode(...codes);
-}
-
-export const wordsToNums = (words:string[]):number[] => {
-	return words.map(word => wordToNum(word));
-}
 
