@@ -92,7 +92,7 @@ const App = () => {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 
-    if (WordUtils.cluesLookUpTable) {
+    if (WordUtils.wordleIndexPartitionsInitialized()) {
       const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
       setWordsAndStatsState(newWords);
     } else {
@@ -220,7 +220,7 @@ const App = () => {
   }
 
   const showQuordleButton = ():boolean => {
-    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && !!WordUtils.cluesLookUpTable;
+    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && WordUtils.wordleIndexPartitionsInitialized();
   }
 
   const memoryButton = (index:number) => {

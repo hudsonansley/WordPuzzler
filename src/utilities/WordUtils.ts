@@ -535,8 +535,12 @@ export let groupSizesByClues:Uint16Array[];
 export let groupCounts:Uint16Array;
 export let groupMaxSizes:Uint16Array;
 
+export let wordleIndexPartitionsInitialized = ():boolean => {
+	return cluesLookUpTableBuffer ? true : false;
+}
+
 export const initWordleIndexPartitions = ():void => {
-	if (!cluesLookUpTable) {
+	if (!wordleIndexPartitionsInitialized) {
 		const wordleAll = WordleDict.wordleAllNums;
 		const wordlePicks =  WordleDict.wordlePicksNums; 
 		const wordCount = wordleAll.length;
@@ -671,7 +675,7 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 	if (words.length === 0) {
 		return [];
 	}
-	if (!cluesLookUpTable) {
+	if (!wordleIndexPartitionsInitialized()) {
 		console.error("getWordleDisplayStats called before partitions resolved");
 		return [];
 	}
