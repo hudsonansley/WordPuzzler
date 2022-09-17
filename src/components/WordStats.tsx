@@ -78,12 +78,12 @@ export const WordStats = ({words, wordStatsState}) => {
                             </th>
                             <th key="avgGroupSize">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: ""})}} >
-                                    average<br/>group size
+                                    average<br/>group<br/>size
                                 </button>
                             </th>
                             <th key="maxGroupSize">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"maxGroupSize", targetWord: ""})}} >
-                                    max<br/>group size
+                                    max<br/>group<br/>size
                                 </button>
                             </th>
                             <th key="letterFrequency">
@@ -125,7 +125,7 @@ export const WordStats = ({words, wordStatsState}) => {
                                         </button>
                                     </td>
                                     <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
-                                    <td key="maxGroupSize">{wordInfo["maxGroupSize"].toFixed(3)}</td>
+                                    <td key="maxGroupSize">{wordInfo["maxGroupSize"]}</td>
                                     <td key="letterFrequency">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
                                 </tr>
                                 )
@@ -148,12 +148,12 @@ export const WordStats = ({words, wordStatsState}) => {
                             </th>
                             <th key="avgGroupSize">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: ""})}} >
-                                    average<br/>group size
+                                    average<br/>group<br/>size
                                 </button>
                             </th>
                             <th key="maxGroupSize">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"maxGroupSize", targetWord: ""})}} >
-                                    max<br/>group size
+                                    max<br/>group<br/>size
                                 </button>
                             </th>
                             <th key="letterFrequency">
@@ -173,7 +173,7 @@ export const WordStats = ({words, wordStatsState}) => {
                                         </button>
                                     </td>
                                     <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
-                                    <td key="maxGroupSize">{wordInfo["maxGroupSize"].toFixed(3)}</td>
+                                    <td key="maxGroupSize">{wordInfo["maxGroupSize"]}</td>
                                     <td key="letterFrequency">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
                                 </tr>
                                 )
@@ -187,7 +187,7 @@ export const WordStats = ({words, wordStatsState}) => {
         case "calculating":
             return (
                 <div className='help'>
-                  calculating initial wordle groups...
+                  calculating wordle groups...
                 </div>
             )
         case "empty":

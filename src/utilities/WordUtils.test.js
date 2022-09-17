@@ -3,38 +3,38 @@ import * as WordleDict from '../data/dictionaries/Wordle'
 // import { english3 } from '../data/dictionaries/English'
 
 test('WordUtils.wordle properly reduces wordlist', () => {
-  const allWords = WordleDict.wordleAll;
+  const picks = WordleDict.wordlePicks;
   let words;
   
-  words = WordUtils.wordle(allWords, 'l-a-t-e-r?_g-i-r?l-y=_d-r?o?l-l-');
+  words = WordUtils.wordle(picks, 'l-a-t-e-r?_g-i-r?l-y=_d-r?o?l-l-');
   expect(words.length).toEqual(1);
   expect(words[0]).toEqual("rocky");
-  words = WordUtils.wordle(allWords, 'l-a?t-e-r-_g-i?r-l-y-_d-r-o-l-l-_r-o-c-k-y-_q-u-a?s=i?_s?w-a?m?i?_s?p-i=c-e-');
+  words = WordUtils.wordle(picks, 'l-a?t-e-r-_g-i?r-l-y-_d-r-o-l-l-_r-o-c-k-y-_q-u-a?s=i?_s?w-a?m?i?_s?p-i=c-e-');
   expect(words.length).toEqual(1);
   expect(words[0]).toEqual("amiss");
-  words = WordUtils.wordle(allWords, 'l?a-t-e-r?_g-i-r?l=y-');
+  words = WordUtils.wordle(picks, 'l?a-t-e-r?_g-i-r?l=y-');
   expect(words.length).toEqual(1);
   expect(words[0]).toEqual("droll");
-  words = WordUtils.wordle(allWords, 'l-a-t?e?r-_e?x-i=s=t=');
+  words = WordUtils.wordle(picks, 'l-a-t?e?r-_e?x-i=s=t=');
   expect(words.length).toEqual(1);
   expect(words[0]).toEqual("heist");
-  words = WordUtils.wordle(allWords, 'r-a-i-s/e-_s=n/o=u-t-');
+  words = WordUtils.wordle(picks, 'r-a-i-s/e-_s=n/o=u-t-');
   expect(words.length).toEqual(3);
   expect(words).toEqual(["shown", "spoon", "swoon"]);
-  words = WordUtils.wordle(allWords, 'a/l/t=e=r=');
+  words = WordUtils.wordle(picks, 'a/l/t=e=r=');
   expect(words.length).toEqual(1);
   expect(words[0]).toEqual("later");
-  words = WordUtils.wordle(allWords, 'c-r-a-n-e/_s-l-e/e-t/');
+  words = WordUtils.wordle(picks, 'c-r-a-n-e/_s-l-e/e-t/');
   expect(words.length).toEqual(11);
   expect(words).toContain("depth");
-  words = WordUtils.wordle(allWords, 's/l-e-e=t-');
+  words = WordUtils.wordle(picks, 's/l-e-e=t-');
   expect(words.length).toEqual(10);
   expect(words).toContain("askew");
   expect(words).toContain("riser");
-  words = WordUtils.wordle(allWords, 'o-t/t-e/r/');
+  words = WordUtils.wordle(picks, 'o-t/t-e/r/');
   expect(words).toContain("trace");
   expect(words).not.toContain("treat");
-  words = WordUtils.wordle(allWords, 't-r=a-c-e/_d-e-f-e=r/');
+  words = WordUtils.wordle(picks, 't-r=a-c-e/_d-e-f-e=r/');
   expect(words).toContain("gruel");
   expect(words).not.toContain("green");
   expect(words.length).toEqual(1);
@@ -59,11 +59,12 @@ test('WordUtils.palendroms finds palendrom pairs properly in worlde dictionary',
     rotor: 'rotor',
     tenet: 'tenet',
   };
-  expect(palendroms).toEqual(expected);
+  expect(palendroms).toStrictEqual(expected);
 })
 
 test('WordUtils.palendroms finds palendroms properly in worlde dictionary', () => {
   const words = WordleDict.wordleAll;
+  words.sort();
   let palendroms = WordUtils.filterPalendroms(words);
   const expected =  [
     "alula",
@@ -189,31 +190,45 @@ test('WordUtils.getWordleClues gets clues properly', () => {
 })
 
 test('WordUtils.filterWordleIndexPartitions works properly', () => {
-  //tdb
+  // TBD
 })
-
-test('WordUtils.wordToNum and WordUtils.numToWord work properly', () => {
-  let word = "aaaaa";
-  let expected = 0b100001000010000100001;
-  expect(WordUtils.wordToNum(word)).toEqual(expected);
-  let wordNum = 0b100001000010000100001;
-  expect(WordUtils.numToWord(wordNum)).toEqual(word);
-  wordNum = 0b100001000010000100010;
-  expect(WordUtils.numToWord(wordNum)).toEqual("aaaab");
-  const wordNums = WordUtils.wordsToNums(WordleDict.wordleDecoys);
-
-  require('fs').writeFile(
-
-    './wordDecoyNums.txt',
-
-    JSON.stringify(wordNums),
-
-    function (err) {
-        if (err) {
-            console.error('Crap happens');
-        }
+// wip, getting heap overflows when attempting to use the generated file data
+test.skip('create WordleData file', () => {
+    // generate a ts file that holds all the initial wordle partion data
+    let data = "// generated file, do not edit\n\n";
+    WordUtils.initWordleIndexPartitions();
+    expect(WordUtils.cluesLookUpTable).not.toBeFalsy();
+    const wordCount = WordleDict.wordleAllNums.length;
+    data += "export let cluesLookUpTable;\n";
+    data += "export let groupSizesByClues;\n";
+    data += "export let groupCounts;\n"
+    data += "export let groupMaxSizes;\n";
+    data += "export const wordleDataInit = () => {\n"
+    data += "cluesLookUpTable = [\n";
+    for (let i = 0; i < wordCount; i++) {
+      data += `new Uint16Array([${WordUtils.cluesLookUpTable[i].toString()}]),\n`
     }
-);
+    data += "];\n"
+    data += "groupSizesByClues = [\n";
+    for (let i = 0; i < wordCount; i++) {
+      data += `new Uint16Array([${WordUtils.groupSizesByClues[i].toString()}]),\n`
+    }
+    data += "];\n"
+    data += `groupCounts = new Uint16Array([${WordUtils.groupCounts.toString()}]);\n`
+    data += `groupMaxSizes = new Uint16Array([${WordUtils.groupMaxSizes.toString()}]);\n`;
+    data += `}\n`;
+  
+  
+    require('fs').writeFile(
+  
+      './WordleData.js',
+      data,
+      function (err) {
+          if (err) {
+              console.error('failed to write WordleData');
+          }
+      }
+    )
+});
 
-})
 

@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect } from 'react';
 
 import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
@@ -28,6 +28,12 @@ const App = () => {
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [words, setWords] = useState<string[]>([]);
   const [wordStatsState, setWordStatsState] = useState<StatsState>("help");
+
+  useEffect(() => {
+    setTimeout(() => {
+      WordUtils.initWordleIndexPartitions();
+    }, 1);
+  }, []);    
 
   const addRowToBoard = (boardRowStr:string) => {
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
@@ -70,14 +76,6 @@ const App = () => {
       setWordsAndStatsState(newWords);
       return;
     }
-    if (storedBoardStates[currentBoardIndex] === "") {
-      setWordStatsState("calculating");
-      setTimeout(() => {
-        WordUtils.initWordleIndexPartitions();
-        setWordsAndStatsState(WordleDict.wordlePicks);
-      }, 1);
-      return;
-    }
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
       alert("Fill in full word to calculate words remaining")
       return;
@@ -92,18 +90,8 @@ const App = () => {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 
-    if (WordUtils.wordleIndexPartitionsInitialized()) {
-      const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
-      setWordsAndStatsState(newWords);
-    } else {
-      setWordStatsState("calculating");
-      setTimeout(() => {
-        WordUtils.initWordleIndexPartitions();
-        const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
-        setWordsAndStatsState(newWords);
-      }, 1)
-    }
-      
+    const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
+    setWordsAndStatsState(newWords);      
   }
 
   const onDelete = () => {

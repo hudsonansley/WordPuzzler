@@ -540,7 +540,7 @@ export let wordleIndexPartitionsInitialized = ():boolean => {
 }
 
 export const initWordleIndexPartitions = ():void => {
-	if (!wordleIndexPartitionsInitialized) {
+	if (!wordleIndexPartitionsInitialized()) {
 		const wordleAll = WordleDict.wordleAllNums;
 		const wordlePicks =  WordleDict.wordlePicksNums; 
 		const wordCount = wordleAll.length;
@@ -564,14 +564,14 @@ export const initWordleIndexPartitions = ():void => {
 			let groupCount = 0;
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
 				const clues = getWordleCluesFast(wordleAll[i], wordlePicks[pickIndex]);
-				cluesLookUpTable[i][pickIndex] = clues | (1 << 15);
+				cluesLookUpTable[i][pickIndex] = clues;
 				groupSizesByClues[i][clues]++;
 				if (groupSizesByClues[i][clues] === 1) {
 					groupCount++;
 				}
 			}
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-				const clues = cluesLookUpTable[i][pickIndex] & ~(1 << 15);
+				const clues = cluesLookUpTable[i][pickIndex];
 				const groupSize = groupSizesByClues[i][clues];
 				if (maxGroupSize < groupSize) {
 					maxGroupSize = groupSize;
@@ -591,16 +591,20 @@ export const filterWordleIndexPartitions = (words:Uint16Array):void => {
 	for (let i = 0; i < words.length; i++) {
 		wordFlags[words[i]] = 1;
 	}
+	let groupCount:number;
+	let clues:number;
 	for (let i = 0; i < wordsCount; i++) {
-		let groupCount = groupCounts[i];
+		groupCount = groupCounts[i];
 		for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-			let clues = cluesLookUpTable[i][pickIndex];
-			const wordFlag = wordFlags[pickIndex];
-			const prevWordFlag = clues & (1 << 15);
+			clues = cluesLookUpTable[i][pickIndex];
+			const wordFlag = wordFlags[pickIndex] > 0;
+			const prevWordFlag = (clues & (1 << 15)) === 0;
+			const wordAdded = wordFlag && !prevWordFlag;
+			const wordRemoved = !wordFlag && prevWordFlag;
 			clues &= ~(1 << 15); //clear the flag
-			if ((wordFlag === 0 && prevWordFlag > 0) || (wordFlag > 0 && prevWordFlag === 0)) {
+			if (wordAdded || wordRemoved) {
 				let groupSize = groupSizesByClues[i][clues];
-				if (wordFlag === 0 && prevWordFlag > 0) {
+				if (wordRemoved) {
 					groupSize--;
 					if (groupSize === 0) {
 						groupCount--;
@@ -613,11 +617,11 @@ export const filterWordleIndexPartitions = (words:Uint16Array):void => {
 				}
 				groupSizesByClues[i][clues] = groupSize;
 			}
-			cluesLookUpTable[i][pickIndex] = clues | (wordFlag << 15);
+			cluesLookUpTable[i][pickIndex] = wordFlag ? clues: clues | (1 << 15) ;
 		}
 		let maxGroupSize = 0;
 		for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-			const clues = cluesLookUpTable[i][pickIndex] & ~(1 << 15);
+			clues = cluesLookUpTable[i][pickIndex] & ~(1 << 15);
 			const groupSize = groupSizesByClues[i][clues];
 			if (maxGroupSize < groupSize) {
 				maxGroupSize = groupSize;

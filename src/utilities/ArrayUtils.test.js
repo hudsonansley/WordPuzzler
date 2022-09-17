@@ -343,43 +343,44 @@ test('Array convert to from Int16Array', () => {
 })
 
 test('numberToArray works as expected', () => {
-    let num = 0x01020304
+    let num = 0x01020304;
     let expected = [4,3,2,1];
-    let result = ArrayUtils.numberToArray(num, 8);
+    let result = ArrayUtils.numberToArray(num, 8, expected.length);
+    expect(result).toEqual(expected);
     expected = [4,6,8,8];
-    result = ArrayUtils.numberToArray(num, 7);
+    result = ArrayUtils.numberToArray(num, 7, expected.length);
     expect(result).toEqual(expected);
     expected = [4,12,32,0,1];
-    result = ArrayUtils.numberToArray(num, 6);
+    result = ArrayUtils.numberToArray(num, 6, expected.length);
     expect(result).toEqual(expected);
     expected = [4,24,0,4,16];
-    result = ArrayUtils.numberToArray(num, 5);
+    result = ArrayUtils.numberToArray(num, 5, expected.length);
     expect(result).toEqual(expected);
-    expected = [4,0,3,0,2,0,1];
-    result = ArrayUtils.numberToArray(num);
+    expected = [4,6,8,8,0,0];
+    result = ArrayUtils.numberToArray(num, 7, expected.length);
     expect(result).toEqual(expected);
     expected = [4,0,4,1,0,4,0,0,1];
-    result = ArrayUtils.numberToArray(num, 3);
+    result = ArrayUtils.numberToArray(num, 3, expected.length);
     expect(result).toEqual(expected);
     expected = [0,1,0,0,3,0,0,0,2,0,0,0,1];
-    result = ArrayUtils.numberToArray(num, 2);
+    result = ArrayUtils.numberToArray(num, 2, expected.length);
     expect(result).toEqual(expected);
     expected = [0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1];
-    result = ArrayUtils.numberToArray(num, 1);
+    result = ArrayUtils.numberToArray(num, 1, expected.length);
     expect(result).toEqual(expected);
     expected = [4,3,2,1,0];
-    result = ArrayUtils.numberToArray(num, 8, 5);
+    result = ArrayUtils.numberToArray(num, 8, expected.length);
     expect(result).toEqual(expected);
     num = 0
     expected = [];
-    result = ArrayUtils.numberToArray(num, 8);
+    result = ArrayUtils.numberToArray(num, 8, 0);
     expect(result).toEqual(expected);
     num = 0xffffffff
     expected = [0xff,0xff,0xff,0xff];
-    result = ArrayUtils.numberToArray(num, 8);
+    result = ArrayUtils.numberToArray(num, 8, expected.length);
     expect(result).toEqual(expected);
     num = 0xffffffff
     expected = [0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf];
-    result = ArrayUtils.numberToArray(num, 4);
+    result = ArrayUtils.numberToArray(num, 4, expected.length);
     expect(result).toEqual(expected);
 })
