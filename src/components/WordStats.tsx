@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useContext, useRef }  from "react";
-import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordUtils';
+import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordleUtils';
 import { AppContext } from "../App";
 import * as ArrayUtils from "../utilities/ArrayUtils";
-import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordUtils";
+import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordleUtils";
 import { lettersPerWord } from "../data/BoardData";
 
 export type StatsState = "help" | "calculating" | "empty" | "normal";

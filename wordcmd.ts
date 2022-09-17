@@ -1,4 +1,4 @@
-import * as WordUtils from './src/utilities/WordUtils';
+import * as WordUtils from './src/utilities/WordleUtils';
 import * as ArrayUtils from './src/utilities/ArrayUtils';
 import { english3 } from './src/data/dictionaries/English'
 import { wordlePicks, wordleDecoys } from './src/data/dictionaries/Wordle'

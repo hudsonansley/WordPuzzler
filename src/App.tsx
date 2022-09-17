@@ -7,7 +7,7 @@ import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
 import { WordStats, StatsState } from "./components/WordStats";
 import * as WordleDict from './data/dictionaries/Wordle'
-import * as WordUtils from './utilities/WordUtils';
+import * as WordUtils from './utilities/WordleUtils';
 
 //TODO: add column for partitions view that gives which board(s) the word 
 // belongs to. Could just be shown on top of group b/c groups don't overlap

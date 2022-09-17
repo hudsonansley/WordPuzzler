@@ -1,5 +1,5 @@
 import * as ArrayUtils from './ArrayUtils';
-import * as WordUtils from './WordUtils';
+import * as WordUtils from './WordleUtils';
 import * as WordleDict from '../data/dictionaries/Wordle';
 
 test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
