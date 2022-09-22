@@ -389,7 +389,11 @@ export let groupSizesByClues:Uint16Array[];
 export let groupCounts:Uint16Array;
 export let groupMaxSizes:Uint16Array;
 
-export let wordleIndexPartitionsInitialized = ():boolean => {
+export const getIndexFromWord = (word:string):number => {
+	return wordToIndexLUTable[word] ?? -1; 
+}
+
+export const wordleIndexPartitionsInitialized = ():boolean => {
 	return cluesLookUpTableBuffer ? true : false;
 }
 

@@ -5,7 +5,7 @@ import * as ArrayUtils from "../utilities/ArrayUtils";
 import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordleUtils";
 import { lettersPerWord } from "../data/BoardData";
 
-export type StatsState = "help" | "calculating" | "empty" | "normal";
+export type StatsState = "help" | "calculating" | "completed" | "empty" | "normal";
 
 type StatsSortOrder = {index: wordleDisplayStatsKeys, decending: boolean};
 type StatsOrderInfo = {primaryIndex: wordleDisplayStatsKeys, targetWord:string};
@@ -17,7 +17,7 @@ const initialSortOrder: StatsSortOrder[] = [
     {index: "clues", decending: false}, 
     {index: "cluesGroupCount", decending: true}];
 
-export const WordStats = ({words, wordStatsState}) => {
+export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsState:StatsState}) => {
     const { addRowToBoard } = useContext(AppContext);
     const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
     const targetWordRef = useRef("");
@@ -195,6 +195,12 @@ export const WordStats = ({words, wordStatsState}) => {
                 <div className="help">
                     The list resulting from the entries has zero words.
                     There likely is a contradiction that needs to be corrected.
+                </div>
+            )
+        case "completed":
+            return (
+                <div className="help">
+                    This board has been completed.
                 </div>
             )
         case "help":

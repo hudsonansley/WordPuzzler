@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useContext } from "react";
 import Key from "./Key";
 import { AppContext } from "../App";
 
-const keys = [
+const keyLabels = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
   ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-  ["Z", "X", "C", "V", "B", "N", "M"],
-  ["Change Letter Color"]
+  ["Z", "X", "C", "V", "B", "N", "M", "DELETE"],
+  ["Change Letter Color", "ENTER"]
 ];
 
 const Keyboard = () => {
@@ -23,24 +23,25 @@ const Keyboard = () => {
 
   const handleKeyboard = useCallback(
     (event) => {
-      if (event.key === "Enter") {
+      const key = event.key.toUpperCase();
+      if (key === "ENTER") {
         event.preventDefault();
         onEnter();
-      } else if (event.key === "Backspace") {
+      } else if (key === "BACKSPACE") {
         onDelete();
       } else if (event.keyCode === 32) {
         event.preventDefault();
         onRotateLetterState(curLetterLoc);
-      } else if (event.key === "?" || event.key === "/") {
+      } else if (key === "?" || key === "/") {
         onShowHelp();
-      } else if (event.key >= "0" && event.key <= "4") {
-        switchToBoard(parseInt(event.key) - 1);
+      } else if (key >= "0" && key <= "4") {
+        switchToBoard(parseInt(key) - 1);
       } else {
-        keys.forEach(row => { row.forEach(key => {
-          if (event.key.toLowerCase() === key.toLowerCase()) {
+        keyLabels.forEach(keyRow => {
+          if (keyRow.indexOf(key) >= 0) {
             onSelectLetter(key);
           }
-        })});
+        });
       }
     },
     [curLetterLoc, onDelete, onEnter, onRotateLetterState, onSelectLetter, switchToBoard, onShowHelp]
@@ -54,26 +55,15 @@ const Keyboard = () => {
 
   return (
     <div className="keyboard" onKeyDown={handleKeyboard}>
-      <div className="line" key="line0">
-        {keys[0].map((key) => {
-          return <Key keyName={key} key={`_${key}`}/>;
-        })}
-      </div>
-      <div className="line" key="line1">
-        {keys[1].map((key) => {
-          return <Key keyName={key} key={`_${key}`}/>;
-        })}
-      </div>
-      <div className="line" key="line2">
-        {keys[2].map((key) => {
-          return <Key keyName={key} key={`_${key}`}/>;
-        })}
-        <Key keyName={"DELETE"} sizeIndex="1" key="DELETE" />
+      {keyLabels.map((keyRow, i) => {
+        return (
+        <div className="line" key={`line${i}`}>
+          {keyRow.map((keyLabel) => {
+            return <Key keyLabel={keyLabel} key={`_${keyLabel.split(" ").join("")}`}/>;
+          })}
         </div>
-      <div className="line" key="line3">
-        <Key keyName=" " keyLabel={keys[3][0]} sizeIndex="2" key="CHANGE" />
-        <Key keyName={"ENTER"} sizeIndex="1" key="ENTER" />
-      </div>
+        )
+      })}
     </div>
   );
 }

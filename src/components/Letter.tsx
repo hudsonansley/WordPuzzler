@@ -2,7 +2,13 @@ import React, { useContext, useMemo }  from "react";
 import { AppContext } from "../App";
 import * as BoardData from "../data/BoardData"
 
-const Letter = ({ rowIndex, letterIndex }) => {
+interface parameters {
+    rowIndex: number,
+    letterIndex: number,
+    key?: string,
+}
+
+const Letter = ({ rowIndex, letterIndex }:parameters) => {
     const { boardStr, onRotateLetterState, combinedBoardMode,
         storedBoardStates} = useContext(AppContext);
 
@@ -37,7 +43,6 @@ const Letter = ({ rowIndex, letterIndex }) => {
     return (
         <div className='letter'
             style={bgStyle}
-            id={letterIndex}
             onClick={rotateLetterState}
         >
             {letterChar}

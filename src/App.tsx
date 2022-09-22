@@ -62,7 +62,8 @@ const App = () => {
 
   const setWordsAndStatsState = (newWords) => {
     setWords(newWords);
-    setWordStatsState(newWords.length > 0 ? "normal" : "empty");
+    setWordStatsState(newWords.length > 0 ? "normal" : 
+      storedBoardCompleted[currentBoardIndex] ? "completed" : "empty");
   }
 
   const onShowHelp = () => {
@@ -72,8 +73,7 @@ const App = () => {
   const onEnter = () => {
     combinedBoardMode = false;
     if (storedBoardCompleted[currentBoardIndex]) {
-      const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
-      setWordsAndStatsState(newWords);
+      setWordsAndStatsState([]);
       return;
     }
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
@@ -86,7 +86,7 @@ const App = () => {
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
 
-    if (WordleDict.wordleAll.indexOf(curWord) < 0) {
+    if (WordUtils.getIndexFromWord(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 

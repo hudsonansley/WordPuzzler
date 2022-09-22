@@ -1,29 +1,31 @@
 import React, { useContext } from "react";
 import { AppContext } from "../App";
 
-const Key = ({ keyName, keyLabel = "", sizeIndex = "0" }) => {
+interface parameters {
+    keyLabel: string,
+    key?: string,
+}
+
+const Key = ({ keyLabel }:parameters) => {
     const { onRotateLetterState, curLetterLoc, onSelectLetter, onDelete, onEnter } = 
         useContext(AppContext);
-    if (keyLabel === "") {
-        keyLabel = keyName;
-    }
 
     const selectLetter = () => {
-        if (keyName === "ENTER") {
+        if (keyLabel === "ENTER") {
             onEnter();
-        } else if (keyName === "DELETE") {
+        } else if (keyLabel === "DELETE") {
             onDelete();
-        } else if (keyName === " ") {
+        } else if (keyLabel.length ===  1) {
+            onSelectLetter(keyLabel);
+        } else { // spacebar
             onRotateLetterState(curLetterLoc);
-        } else {
-            onSelectLetter(keyName);
         }
     };
-    const sizes = ["", " big", " spacebar"];
+    const size = keyLabel.length === 1 ? "" : keyLabel.length < 8 ? "big" : "spacebar";
+
     return (
         <div
-            className={`key${sizes[parseInt(sizeIndex)]}`}
-            key={`_${keyName}`}
+            className={`key ${size}`}
             onClick={selectLetter}
         >
             {keyLabel}
