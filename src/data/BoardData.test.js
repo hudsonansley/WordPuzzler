@@ -139,6 +139,18 @@ test('BoardData.getLetterInBoardString returns expected value', () => {
 
 })
 
+test('BoardData.getBoardWords returns expected value', () => {
+    let boardStr = "";
+    let expected = [];
+    expect(BoardData.getBoardWords(boardStr)).toEqual(expected);
+    boardStr = "A-B-C-D-E-";
+    expected = ["abcde"];
+    expect(BoardData.getBoardWords(boardStr)).toEqual(expected);
+    boardStr = "A-B-C-D-E-_G-H-I-J=K-_L/M=N-O-P-_Q-R=S=T-U=_V/W-X=Y/Z-";
+    expected = ["abcde", "ghijk", "lmnop", "qrstu", "vwxyz"];
+    expect(BoardData.getBoardWords(boardStr)).toEqual(expected);
+})
+
 test('BoardData.setLetterInBoardString returns expected value', () => {
     let boardStr = "A-B-C-D-E-";
     let board = BoardData.getBoardFromString(boardStr);

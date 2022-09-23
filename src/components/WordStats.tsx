@@ -18,11 +18,12 @@ const initialSortOrder: StatsSortOrder[] = [
     {index: "cluesGroupCount", decending: true}];
 
 export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsState:StatsState}) => {
-    const { addRowToBoard } = useContext(AppContext);
+    const { addWordToBoard } = useContext(AppContext);
     const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
     const targetWordRef = useRef("");
     const wordsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
+    const wordCount = words.length;
 
     const hasPartitions = () => {
         return statsOrderInfo.targetWord !== "";
@@ -44,16 +45,12 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
         },
         [words, statsOrderInfo]
     )
-    const wordCount = words.length;
 
-    const addWordToBoard = (word:string) => {
-        const letters = word.split("");
-        const clue = (words?.length === 1 && words[0] === word) ? "=" : "-";
-        let boardRow = "";
-        letters.forEach(letter => {
-            boardRow += letter + clue;
-        })
-        addRowToBoard(boardRow);
+    const onTapListWord = (word:string) => {
+        if (wordCount === 1 && words[0] === word) {
+            addWordToBoard(word, true);
+        }
+        setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: word});
     }
 
     switch (wordStatsState) {
@@ -66,7 +63,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                         <tr>
                             <th key="clues">
                                 <div className="cluesColumn">
-                                    <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord);}} >
+                                    <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord, false)}} >
                                         {statsOrderInfo.targetWord.toUpperCase()}
                                     </button>
                                 </div>
@@ -120,7 +117,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                                         }
                                     </td>
                                     <td key="word">
-                                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} >
+                                        <button onClick={() => {onTapListWord(wordInfo["word"])}} >
                                             {wordInfo["word"].toUpperCase()}
                                         </button>
                                     </td>
@@ -168,7 +165,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                             return (
                                 <tr className={wordInfo["letterFrequency"] > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo["word"]} >
                                     <td key="word">
-                                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: wordInfo["word"]})}} >
+                                        <button onClick={() => {onTapListWord(wordInfo["word"])}} >
                                             {wordInfo["word"].toUpperCase()}
                                         </button>
                                     </td>

@@ -60,6 +60,16 @@ const App = () => {
     }
   }
 
+  const addWordToBoard = (word:string, final: boolean) => {
+    const boardWords = storedBoardStates.reduce((acc, boardStr) => acc.concat(BoardData.getBoardWords(boardStr)), []);
+    if (boardWords.indexOf(word) < 0) {
+        const letters = word.split("");
+        const clue = final ? "=" : "-";
+        const boardRow = letters.reduce((acc, letter) => acc += letter + clue, "");
+        addRowToBoard(boardRow);
+    }
+  }
+
   const setWordsAndStatsState = (newWords) => {
     setWords(newWords);
     setWordStatsState(newWords.length > 0 ? "normal" : 
@@ -262,7 +272,7 @@ const App = () => {
       </nav>
       <AppContext.Provider
         value={{
-          addRowToBoard,
+          addWordToBoard,
           combinedBoardMode,
           storedBoardStates,
           boardStr,
