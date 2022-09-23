@@ -144,8 +144,8 @@ const App = () => {
         storedBoardDirty[index] = true;
       }
     }
+    const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     if (!storedBoardCompleted[currentBoardIndex]) {
-      const newBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
       setBoardStr(storedBoardStates[currentBoardIndex]);
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     }
@@ -179,6 +179,9 @@ const App = () => {
     storedBoardStates[currentBoardIndex] = newBoardStr;
     setBoardStr(newBoardStr);
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+    if (BoardData.boardIsComplete(newBoard)) {
+      storedBoardCompleted[currentBoardIndex] = true;
+    }
   }
 
   const calcCombinedWords = () => {

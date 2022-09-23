@@ -139,6 +139,16 @@ test('BoardData.getLetterInBoardString returns expected value', () => {
 
 })
 
+test('BoardData.boardIsComplete returns expected value', () => {
+    let boardStr = "A-B-C-D-E-_G-H-I-J=K-_L/M=N-O-P-_Q-R=S=T-U=_V/W-X=Y/Z-";
+    let board = BoardData.getBoardFromString(boardStr);
+    expect(BoardData.boardIsComplete(board)).toBeFalsy;
+    boardStr = "A-B-C-D-E-_G-H-I-J=K-_L/M=N-O-P-_Q-R=S=T-U=_V=W=X=Y=Z=";
+    board = BoardData.getBoardFromString(boardStr);
+    expect(BoardData.boardIsComplete(board)).toBeTruthy;
+
+})
+
 test('BoardData.getBoardWords returns expected value', () => {
     let boardStr = "";
     let expected = [];
