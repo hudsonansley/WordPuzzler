@@ -5,7 +5,7 @@ const InitProgress = ({ progress }) => {
     const boxes = [];
     for (let i = 0; i < boxCount; i++) {
         boxes.push(
-            <div 
+            <div key={`_box_${i}`}
                 className={`letter letter--${i / boxCount <= progress ? 'correct' : 'wrong' }`} 
             />
         )
