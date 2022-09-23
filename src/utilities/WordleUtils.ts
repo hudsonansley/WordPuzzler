@@ -393,31 +393,47 @@ export const getIndexFromWord = (word:string):number => {
 	return wordToIndexLUTable[word] ?? -1; 
 }
 
+export let wordCount = 0;
+export let picksCount = 0;
+export let wordleAll:Uint32Array;
+export let wordlePicks:Uint32Array;
+let wordsPerInitChunk:number;
+let wordsProcessed:number;
 export const wordleIndexPartitionsInitialized = ():boolean => {
-	return cluesLookUpTableBuffer ? true : false;
+	return wordsProcessed === wordCount;
 }
 
-export const initWordleIndexPartitions = ():void => {
-	if (!wordleIndexPartitionsInitialized()) {
-		const wordleAll = WordleDict.wordleAllNums;
-		const wordlePicks =  WordleDict.wordlePicksNums; 
-		const wordCount = wordleAll.length;
-		const picksCount = wordlePicks.length;
-		wordIndicesBuffer = new ArrayBuffer(wordCount * 2);
-		wordFlags = new Uint8Array(picksCount);
-		cluesLookUpTableBuffer = new ArrayBuffer(wordCount * picksCount * 2);
-		groupSizesByCluesBuffer = new ArrayBuffer(wordCount * CLUES_COUNTS_LEN * 2);
-		cluesLookUpTable = new Array(wordCount);
-		groupSizesByClues = new Array(wordCount);
-		for (let i = 0; i < wordCount; i++) {
-			wordToIndexLUTable[WordleDict.numToWord(wordleAll[i])] = i;
-			cluesLookUpTable[i] = new Uint16Array(cluesLookUpTableBuffer, i * picksCount * 2, picksCount);
-			groupSizesByClues[i] = new Uint16Array(groupSizesByCluesBuffer, i * CLUES_COUNTS_LEN * 2, CLUES_COUNTS_LEN);
-		}
-		groupCounts = new Uint16Array(wordCount);
-		groupMaxSizes = new Uint16Array(wordCount);
+const initDataLists = ():void => {
+	wordleAll = WordleDict.wordleAllNums;
+	wordlePicks =  WordleDict.wordlePicksNums; 
+	picksCount = wordlePicks.length;
+	wordCount = wordleAll.length;
+	wordsProcessed = 0;
+	wordsPerInitChunk = Math.ceil(wordCount / 10);
 
-		for (let i = 0; i < wordCount; i++) {
+	wordIndicesBuffer = new ArrayBuffer(wordCount * 2);
+	wordFlags = new Uint8Array(picksCount);
+	cluesLookUpTableBuffer = new ArrayBuffer(wordCount * picksCount * 2);
+	groupSizesByCluesBuffer = new ArrayBuffer(wordCount * CLUES_COUNTS_LEN * 2);
+	cluesLookUpTable = new Array(wordCount);
+	groupSizesByClues = new Array(wordCount);
+	for (let i = 0; i < wordCount; i++) {
+		wordToIndexLUTable[WordleDict.numToWord(wordleAll[i])] = i;
+		cluesLookUpTable[i] = new Uint16Array(cluesLookUpTableBuffer, i * picksCount * 2, picksCount);
+		groupSizesByClues[i] = new Uint16Array(groupSizesByCluesBuffer, i * CLUES_COUNTS_LEN * 2, CLUES_COUNTS_LEN);
+	}
+	groupCounts = new Uint16Array(wordCount);
+	groupMaxSizes = new Uint16Array(wordCount);
+}
+
+export const initWordleIndexPartitionsProg = ():number => {
+	if (!wordleIndexPartitionsInitialized()) {
+		if (wordCount === 0) {
+			initDataLists();
+		}
+		const n = Math.min(wordCount, wordsProcessed + wordsPerInitChunk);
+		let i:number;
+		for (i = wordsProcessed; i < n; i++) {
 			let maxGroupSize = 0;
 			let groupCount = 0;
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
@@ -438,8 +454,11 @@ export const initWordleIndexPartitions = ():void => {
 			groupCounts[i] = groupCount;
 			groupMaxSizes[i] = maxGroupSize;
 		}
-	
-	}	
+		wordsProcessed = i;
+		return wordsProcessed / wordCount;
+	} else {
+		return 1;
+	}
 }
 
 export const filterWordleIndexPartitions = (words:Uint16Array):void => {

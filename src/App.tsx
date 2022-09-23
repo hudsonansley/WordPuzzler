@@ -5,9 +5,10 @@ import React, { useState, createContext, useEffect } from 'react';
 import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
+import InitProgress from "./components/InitProgress";
 import { WordStats, StatsState } from "./components/WordStats";
 import * as WordleDict from './data/dictionaries/Wordle'
-import * as WordUtils from './utilities/WordleUtils';
+import * as WordleUtils from './utilities/WordleUtils';
 
 //TODO: add column for partitions view that gives which board(s) the word 
 // belongs to. Could just be shown on top of group b/c groups don't overlap
@@ -28,12 +29,11 @@ const App = () => {
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [words, setWords] = useState<string[]>([]);
   const [wordStatsState, setWordStatsState] = useState<StatsState>("help");
+  const [initProgress, setInitProgress] = useState<number>(0);
 
   useEffect(() => {
-    setTimeout(() => {
-      WordUtils.initWordleIndexPartitions();
-    }, 1);
-  }, []);    
+    setInitProgress(WordleUtils.initWordleIndexPartitionsProg());
+  }, [initProgress]);    
 
   const addRowToBoard = (boardRowStr:string) => {
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
@@ -86,11 +86,11 @@ const App = () => {
     const board = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
     board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
 
-    if (WordUtils.getIndexFromWord(curWord) < 0) {
+    if (WordleUtils.getIndexFromWord(curWord) < 0) {
       alert(`Note: "${curWord}" is not in our dictionary`);
     }
 
-    const newWords = WordUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
+    const newWords = WordleUtils.wordle(WordleDict.wordlePicks, storedBoardStates[currentBoardIndex]);
     setWordsAndStatsState(newWords);      
   }
 
@@ -174,26 +174,28 @@ const App = () => {
   const calcCombinedWords = () => {
     const newWords = [...new Set(storedBoardStates)]
       .filter((_, index) => !storedBoardCompleted[index])
-      .reduce((acc, boardStr) => acc.concat(WordUtils.wordle(WordleDict.wordlePicks, boardStr)),[]);
+      .reduce((acc, boardStr) => acc.concat(WordleUtils.wordle(WordleDict.wordlePicks, boardStr)),[]);
     setWordsAndStatsState(newWords);
   }
 
   const switchToBoard = (boardIndex:number) => {
-    if (boardIndex < 0) {
-      combinedBoardMode = true;
-      calcCombinedWords();
-    } else {
-      combinedBoardMode = false;
-      currentBoardIndex = boardIndex;
-      const newBoardStr = storedBoardStates[currentBoardIndex];
-      setBoardStr(newBoardStr);
-      const newBoard = BoardData.getBoardFromString(newBoardStr);
-      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
-      if (storedBoardDirty[currentBoardIndex]) {
-        storedBoardDirty[currentBoardIndex] = false;
-        onShowHelp();
+    if (initProgress === 1) {
+      if (boardIndex < 0) {
+        combinedBoardMode = true;
+        calcCombinedWords();
       } else {
-        onEnter();
+        combinedBoardMode = false;
+        currentBoardIndex = boardIndex;
+        const newBoardStr = storedBoardStates[currentBoardIndex];
+        setBoardStr(newBoardStr);
+        const newBoard = BoardData.getBoardFromString(newBoardStr);
+        setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+        if (storedBoardDirty[currentBoardIndex]) {
+          storedBoardDirty[currentBoardIndex] = false;
+          onShowHelp();
+        } else {
+          onEnter();
+        }
       }
     }
   }
@@ -207,10 +209,6 @@ const App = () => {
     switchToBoard(0);
   }
 
-  const showQuordleButton = ():boolean => {
-    return (curLetterLoc.letterIndex === (BoardData.lettersPerWord - 1)) && WordUtils.wordleIndexPartitionsInitialized();
-  }
-
   const memoryButton = (index:number) => {
     let bgClassName:string;
     if (index < 0) {
@@ -219,7 +217,10 @@ const App = () => {
       bgClassName = (!combinedBoardMode && index === currentBoardIndex) ? "bg-mem-button-selected" : "bg-mem-button-deselected";
     }
     return (
-      <button id={`memory${index}`} onClick={() => switchToBoard(index)} tabIndex={-1}>
+      <button 
+        id={`memory${index}`} 
+        onClick={() => switchToBoard(index)} 
+        tabIndex={-1}>
         <div className={`${bgClassName} memory-button`}>{index + 1}</div>
       </button>
     )
@@ -249,7 +250,7 @@ const App = () => {
         <h1>Wordle Helper</h1>
         <div className="memory-button-container">
           <div className="quordle-button-container">
-            {showQuordleButton() && memoryButton(-1)}
+            {memoryButton(-1)}
           </div>
           <div className="two-by-two-buttons">
             {memoryButton(0)}
@@ -277,15 +278,22 @@ const App = () => {
         }}
       >
       <div className='content'>
-        <div className='row'>
-          <div className='game collumn'>
-            <Board />
-            <Keyboard />
-          </div>
-          <div className='stats collumn'>
-            <WordStats words={words} wordStatsState={wordStatsState}/>
-          </div>
-        </div>
+        {
+          initProgress < 1 ? 
+            (<InitProgress progress={initProgress} />)
+          :
+          (
+            <div className='row'>
+              <div className='game collumn'>
+                <Board />
+                <Keyboard />
+              </div>
+              <div className='stats collumn'>
+                <WordStats words={words} wordStatsState={wordStatsState}/>
+              </div>
+            </div>  
+          )
+        }
       </div>
       </AppContext.Provider>
     </div>

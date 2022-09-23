@@ -126,6 +126,25 @@ button#reset {
   background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
 }
 
+.progress-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.progress {
+  display: flex;
+  flex-direction: row;
+  max-width: 340px;
+}
+
+.progress-spacer {
+  display: flex;
+  width: auto;
+  flex-grow: 1;
+}
+
 .content {
   flex: 1;
   overflow: auto;
