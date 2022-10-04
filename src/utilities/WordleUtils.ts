@@ -110,7 +110,7 @@ export const wordleFreqStats = (words: Uint16Array, sortOrder:ArrayUtils.SortOrd
 	const letterFreq:NumberToNumberMap = {};
 	let letterCount = 0;
 	words.forEach( wordIndex => {
-		const word = WordleDict.wordleAllNums[wordIndex];
+		const word = wordleAllNums[wordIndex];
 		setArrayFromWordInt(letters, word);
 		letters.forEach( (letter, i) => {
 			ArrayUtils.numKeyCountIncrement(letterFreq, letter);
@@ -126,7 +126,7 @@ export const wordleFreqStats = (words: Uint16Array, sortOrder:ArrayUtils.SortOrd
 	const wordPercentages:NumberToNumberMap = {};
 	words.forEach( (wordIndex) => {
 		let wordPercent = 0;
-		const word = WordleDict.wordleAllNums[wordIndex];
+		const word = wordleAllNums[wordIndex];
 		setArrayFromWordInt(letters, word);
 		letters.forEach( letter => {
 			wordPercent += percentageByLetter[letter] ?? 0;
@@ -395,19 +395,32 @@ export const getIndexFromWord = (word:string):number => {
 
 export let wordCount = 0;
 export let picksCount = 0;
-export let wordleAll:Uint32Array;
-export let wordlePicks:Uint32Array;
+export let wordleAllNums:Uint32Array;
+export let wordlePicksNums:Uint32Array;
+export let wordlePicks:string[];
+export let wordleAll:string[];
+
 let wordsPerInitChunk:number;
 let wordsProcessed:number;
 export const wordleIndexPartitionsInitialized = ():boolean => {
-	return wordsProcessed === wordCount;
+	return wordCount > 0 && wordsProcessed === wordCount;
 }
 
-const initDataLists = ():void => {
-	wordleAll = WordleDict.wordleAllNums;
-	wordlePicks =  WordleDict.wordlePicksNums; 
-	picksCount = wordlePicks.length;
-	wordCount = wordleAll.length;
+// for tests
+export const initWordleIndexPartitions = (type:WordleDict.wordSet = "quordle"):void => {
+	let prog = 0;
+	while (prog < 1) {
+		prog = initWordleIndexPartitionsProg(type);
+	}
+}
+
+export const initDataLists = (type:WordleDict.wordSet = "quordle"):void => {
+	wordleAllNums = WordleDict.wordleAllNums[type];
+	wordlePicksNums =  WordleDict.wordlePicksNums[type]; 
+	picksCount = wordlePicksNums.length;
+	wordCount = wordleAllNums.length;
+	wordlePicks = WordleDict.getWordlePicks(type);
+	wordleAll = WordleDict.getWordleAll(type);
 	wordsProcessed = 0;
 	wordsPerInitChunk = Math.ceil(wordCount / 10);
 
@@ -418,7 +431,7 @@ const initDataLists = ():void => {
 	cluesLookUpTable = new Array(wordCount);
 	groupSizesByClues = new Array(wordCount);
 	for (let i = 0; i < wordCount; i++) {
-		wordToIndexLUTable[WordleDict.numToWord(wordleAll[i])] = i;
+		wordToIndexLUTable[WordleDict.numToWord(wordleAllNums[i])] = i;
 		cluesLookUpTable[i] = new Uint16Array(cluesLookUpTableBuffer, i * picksCount * 2, picksCount);
 		groupSizesByClues[i] = new Uint16Array(groupSizesByCluesBuffer, i * CLUES_COUNTS_LEN * 2, CLUES_COUNTS_LEN);
 	}
@@ -426,10 +439,16 @@ const initDataLists = ():void => {
 	groupMaxSizes = new Uint16Array(wordCount);
 }
 
-export const initWordleIndexPartitionsProg = ():number => {
+export let currentWordSetType:WordleDict.wordSet;
+export const initWordleIndexPartitionsProg = (type:WordleDict.wordSet = "quordle"):number => {
+	if (currentWordSetType !== type) {
+		wordCount = 0;
+		wordsProcessed = 0;
+		currentWordSetType = type;
+	}
 	if (!wordleIndexPartitionsInitialized()) {
 		if (wordCount === 0) {
-			initDataLists();
+			initDataLists(type);
 		}
 		const n = Math.min(wordCount, wordsProcessed + wordsPerInitChunk);
 		let i:number;
@@ -437,7 +456,7 @@ export const initWordleIndexPartitionsProg = ():number => {
 			let maxGroupSize = 0;
 			let groupCount = 0;
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-				const clues = getWordleCluesFast(wordleAll[i], wordlePicks[pickIndex]);
+				const clues = getWordleCluesFast(wordleAllNums[i], wordlePicksNums[pickIndex]);
 				cluesLookUpTable[i][pickIndex] = clues;
 				groupSizesByClues[i][clues]++;
 				if (groupSizesByClues[i][clues] === 1) {
@@ -574,12 +593,12 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 		const partStat = partStats[i];
 		const wordIndex = partStat[0];
 		const freqStat:number = freqStats[wordIndex] ?? 0;
-		const word = WordleDict.numToWord(WordleDict.wordleAllNums[wordIndex]);
+		const word = WordleDict.numToWord(wordleAllNums[wordIndex]);
 		const item:wordleDisplayStatsType = {word:word, clues:partStat[1].wordleClues, avgGroupSize:partStat[1].averageGroupSize, maxGroupSize:partStat[1].largestGroup, letterFrequency:freqStat, cluesGroupCount:0, cluesGroupDivider:0};
 		if (wordsLU[wordIndex]) {
 			result.push(item);
 		} else if (targetWordIndex < 0) {
-			if (wordIndex < WordleDict.picksCount) {
+			if (wordIndex < picksCount) {
 				nonAnswerPicks.push(item);
 			} else {
 				nonAnswerNotPicks.push(item);

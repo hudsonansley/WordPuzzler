@@ -1,6 +1,10 @@
 import * as ArrayUtils from './ArrayUtils';
-import * as WordUtils from './WordleUtils';
+import * as WordleUtils from './WordleUtils';
 import * as WordleDict from '../data/dictionaries/Wordle';
+
+beforeAll(() => {
+    WordleUtils.initDataLists();
+  })
 
 test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
     let array = [];
@@ -69,9 +73,9 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
         {index: "cluesGroupCount", decending: true}];
     const sortOrder = initialSortOrder.slice();
     const t0 = new Date().getTime();
-    WordUtils.initWordleIndexPartitions();
+    WordleUtils.initWordleIndexPartitions();
     const t1 = new Date().getTime();
-    const stats = WordUtils.getWordleDisplayStats(WordleDict.wordleAll, sortOrder, "trace");
+    const stats = WordleUtils.getWordleDisplayStats(WordleUtils.wordleAll, sortOrder, "trace");
     const t2 = new Date().getTime();
     sortOrder.reverse();
     ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);

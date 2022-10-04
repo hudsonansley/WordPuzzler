@@ -1,10 +1,16 @@
 import * as WordleDict from './Wordle'
-import { numToWord, wordToNum } from './Wordle'
+import { numToWord, wordToNum, wordsToNums } from './Wordle'
+import * as WordleUtils from '../../utilities/WordleUtils';
 
+const wordSetType = "wordle";
+beforeAll(() => {
+    WordleUtils.initDataLists(wordSetType);
+  })
+  
 test('Wordle.wordleAll has wordle some picks and decoys and not other words', () => {
-    const wordleAll = Array.from(WordleDict.wordleAllNums).map(numToWord);
-    const wordlePicks = Array.from(WordleDict.wordlePicksNums).map(numToWord);
-    const wordleDecoys = Array.from(WordleDict.wordleDecoysNums).map(numToWord);
+    const wordleAll = Array.from(WordleDict.wordleAllNums[wordSetType]).map(numToWord);
+    const wordlePicks = Array.from(WordleDict.wordlePicksNums[wordSetType]).map(numToWord);
+    const wordleDecoys = Array.from(WordleDict.wordleDecoysNums[wordSetType]).map(numToWord);
 
     expect(wordleDecoys).toContain("orate");
     expect(wordlePicks).not.toContain("orate");
@@ -24,18 +30,18 @@ test('Wordle.wordleAll has wordle some picks and decoys and not other words', ()
     expect(wordleDecoys).not.toContain("yutes");
 });
 test('Wordle.wordleAllNums wordlePicksNums wordleDecoysNums have the same words as string lists', () => {
-    const wordleAll = WordleDict.wordleAll;
-    const wordlePicks = WordleDict.wordlePicks;
-    const wordlePicksWords = Array.from(WordleDict.wordlePicksNums).map(numToWord);
-    const wordleAllWords = Array.from(WordleDict.wordleAllNums).map(numToWord);
+    const wordleAll = WordleUtils.wordleAll;
+    const wordlePicks = WordleUtils.wordlePicks;
+    const wordlePicksWords = Array.from(WordleDict.wordlePicksNums[wordSetType]).map(numToWord);
+    const wordleAllWords = Array.from(WordleDict.wordleAllNums[wordSetType]).map(numToWord);
     wordleAll.sort();
     wordleAllWords.sort();
     expect(wordlePicks.length).toEqual(wordlePicksWords.length);
-    expect(wordlePicks[0]).toEqual(numToWord(WordleDict.wordlePicksNums[0]));
+    expect(wordlePicks[0]).toEqual(numToWord(WordleDict.wordlePicksNums[wordSetType][0]));
     expect(wordlePicks).toEqual(wordlePicksWords);
     expect(wordleAll.length).toEqual(wordleAllWords.length);
     expect(wordleAll).toEqual(wordleAllWords);
-
+    console.log(wordleAll.length, wordlePicks.length);
 });
 test.skip('Wordle.wordleAll has all wordle picks and decoys exactly both combined', () => {
     // only unskip if want to check updated dictionaries,
@@ -64,13 +70,16 @@ test('wordToNum and numToWord work properly', () => {
     expect(numToWord(wordNum)).toEqual("aaaab");  
 });
 
-test.skip('Wordle write out the number version of a words list', () => {
-    const wordNums = wordsToNums(WordleDict.wordleDecoys);
+test.skip('Wordle utility test to write out the number version of a words list', () => {
+    // set the string word list to convert here and update the filename
+    const wordNums = wordsToNums([
+        
+    ]);
     require('fs').writeFile(
   
-      './wordDecoyNums.txt',
+      './wordPicksNums.txt',
   
-      JSON.stringify(wordNums),
+      `[${wordNums.toString()}]`,
   
       function (err) {
           if (err) {

@@ -4,6 +4,7 @@
   --stats-clues-min-width: 57px;
   --stats-table-line-height: 15px;
   --nav-height: 60px;
+  --game-top-padding: 5px;
   /* in rgb components for use in rgba() */
   --bg-correct: 83, 141, 78;
   --bg-wrong-index: 181, 159, 59;
@@ -48,13 +49,7 @@ nav h1 {
 
 @media screen and (max-width: 600px) {
   nav h1 {
-    font-size: 38px;
-  }
-}
-@media screen and (max-width: 500px) {
-  nav h1 {
-    font-size: 28px;
-    line-height: 24px;
+    font-size: 40px;
   }
 }
 
@@ -63,6 +58,12 @@ nav h1 {
   direction: row;
   align-items: center;
   padding: 4px;
+  width:7rem;
+}
+
+.navSpacer {
+  display: flex;
+  flex: 0 40 1rem;
 }
 
 button#help {
@@ -78,14 +79,29 @@ button#reset {
   padding-left: 5px;
 }
 
+.word-set-button-container {
+  display: grid; 
+  align-content: center;
+  column-gap: 0; 
+  width:0.7rem;
+}
+
+.one-by-two-buttons {
+  display: grid; 
+  padding-left: 0.5rem;
+  padding-right: 0.5rem; 
+  grid-template-columns: 1fr; 
+  gap: 0; 
+}
+
 .memory-button-container {
   display: grid; 
   padding-left: 0.5rem;
   padding-right: 0.5rem; 
-  align-content: center; 
+  align-content: center;
   grid-template-columns: 1fr 1fr; 
   column-gap: 0; 
-  min-width:10rem;
+  width:8rem;
 }
 
 .quordle-button-container {
@@ -96,8 +112,8 @@ button#reset {
 
 .two-by-two-buttons {
   display: grid; 
-  padding-left: 0.5rem;
-  padding-right: 0.5rem; 
+  padding-left: 0.2rem;
+  padding-right: 0.1rem; 
   grid-template-columns: 1fr 1fr; 
   gap: 0; 
 }
@@ -106,6 +122,16 @@ button#reset {
   box-sizing: border-box; 
   padding-left: 0.6rem; 
   padding-right: 0.65rem; 
+  text-align: center; 
+  border-radius: 0.5rem; 
+  border-width: 2px; 
+  min-width: 2rem;
+}
+
+.word-set-button {
+  box-sizing: border-box; 
+  padding-left: 0.4rem; 
+  padding-right: 0.4rem; 
   text-align: center; 
   border-radius: 0.5rem; 
   border-width: 2px; 
@@ -126,23 +152,8 @@ button#reset {
   background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
 }
 
-.progress-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-around;
-}
-
-.progress {
-  display: flex;
-  flex-direction: row;
-  max-width: 340px;
-}
-
-.progress-spacer {
-  display: flex;
-  width: auto;
-  flex-grow: 1;
+.hidden {
+  visibility: hidden;
 }
 
 .content {
@@ -164,7 +175,7 @@ button#reset {
 
 .game {
   align-items: center;
-  padding-top: 10px;
+  padding-top: var(--game-top-padding);
   flex-grow: 1;
 }
 
@@ -186,7 +197,6 @@ button#reset {
 }
 
 .letter {
-  flex: 33%;
   border: 1px solid grey;
   margin: 5px;
   min-width: 50px;
@@ -244,7 +254,7 @@ tbody {
 }
 
 .statTable {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Ubunto Mono', monospace, 'DejaVu Sans Mono', 'Courier New', Courier;
   font-weight: bold;
   min-width: 260px;
   max-width: 340px;

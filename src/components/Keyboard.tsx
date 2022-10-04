@@ -9,7 +9,7 @@ const keyLabels = [
   ["Change Letter Color", "ENTER"]
 ];
 
-const Keyboard = () => {
+const Keyboard = ({hidden}) => {
 
   const {
     curLetterLoc,
@@ -57,7 +57,7 @@ const Keyboard = () => {
     <div className="keyboard" onKeyDown={handleKeyboard}>
       {keyLabels.map((keyRow, i) => {
         return (
-        <div className="line" key={`line${i}`}>
+        <div className={`line${hidden ? " hidden": ""}`} key={`line${i}`}>
           {keyRow.map((keyLabel) => {
             return <Key keyLabel={keyLabel} key={`_${keyLabel.split(" ").join("")}`}/>;
           })}
