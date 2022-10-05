@@ -53,6 +53,18 @@ nav h1 {
   }
 }
 
+@media screen and (max-width: 540px) {
+  nav h1 {
+    font-size: 30px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  nav h1 {
+    font-size: 24px;
+  }
+}
+
 .navButtons {
   display: flex;
   direction: row;
