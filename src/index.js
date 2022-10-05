@@ -5,9 +5,13 @@ import App from './App.tsx';
 import reportWebVitals from './reportWebVitals.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const initWordSetType = window?.location.search.toLowerCase().indexOf("quordle") < 0 ?
+  "wordle" :
+  "quordle";
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App  initWordSetType={initWordSetType} />
   </React.StrictMode>
 );
 

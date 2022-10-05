@@ -14,8 +14,6 @@ import * as WordleUtils from './utilities/WordleUtils';
 // belongs to. Could just be shown on top of group b/c groups don't overlap
 // unless the clues are the same
 
-console.log(`search: '${window.location}'`)
-
 export const AppContext = createContext(undefined);
 const initBoardStr = "";
 const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
@@ -26,13 +24,13 @@ let combinedBoardMode = false;
 const initBoard = BoardData.getBoardFromString(storedBoardStates[currentBoardIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
 
-const App = () => {
+const App = ({initWordSetType}) => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [words, setWords] = useState<string[]>([]);
   const [wordStatsState, setWordStatsState] = useState<StatsState>("help");
   const [initProgress, setInitProgress] = useState<number>(0);
-  const [wordSetType, setWordSetType] = useState<WordleDict.wordSet>("quordle");
+  const [wordSetType, setWordSetType] = useState<WordleDict.wordSet>(initWordSetType);
 
   useEffect(() => {
     setInitProgress(WordleUtils.initWordleIndexPartitionsProg(wordSetType));
@@ -195,7 +193,7 @@ const App = () => {
   }
 
   const switchToBoard = (boardIndex:number) => {
-    if (initProgress === 1) {
+    if (initProgress === 1 && ((wordSetType === "quordle") || boardIndex === 0)) {
       if (boardIndex < 0) {
         combinedBoardMode = true;
         calcCombinedWords();
@@ -259,6 +257,10 @@ const App = () => {
     )
   }
 
+  const pageTitle = () => {
+    return `${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}&nbsp;Helper`;
+  }
+
   return (
     <div className="App">
       <nav>
@@ -287,8 +289,8 @@ const App = () => {
           </div>
         </div>
         <div className="navSpacer" />
-        <h1>Wordle&nbsp;Helper</h1>
-        <div className="memory-button-container">
+        <h1>{`${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}`}&nbsp;Helper</h1>
+        <div className={`memory-button-container${(wordSetType === "quordle") ? "" : " hidden"}`}>
           <div className="quordle-button-container">
             {memoryButton(-1)}
           </div>
