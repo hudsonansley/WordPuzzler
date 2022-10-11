@@ -257,10 +257,6 @@ const App = ({initWordSetType}) => {
     )
   }
 
-  const pageTitle = () => {
-    return `${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}&nbsp;Helper`;
-  }
-
   return (
     <div className="App">
       <nav>
