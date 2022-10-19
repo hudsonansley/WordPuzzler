@@ -107,7 +107,7 @@ export const updatePrimaryIndex = (sortOrder:SortOrderType[], primaryIndex:SortO
 	}
 	const [item] = result.splice(i, 1);
 	result.unshift(item);
-return result;
+	return result;
 }
 
 /**
@@ -143,7 +143,10 @@ export const sortArrayOfStringToAnyMaps = (array:StringToAnyMap[], sortOrder:Sor
 			const {index, decending} = sortOrder[i];
 			const ai = a[index];
 			const bi = b[index];
-			result = ai === bi ? 0 : ai > bi ? decending ? 1 : -1 : decending ? -1 : 1;
+			result = ai === bi ? 0 : 
+				ai > bi ? 
+					decending ? 1 : -1 : 
+					decending ? -1 : 1;
 			i++;
 		}
 		return result;

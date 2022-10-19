@@ -248,6 +248,33 @@ tr {
   background-color: #404040;
 }
 
+.group0Bg {
+  background-color: #300000;
+}
+.altGroup0Bg {
+  background-color: #502020;
+}
+
+.group1Bg {
+  background-color: #003000;
+}
+.altGroup1Bg {
+  background-color: #205020;
+}
+
+.group2Bg {
+  background-color: #000040;
+}
+.altGroup2Bg {
+  background-color: #202060;
+}
+
+.group3Bg {
+  background-color: #200020;
+}
+.altGroup3Bg {
+  background-color: #402040;
+}
 
 td th {
   line-height: var(--stats-table-line-height);

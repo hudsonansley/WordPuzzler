@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useContext, useRef }  from "react";
-import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys } from '../utilities/WordleUtils';
+import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys, WordInfoType } from '../utilities/WordleUtils';
 import { AppContext } from "../App";
 import * as ArrayUtils from "../utilities/ArrayUtils";
 import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordleUtils";
 import { lettersPerWord } from "../data/BoardData";
 
 export type StatsState = "help" | "calculating" | "completed" | "empty" | "normal";
+export type StatsInfoType = WordInfoType & {wordStatsState: StatsState};
 
 type StatsSortOrder = {index: wordleDisplayStatsKeys, decending: boolean};
 type StatsOrderInfo = {primaryIndex: wordleDisplayStatsKeys, targetWord:string};
@@ -14,16 +15,18 @@ const initialSortOrder: StatsSortOrder[] = [
     {index: "maxGroupSize", decending: true}, 
     {index: "letterFrequency", decending: false}, 
     {index: "word", decending: true}, 
-    {index: "clues", decending: false}, 
-    {index: "cluesGroupCount", decending: true}];
+    {index: "clues", decending: true}, 
+    {index: "cluesGroupCount", decending: true},
+    {index: "boardGroup", decending: true},
+];
 
-export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsState:StatsState}) => {
+export const WordStats = ({statsInfo}:{statsInfo: StatsInfoType}) => {
     const { addWordToBoard } = useContext(AppContext);
     const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
     const targetWordRef = useRef("");
     const wordsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
-    const wordCount = words.length;
+    const combinedBoardModeRef = useRef(statsInfo.combinedBoardMode);
 
     const hasPartitions = () => {
         return statsOrderInfo.targetWord !== "";
@@ -31,29 +34,38 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
 
     const wordleDisplayStats:wordleDisplayStatsType[] = useMemo<wordleDisplayStatsType[]>(() => {
             let resetSortOrder = (targetWordRef.current === statsOrderInfo.targetWord);
-            if (wordsRef.current !== words) {
+            if (wordsRef.current !== statsInfo.words[statsInfo.wordSetIndex] ||
+                combinedBoardModeRef.current !== statsInfo.combinedBoardMode) {
                 statsOrderInfo.targetWord = ""; 
-                //intentionally not triggering state update
                 resetSortOrder = true;
             }
+            combinedBoardModeRef.current = statsInfo.combinedBoardMode;
             targetWordRef.current = statsOrderInfo.targetWord;
-            wordsRef.current = words;
+            wordsRef.current = statsInfo.words[statsInfo.wordSetIndex];
             const newSortOrder = resetSortOrder ?
                 sortOrder.current.slice() : initialSortOrder.slice();
             sortOrder.current = ArrayUtils.updatePrimaryIndex(newSortOrder, statsOrderInfo.primaryIndex) as StatsSortOrder[];
-            return getWordleDisplayStats(words, sortOrder.current, statsOrderInfo.targetWord);
+            const result = getWordleDisplayStats(statsInfo, sortOrder.current, statsOrderInfo.targetWord);
+            return result;
         },
-        [words, statsOrderInfo]
+        [statsInfo, statsOrderInfo]
     )
 
     const onTapListWord = (word:string) => {
-        if (wordCount === 1 && words[0] === word) {
+        if (wordleDisplayStats.length === 1 && wordleDisplayStats[0].word === word) {
             addWordToBoard(word, true);
+        } else {
+            setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: word});
         }
-        setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: word});
     }
 
-    switch (wordStatsState) {
+    const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
+        let boardType = (wordStats.boardGroup < 0) ? "" : wordStats.boardGroup.toString();
+        const result = (wordStats.cluesGroupDivider > 0 ? "altGroup" : "group") + boardType + "Bg";
+        return result;
+    }
+
+    switch (statsInfo.wordStatsState) {
         case "normal":
             if (hasPartitions()) {
                 return (
@@ -70,7 +82,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                             </th>
                             <th key="word">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} >
-                                   words<br/>({wordCount})
+                                   words<br/>({statsInfo.wordCount})
                                 </button>
                             </th>
                             <th key="avgGroupSize">
@@ -102,7 +114,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                                 wordInfo["cluesGroupDivider"] = 2;
                             }
                             return (
-                                <tr className={`${wordInfo["cluesGroupDivider"] > 0 ? "altGroupBg" : "groupBg"}`} key={wordInfo["word"]} >
+                                <tr className={getRowClassName(wordInfo)} key={wordInfo["word"]} >
                                     <td 
                                         key="clues"
                                         className={`cluesContainer`}
@@ -140,7 +152,7 @@ export const WordStats = ({words, wordStatsState}: {words:string[], wordStatsSta
                         <tr>
                             <th key="word">
                                 <button onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} >
-                                    words<br/>({wordCount})
+                                    words<br/>({statsInfo.wordCount})
                                 </button>
                             </th>
                             <th key="avgGroupSize">

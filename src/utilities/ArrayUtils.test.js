@@ -20,6 +20,8 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
         {a:5, b:"3", c: 4},
         {a:6, b:"4", c: 3},
         {a:7, b:"4", c: 3},
+        {a:8, b:"1", c: 2},
+        {a:9, b:"1", c: 1},
     ];
     sortOrder = [
         {index:"a", decending:true},
@@ -35,6 +37,8 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
         {index:"a", decending:true},
     ];
     expected = [
+        {a:9, b:"1", c: 1},
+        {a:8, b:"1", c: 2},
         {a:1, b:"2", c: 2},
         {a:2, b:"2", c: 3},
         {a:3, b:"3", c: 3},
@@ -51,6 +55,8 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
         {index:"a", decending:true},
     ];
     expected = [
+        {a:9, b:"1", c: 1},
+        {a:8, b:"1", c: 2},
         {a:1, b:"2", c: 2},
         {a:2, b:"2", c: 3},
         {a:3, b:"3", c: 3},
@@ -58,6 +64,60 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
         {a:5, b:"3", c: 4},
         {a:6, b:"4", c: 3},
         {a:7, b:"4", c: 3},
+    ];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    sortOrder = [
+        {index:"a", decending:false},
+        {index:"b", decending:false},
+        {index:"c", decending:false},
+    ];
+    expected = [
+        {a:9, b:"1", c: 1},
+        {a:8, b:"1", c: 2},
+        {a:7, b:"4", c: 3},
+        {a:6, b:"4", c: 3},
+        {a:5, b:"3", c: 4},
+        {a:4, b:"3", c: 4},
+        {a:3, b:"3", c: 3},
+        {a:2, b:"2", c: 3},
+        {a:1, b:"2", c: 2},
+    ];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    sortOrder = [
+        {index:"c", decending:false},
+        {index:"b", decending:false},
+        {index:"a", decending:false},
+    ];
+    expected = [
+        {a:5, b:"3", c: 4},
+        {a:4, b:"3", c: 4},
+        {a:7, b:"4", c: 3},
+        {a:6, b:"4", c: 3},
+        {a:3, b:"3", c: 3},
+        {a:2, b:"2", c: 3},
+        {a:1, b:"2", c: 2},
+        {a:8, b:"1", c: 2},
+        {a:9, b:"1", c: 1},
+    ];
+    ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
+    expect(array).toEqual(expected);
+    sortOrder = [
+        {index:"b", decending:false},
+        {index:"c", decending:false},
+        {index:"a", decending:false},
+    ];
+    expected = [
+        {a:7, b:"4", c: 3},
+        {a:6, b:"4", c: 3},
+        {a:5, b:"3", c: 4},
+        {a:4, b:"3", c: 4},
+        {a:3, b:"3", c: 3},
+        {a:2, b:"2", c: 3},
+        {a:1, b:"2", c: 2},
+        {a:8, b:"1", c: 2},
+        {a:9, b:"1", c: 1},
     ];
     ArrayUtils.sortArrayOfStringToAnyMaps(array, sortOrder);
     expect(array).toEqual(expected);
@@ -70,7 +130,9 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
         {index: "letterFrequency", decending: false}, 
         {index: "word", decending: true}, 
         {index: "clues", decending: true}, 
-        {index: "cluesGroupCount", decending: true}];
+        {index: "cluesGroupCount", decending: true},
+        {index: "boardGroup", decending: true},
+    ];
     const sortOrder = initialSortOrder.slice();
     const t0 = new Date().getTime();
     WordleUtils.initWordleIndexPartitions();

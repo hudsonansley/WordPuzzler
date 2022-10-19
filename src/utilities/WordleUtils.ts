@@ -15,9 +15,7 @@ export interface StringToStringToArrayMap {[key: string]: StringToArrayMap; }
 export interface StringToStringToNumberMap {[key: string]: StringToNumberMap; }
 export interface partitionWordStat {
 	numberOfGroups : number,
-	averageGroupSize : number,
 	largestGroup : number,
-	wordleClues : number,
 }
 export type partionStats = [number, partitionWordStat];
 
@@ -41,6 +39,13 @@ export const makeIndexLookupMap = (words:string[]):StringToNumberMap => {
 	return results;
 }
 
+export const makeIndexUint16LookupMap = (items:Uint16Array):NumberToNumberMap => {
+	const results: StringToNumberMap = {};
+	items.forEach( (item, index) => {
+		results[item] = index;
+	});
+	return results;
+}
 /**
  * @param  {string[]} words
  * @returns string
@@ -528,21 +533,13 @@ export const filterWordleIndexPartitions = (words:Uint16Array):void => {
 	}
 }
 
-export const getStatsFromIndexPartitionFast = (wordCount:number, targetWord:number = -1):partionStats[] => {
-	const n = cluesLookUpTable.length;
+const getStatsFromIndexPartitionFast = (includeDecoys:boolean):partionStats[] => {
+	const n = includeDecoys ? wordCount : picksCount;
 	const result:partionStats[] = Array(n);
-	let wordleClues = 0;
 	for(let i = 0; i < n; i++) {
-		if (targetWord > 0) {
-			wordleClues = cluesLookUpTable[targetWord][i] & ~(1 << 15);
-		}
-		const groupCount = groupCounts[i];
-		const largestGroup = groupMaxSizes[i];
 		result[i] = [i, {
-			numberOfGroups : groupCount,
-			averageGroupSize : wordCount / groupCount,
-			largestGroup : largestGroup,
-			wordleClues : wordleClues,
+			numberOfGroups : groupCounts[i],
+			largestGroup : groupMaxSizes[i],
 		}];
 	}
 	result.sort((a:partionStats, b:partionStats) => {
@@ -561,57 +558,113 @@ const getWordIndicies = (words:string[]):Uint16Array => {
 	return result;
 }
 
-export type wordleDisplayStatsType = {word:string, clues:number, avgGroupSize:number, maxGroupSize:number, letterFrequency:number, cluesGroupCount:number, cluesGroupDivider:number};
-export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
-/**
- * @param  {string[]} words
- * @param  {ArrayUtils.SortOrderObjType[]} sortOrder
- * @param  {string=""} targetWord
- * @param  {number=50} maxNonPickWords
- * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
- *  useful for display in the word data table
- */
-export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonPickWords:number = 50):wordleDisplayStatsType[] => {
-	if (words.length === 0) {
-		return [];
-	}
-	if (!wordleIndexPartitionsInitialized()) {
-		console.error("getWordleDisplayStats called before partitions resolved");
-		return [];
-	}
-	const targetWordIndex = wordToIndexLUTable[targetWord] ?? -1;
-	const wordCount = words.length;
-	const wordIndices = getWordIndicies(words);
+const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Array, collectNonAnswers:boolean):[wordleDisplayStatsType[], wordleDisplayStatsType[], wordleDisplayStatsType[]] => {
 	filterWordleIndexPartitions(wordIndices);
-	const partStats = getStatsFromIndexPartitionFast(wordCount, targetWordIndex);
+	const partStats = getStatsFromIndexPartitionFast(collectNonAnswers);
 	const freqStats:NumberToNumberMap = wordleFreqStats(wordIndices);
 	const result:wordleDisplayStatsType[] = [];
 	const nonAnswerPicks:wordleDisplayStatsType[] = [];
 	const nonAnswerNotPicks:wordleDisplayStatsType[] = [];
-	const wordsLU = makeLookupNumMap(wordIndices);
-	for (let i = 0; i < partStats.length; i++) {
+	const wordsLU = makeIndexUint16LookupMap(wordIndices);
+	const boardGroupIsNumber = typeof boardGroup === "number";
+	let i = 0;
+	let wordsLeft = wordIndices.length;
+	while (i < partStats.length && wordsLeft > 0) {
 		const partStat = partStats[i];
 		const wordIndex = partStat[0];
 		const freqStat:number = freqStats[wordIndex] ?? 0;
-		const word = WordleDict.numToWord(wordleAllNums[wordIndex]);
-		const item:wordleDisplayStatsType = {word:word, clues:partStat[1].wordleClues, avgGroupSize:partStat[1].averageGroupSize, maxGroupSize:partStat[1].largestGroup, letterFrequency:freqStat, cluesGroupCount:0, cluesGroupDivider:0};
-		if (wordsLU[wordIndex]) {
+		const wordIndicesIndex = wordsLU[wordIndex];
+		const item:wordleDisplayStatsType = {
+			word:"",
+			wordIndex, 
+			clues:0, 
+			avgGroupSize:0,
+			numberOfGroups:partStat[1].numberOfGroups, 
+			maxGroupSize:partStat[1].largestGroup, 
+			letterFrequency:freqStat,
+			cluesGroupCount:0, 
+			cluesGroupDivider:0,
+			boardGroup: boardGroupIsNumber ? boardGroup : boardGroup[wordIndicesIndex],
+		};
+		if (typeof wordIndicesIndex === "number") {
 			result.push(item);
-		} else if (targetWordIndex < 0) {
+			wordsLeft--;
+		} else if (collectNonAnswers) {
 			if (wordIndex < picksCount) {
 				nonAnswerPicks.push(item);
 			} else {
 				nonAnswerNotPicks.push(item);
 			}
 		}
+		i++;
+	}
+	return [result, nonAnswerPicks, nonAnswerNotPicks];
+}
+ 
+export type WordInfoType = {
+    words: string[][],
+    wordSetIndex: number,
+    combinedBoardMode: boolean,
+	wordCount: number,
+};
+export type wordleDisplayStatsType = {
+	word:string, 
+	wordIndex:number,
+	clues:number, 
+	avgGroupSize:number,
+	numberOfGroups:number, 
+	maxGroupSize:number, 
+	letterFrequency:number, 
+	cluesGroupCount:number, 
+	cluesGroupDivider:number, 
+	boardGroup:number
+};
+export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
+/**
+ * @param  {WordInfoType[]} wordInfo
+ * @param  {ArrayUtils.SortOrderObjType[]} sortOrder
+ * @param  {string} targetWord
+ * @param  {number} maxNonPickWords
+ * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
+ *  useful for display in the word data table
+ */
+export const getWordleDisplayStats = (wordInfo:WordInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
+	if (wordInfo.wordCount === 0) {
+		return [];
+	}
+	if (!wordleIndexPartitionsInitialized()) {
+		console.error("getWordleDisplayStats called before partitions resolved");
+		return [];
+	}
+	let result:wordleDisplayStatsType[] = [];
+	let nonAnswerPicks:wordleDisplayStatsType[] = [];
+	let nonAnswerNotPicks:wordleDisplayStatsType[] = [];
+
+	const targetWordIndex = wordToIndexLUTable[targetWord] ?? -1;
+	const boardWordIndicies:Uint16Array[] = [];
+	if (wordInfo.combinedBoardMode) {
+		const boardIndicies = new Uint8Array(wordInfo.wordCount);
+		const totalWordIndicies = new Uint16Array(wordInfo.wordCount);
+		let offset = 0;
+		for (let i = 0; i < wordInfo.words.length; i++) {
+			const wordIndices = getWordIndicies(wordInfo.words[i]);
+			totalWordIndicies.set(wordIndices, offset);
+			boardWordIndicies[i] = totalWordIndicies.subarray(offset, offset + wordIndices.length);
+			boardIndicies.fill(i, offset, offset + wordIndices.length);
+			offset += wordIndices.length;
+		}
+		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(totalWordIndicies, boardIndicies, targetWordIndex < 0);
+	} else {
+		const wordIndices = getWordIndicies(wordInfo.words[wordInfo.wordSetIndex]);
+		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, wordInfo.wordSetIndex, true);
 	}
 	if (targetWordIndex < 0) {
-		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", clues:0, avgGroupSize:1000, maxGroupSize:10000, letterFrequency:0, cluesGroupCount:0, cluesGroupDivider:0};
+		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, letterFrequency:0, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: -1};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
 		if (result[0] && result[0]["maxGroupSize"] - 1 > 0.000001) {
-			let n = Math.min(Math.floor(1.5 * wordCount), maxNonPickWords);
+			let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
 			while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
 				n--;
 				if (nonAnswerPicks[0]["maxGroupSize"] <= nonAnswerNotPicks[0]["maxGroupSize"]) {
@@ -622,32 +675,70 @@ export const getWordleDisplayStats = (words:string[], sortOrder:ArrayUtils.SortO
 			}
 		}
 	} else {
+		const n = result.length;
+		for (let i = 0; i < n; i++) {
+			const item = result[i];
+			item.clues = cluesLookUpTable[targetWordIndex][item.wordIndex] & ~(1 << 15);
+		}	
+		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "boardGroup") as ArrayUtils.SortOrderObjType[];
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
 		ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
-		let lastWordClues = WORDLE_ALL_CORRECT; //always sorted to top
+		let lastWordClues = ""; 
 		let sameCluesCount = 0;
-		const lastIndex = result.length - 1;
-		for (let i = 0; i <= lastIndex; i++) {
+		for (let i = 0; i < n; i++) {
 			const item = result[i];
-			if (item["clues"] !== lastWordClues) {
+			const wordClues = `${item.clues}_${item.boardGroup}`;
+			if (wordClues !== lastWordClues) {
 				let j = sameCluesCount;
 				while (j > 0) {
-					result[i - j]["cluesGroupCount"] = sameCluesCount;
+					result[i - j].cluesGroupCount = sameCluesCount;
 					j--;
 				}
 				sameCluesCount = 1;
 			} else {
 				sameCluesCount++;
 			}
-			lastWordClues = item["clues"];
+			lastWordClues = wordClues;
 		}
 		let j = sameCluesCount;
 		while (j > 0) {
-			result[lastIndex + 1 - j]["cluesGroupCount"] = sameCluesCount;
+			result[n - j].cluesGroupCount = sameCluesCount;
 			j--;
 		}
+		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "cluesGroupCount") as ArrayUtils.SortOrderObjType[];
 	}
+	const resultCount = result.length;
+	if (wordInfo.combinedBoardMode) {
+		const boardGroupInfo:{groupCount:number, maxGroupSize:number}[] = Array(resultCount);
+		for (let i = 0; i < resultCount; i++) {
+			boardGroupInfo[i] = {groupCount:0, maxGroupSize: 0};
+		}
+		boardWordIndicies.forEach( wordIndices => {
+			filterWordleIndexPartitions(wordIndices);
+			for (let i = 0; i < resultCount; i++) {
+				const wordIndex = result[i].wordIndex;
+				if (boardGroupInfo[i].maxGroupSize < groupMaxSizes[wordIndex]) {
+					boardGroupInfo[i].maxGroupSize = groupMaxSizes[wordIndex];
+				}
+				boardGroupInfo[i].groupCount += groupCounts[wordIndex];
+			}
+		})
+		for (let i = 0; i < resultCount; i++) {
+			const item = result[i];
+			const {maxGroupSize, groupCount} = boardGroupInfo[i];
+			if (maxGroupSize > 0) {
+				item.maxGroupSize = maxGroupSize;
+			}
+			item.numberOfGroups = groupCount;
+		}
+	}
+	for (let i = 0; i < resultCount; i++) {
+		const item = result[i];
+		item.word = WordleDict.numToWord(wordleAllNums[item.wordIndex]);
+		item.avgGroupSize = wordInfo.wordCount / item.numberOfGroups;
+	}
+	console.log(`getWordleDisplayStats: ${resultCount}`);
 	ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
 	return result;
 }
