@@ -305,7 +305,7 @@ tbody {
   font-size: var(--stats-table-line-height);
 }
 
-.help {
+.info {
   min-width: 260px;
   max-width: 340px;
   margin-left: auto;

@@ -601,7 +601,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 	return [result, nonAnswerPicks, nonAnswerNotPicks];
 }
  
-export type WordInfoType = {
+export type WordSetInfoType = {
     words: string[][],
     wordSetIndex: number,
     combinedBoardMode: boolean,
@@ -621,14 +621,14 @@ export type wordleDisplayStatsType = {
 };
 export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
 /**
- * @param  {WordInfoType[]} wordInfo
+ * @param  {WordSetInfoType[]} wordInfo
  * @param  {ArrayUtils.SortOrderObjType[]} sortOrder
  * @param  {string} targetWord
  * @param  {number} maxNonPickWords
  * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
  *  useful for display in the word data table
  */
-export const getWordleDisplayStats = (wordInfo:WordInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
+export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
 	if (wordInfo.wordCount === 0) {
 		return [];
 	}

@@ -6,7 +6,8 @@ import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
 import InitProgress from "./components/InitProgress";
-import { WordStats, StatsState, StatsInfoType } from "./components/WordStats";
+import { WordStats } from "./components/WordStats";
+import Information, { InfoType } from './components/Information';
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordleUtils from './utilities/WordleUtils';
 
@@ -15,9 +16,8 @@ import * as WordleUtils from './utilities/WordleUtils';
 // unless the clues are the same
 
 export const AppContext = createContext(undefined);
-const initStatsInfo:StatsInfoType = {
+const initStatsInfo:WordleUtils.WordSetInfoType = {
   words: [[],[],[],[]],
-  wordStatsState: "help",
   wordSetIndex: 0,
   combinedBoardMode: false,
   wordCount: 0,
@@ -34,7 +34,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const [curLetterLoc, setCurLetterLoc] = useState(initLetterLoc);
   const [initProgress, setInitProgress] = useState<number>(0);
   const [wordSetType, setWordSetType] = useState<WordleDict.wordSet>(initWordSetType);
-  const [statsInfo, setStatsInfo] = useState<StatsInfoType>(initStatsInfo);
+  const [statsInfo, setStatsInfo] = useState<WordleUtils.WordSetInfoType>(initStatsInfo);
+  const [infoType, setInfoType] = useState<InfoType>("help");
 
   useEffect(() => {
     setInitProgress(WordleUtils.initWordleIndexPartitionsProg(wordSetType));
@@ -79,13 +80,16 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     statsInfo.wordCount = statsInfo.combinedBoardMode ?
         statsInfo.words.reduce((acc, list) => acc + list.length, 0) :
         statsInfo.words[statsInfo.wordSetIndex].length;
-    const statsState:StatsState = statsInfo.wordCount > 0 ? "normal" : 
-      storedBoardCompleted[statsInfo.wordSetIndex] ? "completed" : "empty";
-    setStatsInfo({...statsInfo, wordStatsState: statsState});
+    if (statsInfo.wordCount > 0) {
+      setInfoType("stats");
+      setStatsInfo({...statsInfo});
+    } else {
+      setInfoType(storedBoardCompleted[statsInfo.wordSetIndex] ? "completed" : "empty");
+    }
   }
 
   const onShowHelp = () => {
-    setStatsInfo({...statsInfo, wordStatsState: "help"});
+    setInfoType("help");
   }
 
   const onEnter = () => {
@@ -349,7 +353,12 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
               <Keyboard hidden={initProgress < 1}/>
             </div>
           <div className='stats column'>
-              <WordStats statsInfo={statsInfo} />
+              {infoType === "stats" ?
+              (<WordStats statsInfo={statsInfo} />)
+              :
+              (<Information infoType={infoType} />)
+              }
+              
             </div>
           </div>  
       </div>
