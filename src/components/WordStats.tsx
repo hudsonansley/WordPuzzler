@@ -57,7 +57,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     }
 
     const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
-        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0);
+        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0, "alt");
     }
 
     if (hasPartitions()) {
@@ -98,22 +98,22 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                 <tbody>
                 {wordleDisplayStats.map( (wordInfo, i, stats) => {
                     if (i > 0) {
-                        if (wordInfo["clues"] === stats[i-1]["clues"]) {
-                            wordInfo["cluesGroupDivider"] = Math.sign(stats[i-1]["cluesGroupDivider"]);
+                        if (wordInfo.clues === stats[i-1].clues && wordInfo.boardGroup === stats[i-1].boardGroup) {
+                            wordInfo.cluesGroupDivider = Math.sign(stats[i-1].cluesGroupDivider);
                         } else {
-                            wordInfo["cluesGroupDivider"] = - 2 * Math.sign(stats[i-1]["cluesGroupDivider"]);
+                            wordInfo.cluesGroupDivider = - 2 * Math.sign(stats[i-1].cluesGroupDivider);
                         }
                     } else {
-                        wordInfo["cluesGroupDivider"] = 2;
+                        wordInfo.cluesGroupDivider = 2;
                     }
                     return (
-                        <tr className={getRowClassName(wordInfo)} key={wordInfo["word"]} >
+                        <tr className={getRowClassName(wordInfo)} key={wordInfo.word} >
                             <td 
                                 key="clues"
                                 className={`cluesContainer`}
                             >
-                                {(Math.abs(wordInfo["cluesGroupDivider"]) > 1) && 
-                                    ArrayUtils.numberToArray(wordInfo["clues"], 2, lettersPerWord).map((clue, i) => (
+                                {(Math.abs(wordInfo.cluesGroupDivider) > 1) && 
+                                    ArrayUtils.numberToArray(wordInfo.clues, 2, lettersPerWord).map((clue, i) => (
                                         <div 
                                             key = {`key_${clue}_${i}`}
                                             className={`clueBox clueBox--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} 
@@ -122,13 +122,13 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                                 }
                             </td>
                             <td key="word">
-                                <button onClick={() => {onTapListWord(wordInfo["word"])}} >
-                                    {wordInfo["word"].toUpperCase()}
+                                <button onClick={() => {onTapListWord(wordInfo.word)}} >
+                                    {wordInfo.word.toUpperCase()}
                                 </button>
                             </td>
-                            <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
-                            <td key="maxGroupSize">{wordInfo["maxGroupSize"]}</td>
-                            <td key="letterFrequency">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
+                            <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
+                            <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
+                            <td key="letterFrequency">{Math.round(1000 * wordInfo.letterFrequency)}</td>
                         </tr>
                         )
                     })
@@ -168,15 +168,15 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                 <tbody>
                 {wordleDisplayStats.map( wordInfo => {
                     return (
-                        <tr className={wordInfo["letterFrequency"] > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo["word"]} >
+                        <tr className={wordInfo.letterFrequency > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo.word} >
                             <td key="word">
-                                <button onClick={() => {onTapListWord(wordInfo["word"])}} >
-                                    {wordInfo["word"].toUpperCase()}
+                                <button onClick={() => {onTapListWord(wordInfo.word)}} >
+                                    {wordInfo.word.toUpperCase()}
                                 </button>
                             </td>
-                            <td key="avgGroupSize">{wordInfo["avgGroupSize"].toFixed(3)}</td>
-                            <td key="maxGroupSize">{wordInfo["maxGroupSize"]}</td>
-                            <td key="letterFrequency">{Math.round(1000 * wordInfo["letterFrequency"])}</td>
+                            <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
+                            <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
+                            <td key="letterFrequency">{Math.round(1000 * wordInfo.letterFrequency)}</td>
                         </tr>
                         )
                     })

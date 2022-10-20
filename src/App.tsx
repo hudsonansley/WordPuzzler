@@ -280,8 +280,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
   }
 
-  const getBoardColorClass = (boardGroup:number, alt:boolean):string => {
-    return `${alt ? "altGroup" : "group"}${boardGroup}Bg`;
+  const getBoardColorClass = (boardGroup:number, alt:boolean, altString:string = "selected"):string => {
+    return `${alt ? altString + "Group" : "group"}${boardGroup}Bg`;
   }
 
   const wordSetButton = (type: WordleDict.wordSet) => {

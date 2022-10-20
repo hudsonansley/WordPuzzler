@@ -245,6 +245,9 @@ tr {
   background-color: #202020;
 }
 .altGroup0Bg {
+  background-color: #404040;
+}
+.selectedGroup0Bg {
   background-color: #606060;
 }
 
@@ -252,6 +255,9 @@ tr {
   background-color: #004040;
 }
 .altGroup1Bg {
+  background-color: #005050;
+}
+.selectedGroup1Bg {
   background-color: #008080;
 }
 
@@ -259,6 +265,9 @@ tr {
   background-color: #404000;
 }
 .altGroup2Bg {
+  background-color: #505000;
+}
+.selectedGroup2Bg {
   background-color: #808000;
 }
 
@@ -266,6 +275,9 @@ tr {
   background-color: #400040;
 }
 .altGroup3Bg {
+  background-color: #500050;
+}
+.selectedGroup3Bg {
   background-color: #800080;
 }
 
