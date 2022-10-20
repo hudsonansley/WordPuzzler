@@ -50,7 +50,8 @@ export const Information = ({infoType}:{infoType:InfoType}) => {
                     You can use "1" to "4" to switch between four boards with the same words but 
                     different target words, for use with a variation like Quordle.
                     <p/>
-                    "0" combines all the boards words together to help with Quordle.
+                    "0" combines all the boards words together to help with Quordle. The row colors 
+                    correspond to the boards the words came from.
                 </div>
             )
             case "stats":
