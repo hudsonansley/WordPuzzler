@@ -18,7 +18,7 @@ const initialSortOrder: StatsSortOrder[] = [
 ];
 
 export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
-    const { addWordToBoard } = useContext(AppContext);
+    const { addWordToBoard, getBoardColorClass } = useContext(AppContext);
     const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
     const targetWordRef = useRef("");
     const wordsRef = useRef(null);
@@ -57,9 +57,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     }
 
     const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
-        let boardType = (wordStats.boardGroup < 0) ? "" : wordStats.boardGroup.toString();
-        const result = (wordStats.cluesGroupDivider > 0 ? "altGroup" : "group") + boardType + "Bg";
-        return result;
+        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0);
     }
 
     if (hasPartitions()) {

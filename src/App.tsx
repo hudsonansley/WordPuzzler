@@ -276,8 +276,12 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     onReset();
   }
 
+  const getBoardColorClass = (boardGroup:number, alt:boolean):string => {
+    return `${alt ? "altGroup" : "group"}${boardGroup}Bg`;
+  }
+
   const wordSetButton = (type: WordleDict.wordSet) => {
-    let bgClassName:string = (type === WordleUtils.currentWordSetType) ? "bg-mem-button-selected" : "bg-mem-button-deselected";
+    let bgClassName:string = getBoardColorClass(0, type === WordleUtils.currentWordSetType);
     return (
       <button 
         onClick={() => switchToWordSet(type)} 
@@ -292,7 +296,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     if (index < 0) {
       bgClassName = (statsInfo.combinedBoardMode) ? "bg-qmem-button-selected" : "bg-qmem-button-deselected";
     } else {
-      bgClassName = (!statsInfo.combinedBoardMode && index === statsInfo.wordSetIndex) ? "bg-mem-button-selected" : "bg-mem-button-deselected";
+      bgClassName = getBoardColorClass(index, !statsInfo.combinedBoardMode && index === statsInfo.wordSetIndex);
     }
     return (
       <button 
@@ -353,6 +357,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
           boardStr,
           setBoardStr,
           curLetterLoc,
+          getBoardColorClass,
           setCurLetterLoc,
           onSelectLetter,
           onDelete,
