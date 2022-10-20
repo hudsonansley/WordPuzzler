@@ -271,9 +271,13 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
 
   const switchToWordSet = (type: WordleDict.wordSet) => {
+    if (window) {
+      window.location.search = type === "quordle" ? "quordle" : "";
+    } else {
     setInitProgress(0);
     setWordSetType(type);
     onReset();
+  }
   }
 
   const getBoardColorClass = (boardGroup:number, alt:boolean):string => {
