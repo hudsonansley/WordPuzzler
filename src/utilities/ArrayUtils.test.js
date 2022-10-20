@@ -137,7 +137,13 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
     const t0 = new Date().getTime();
     WordleUtils.initWordleIndexPartitions();
     const t1 = new Date().getTime();
-    const stats = WordleUtils.getWordleDisplayStats(WordleUtils.wordleAll, sortOrder, "trace");
+    const wordSetInfo = {
+        words: [WordleUtils.wordleAll, [], [], []],
+        wordSetIndex: 0,
+        combinedBoardMode: false,
+        wordCount: WordleUtils.wordleAll.length,
+    }
+    const stats = WordleUtils.getWordleDisplayStats(wordSetInfo, sortOrder, "trace");
     const t2 = new Date().getTime();
     sortOrder.reverse();
     ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
