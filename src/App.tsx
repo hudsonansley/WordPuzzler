@@ -24,7 +24,8 @@ const initStatsInfo:WordleUtils.WordSetInfoType = {
 };
 const initBoardStr = "";
 const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
-const storedBoardDirty = [false, false, false, false];
+const storedBoardLetterStateDirty = [false, false, false, false];
+const storedBoardLettersDirty = [false, false, false, false];
 const storedBoardCompleted = [false, false, false, false];
 const initBoard = BoardData.getBoardFromString(storedBoardStates[initStatsInfo.wordSetIndex]);
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
@@ -55,7 +56,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         const storedBoard = storedBoardStates[index];
         storedBoardStates[index] = (storedBoard.length === 0 ? '' : storedBoard + '_')
           + ((index === statsInfo.wordSetIndex) ? boardRowStr : otherBoardStrs);
-        storedBoardDirty[index] = true;
+        storedBoardLetterStateDirty[index] = false;
+        storedBoardLettersDirty[index] = true;
       }
     }
     const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
@@ -83,6 +85,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     if (statsInfo.wordCount > 0) {
       setInfoType("stats");
       setStatsInfo({...statsInfo});
+      storedBoardLetterStateDirty[statsInfo.wordSetIndex] = false;
+      storedBoardLettersDirty[statsInfo.wordSetIndex] = false;
     } else {
       setInfoType(storedBoardCompleted[statsInfo.wordSetIndex] ? "completed" : "empty");
     }
@@ -103,14 +107,15 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       alert("Fill in full word to calculate words remaining")
       return;
     }
-    storedBoardDirty[statsInfo.wordSetIndex] = false;
 
-    let curWord = "";
-    const board = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
-    board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
-
-    if (WordleUtils.getIndexFromWord(curWord) < 0) {
-      alert(`Note: "${curWord}" is not in our dictionary`);
+    if (curLetterLoc.rowIndex >= 0) {
+      let curWord = "";
+      const board = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
+      board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
+  
+      if (WordleUtils.getIndexFromWord(curWord) < 0) {
+        alert(`Note: "${curWord}" is not in our dictionary`);
+      }
     }
 
     const newWords = WordleUtils.wordle(WordleUtils.wordlePicks, storedBoardStates[statsInfo.wordSetIndex]);
@@ -127,6 +132,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       storedBoardStates[statsInfo.wordSetIndex] = newBoardStr;
       setBoardStr(newBoardStr);
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+      storedBoardCompleted[statsInfo.wordSetIndex] = false;
       return;
     }
 
@@ -135,6 +141,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         const blankLetter = BoardData.getBlankLetter();
         const storedBoard = storedBoardStates[index];
         storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, curLetterLoc, blankLetter);
+        storedBoardLetterStateDirty[index] = false;
+        storedBoardLettersDirty[index] = true;
       }
     }
     if (!storedBoardCompleted[statsInfo.wordSetIndex]) {
@@ -155,7 +163,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       if (!storedBoardCompleted[index]) {
         const storedBoard = storedBoardStates[index];
         storedBoardStates[index] = BoardData.setLetterInBoardString(storedBoard, loc, letter);
-        storedBoardDirty[index] = true;
+        storedBoardLetterStateDirty[index] = false;
+        storedBoardLettersDirty[index] = true;
       }
     }
     const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
@@ -174,6 +183,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       const longestBoardString = storedBoardStates.reduce((a, b) => a.length > b.length ? a : b);
       const extension = longestBoardString.slice(newBoardStr.length).replace(/[=/]/g, '-');
       newBoardStr += extension;
+      storedBoardLetterStateDirty[statsInfo.wordSetIndex] = false;
+      storedBoardLettersDirty[statsInfo.wordSetIndex] = true;
     }
     return newBoardStr;
   }
@@ -195,6 +206,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     if (BoardData.boardIsComplete(newBoard)) {
       storedBoardCompleted[statsInfo.wordSetIndex] = true;
+    } else {
+      storedBoardLetterStateDirty[statsInfo.wordSetIndex] = true;
     }
   }
 
@@ -230,12 +243,18 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         const newBoardStr = storedBoardStates[statsInfo.wordSetIndex];
         setBoardStr(newBoardStr);
         const newBoard = BoardData.getBoardFromString(newBoardStr);
-        setCurLetterLoc(BoardData.getLetterLoc(newBoard));
-        if (storedBoardDirty[statsInfo.wordSetIndex]) {
-          storedBoardDirty[statsInfo.wordSetIndex] = false;
+        const newLetterLoc = BoardData.getLetterLoc(newBoard);
+        setCurLetterLoc(newLetterLoc);
+        if (storedBoardCompleted[statsInfo.wordSetIndex]) {
+          setInfoType("completed");
+        } else if (newLetterLoc.letterIndex === initLetterLoc.letterIndex && newLetterLoc.rowIndex === initLetterLoc.rowIndex) {
           onShowHelp();
+        } else if (storedBoardLetterStateDirty[statsInfo.wordSetIndex] ||
+          !storedBoardLettersDirty[statsInfo.wordSetIndex]) {
+          statsInfo.words[statsInfo.wordSetIndex] = WordleUtils.wordle(WordleUtils.wordlePicks, newBoardStr);
+          updateStatsInfo();
         } else {
-          onEnter();
+          setInfoType("needsAdjustment");
         }
       }
     }
@@ -244,7 +263,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const onReset = () => {
     for (let i = 0; i < storedBoardStates.length; i++) {
       storedBoardStates[i] = initBoardStr;
-      storedBoardDirty[i] = false;
+      storedBoardLetterStateDirty[i] = false;
+      storedBoardLettersDirty[i] = false;
       storedBoardCompleted[i] = false;
     }
     switchToBoard(0);

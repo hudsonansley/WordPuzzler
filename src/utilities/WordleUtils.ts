@@ -738,7 +738,6 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		item.word = WordleDict.numToWord(wordleAllNums[item.wordIndex]);
 		item.avgGroupSize = wordInfo.wordCount / item.numberOfGroups;
 	}
-	console.log(`getWordleDisplayStats: ${resultCount}`);
 	ArrayUtils.sortArrayOfStringToAnyMaps(result, sortOrder);
 	return result;
 }

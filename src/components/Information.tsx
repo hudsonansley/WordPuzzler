@@ -1,6 +1,6 @@
 import React from "react";
 
-export type InfoType = "help" | "completed" | "empty" | "stats";
+export type InfoType = "help" | "completed" | "empty" | "needsAdjustment" | "stats";
 
 export const Information = ({infoType}:{infoType:InfoType}) => {
     switch (infoType) {
@@ -15,6 +15,13 @@ export const Information = ({infoType}:{infoType:InfoType}) => {
             return (
                 <div className="info">
                     This board has been completed.
+                </div>
+            )
+        case "needsAdjustment":
+            return (
+                <div className="info">
+                    The letters have changed since these board stats were shown. Make any needed changes to
+                    the letter states (colors) and use "ENTER" to see the results. 
                 </div>
             )
         case "help":
@@ -37,7 +44,7 @@ export const Information = ({infoType}:{infoType:InfoType}) => {
                     based on the clues that would be shown if the word in each row 
                     was the answer and the selected word were entered.
                     <p/> 
-                    Clicking the selected word group breakdown header enters that word 
+                    Tapping the selected word group breakdown header enters that word 
                     on the board.
                     <p/>
                     You can use "1" to "4" to switch between four boards with the same words but 
