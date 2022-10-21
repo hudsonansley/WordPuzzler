@@ -336,9 +336,18 @@ const clueNumToString = ["e", "p", "n"];
  *  and "n" if letter not in the answer
  */
  export const getWordleClues = (word:string, pick:string):string => {
-	getWordleCluesFast(WordleDict.wordToNum(word), WordleDict.wordToNum(pick));
+	setWordLets(WordleDict.wordToNum(word));
+	getWordleCluesFast(WordleDict.wordToNum(pick));
 	return clues.reduce((acc, clueNum) => acc + clueNumToString[clueNum], "");
  }
+
+const setWordLets = (word:number):void => {
+	let i = WORD_LEN;
+	while (i--) {
+		wordLets[i] = word & 0x1F;
+	  	word = word >>> 5;
+	}
+}
 
 const WORD_LEN = 5;
 const wordLets = new Uint8Array(WORD_LEN);
@@ -350,12 +359,15 @@ export const WORDLE_WRONG_POSITION = 0b01;
 export const WORDLE_WRONG = 0b10;
 const MAX_CLUES_VALUE = 0b1010101010;
 const CLUES_COUNTS_LEN = MAX_CLUES_VALUE + 1;
-export function getWordleCluesFast(word:number, pick:number):number {
+/**
+ * @param  {number} pick
+ * @returns number the clue value for wordlets and pick.
+ *  *** ASSUMES *** wordlets has been set (for efficiency)
+ */
+function getWordleCluesFast(pick:number):number {
 	let i = WORD_LEN;
 	while (i--) {
-		wordLets[i] = word & 0x1F;
 		pickLets[i] = pick & 0x1F;
-	  	word = word >>> 5;
 	  	pick = pick >>> 5;
 		clues[i] = WORDLE_WRONG;
 	}
@@ -386,7 +398,8 @@ export function getWordleCluesFast(word:number, pick:number):number {
 
 let cluesLookUpTableBuffer:ArrayBuffer;
 let groupSizesByCluesBuffer:ArrayBuffer;
-let wordFlags:Uint8Array;
+let wordFlags:Uint8Array[];
+let wordFlagIndex = 0;
 let wordIndicesBuffer:ArrayBuffer; // scratch array for converting strings to word indicies
 const wordToIndexLUTable:StringToNumberMap = {};
 export let cluesLookUpTable:Uint16Array[];
@@ -430,7 +443,8 @@ export const initDataLists = (type:WordleDict.wordSet = "quordle"):void => {
 	wordsPerInitChunk = Math.ceil(wordCount / 10);
 
 	wordIndicesBuffer = new ArrayBuffer(wordCount * 2);
-	wordFlags = new Uint8Array(picksCount);
+	wordFlags = [new Uint8Array(picksCount), new Uint8Array(picksCount)];
+	wordFlags[wordFlagIndex].fill(1);
 	cluesLookUpTableBuffer = new ArrayBuffer(wordCount * picksCount * 2);
 	groupSizesByCluesBuffer = new ArrayBuffer(wordCount * CLUES_COUNTS_LEN * 2);
 	cluesLookUpTable = new Array(wordCount);
@@ -455,22 +469,27 @@ export const initWordleIndexPartitionsProg = (type:WordleDict.wordSet = "quordle
 		if (wordCount === 0) {
 			initDataLists(type);
 		}
+		let cluesLUT:Uint16Array;
+		let groupSizeByClues:Uint16Array;
 		const n = Math.min(wordCount, wordsProcessed + wordsPerInitChunk);
 		let i:number;
 		for (i = wordsProcessed; i < n; i++) {
 			let maxGroupSize = 0;
 			let groupCount = 0;
+			cluesLUT = cluesLookUpTable[i];
+			groupSizeByClues = groupSizesByClues[i];
+			setWordLets(wordleAllNums[i]);
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-				const clues = getWordleCluesFast(wordleAllNums[i], wordlePicksNums[pickIndex]);
-				cluesLookUpTable[i][pickIndex] = clues;
-				groupSizesByClues[i][clues]++;
-				if (groupSizesByClues[i][clues] === 1) {
+				const clues = getWordleCluesFast(wordlePicksNums[pickIndex]);
+				cluesLUT[pickIndex] = clues;
+				groupSizeByClues[clues]++;
+				if (groupSizeByClues[clues] === 1) {
 					groupCount++;
 				}
 			}
 			for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-				const clues = cluesLookUpTable[i][pickIndex];
-				const groupSize = groupSizesByClues[i][clues];
+				const clues = cluesLUT[pickIndex];
+				const groupSize = groupSizeByClues[clues];
 				if (maxGroupSize < groupSize) {
 					maxGroupSize = groupSize;
 				}
@@ -488,42 +507,44 @@ export const initWordleIndexPartitionsProg = (type:WordleDict.wordSet = "quordle
 export const filterWordleIndexPartitions = (words:Uint16Array):void => {
 	const wordsCount = groupCounts.length;
 	const picksCount = cluesLookUpTable[0].length;
-	wordFlags.fill(0);
+	const prevWordFlags = wordFlags[wordFlagIndex];
+	wordFlagIndex = 1 - wordFlagIndex;
+	const curWordFlags = wordFlags[wordFlagIndex];
+	curWordFlags.fill(0);
 	for (let i = 0; i < words.length; i++) {
-		wordFlags[words[i]] = 1;
+		curWordFlags[words[i]] = 1;
 	}
 	let groupCount:number;
+	let cluesLUT:Uint16Array;
+	let groupSizeByClues:Uint16Array;
 	let clues:number;
 	for (let i = 0; i < wordsCount; i++) {
 		groupCount = groupCounts[i];
+		cluesLUT = cluesLookUpTable[i];
+		groupSizeByClues = groupSizesByClues[i];
 		for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-			clues = cluesLookUpTable[i][pickIndex];
-			const wordFlag = wordFlags[pickIndex] > 0;
-			const prevWordFlag = (clues & (1 << 15)) === 0;
-			const wordAdded = wordFlag && !prevWordFlag;
-			const wordRemoved = !wordFlag && prevWordFlag;
-			clues &= ~(1 << 15); //clear the flag
-			if (wordAdded || wordRemoved) {
-				let groupSize = groupSizesByClues[i][clues];
-				if (wordRemoved) {
-					groupSize--;
-					if (groupSize === 0) {
-						groupCount--;
-					}
-				} else {
+			const wordChange = curWordFlags[pickIndex] - prevWordFlags[pickIndex];
+			if (wordChange) {
+				clues = cluesLUT[pickIndex];
+				let groupSize = groupSizeByClues[clues];
+				if (wordChange === 1) {
 					groupSize++;
 					if (groupSize === 1) {
 						groupCount++;
 					}
+				} else {
+					groupSize--;
+					if (groupSize === 0) {
+						groupCount--;
+					}
 				}
-				groupSizesByClues[i][clues] = groupSize;
+				groupSizeByClues[clues] = groupSize;
 			}
-			cluesLookUpTable[i][pickIndex] = wordFlag ? clues: clues | (1 << 15) ;
 		}
 		let maxGroupSize = 0;
 		for (let pickIndex = 0; pickIndex < picksCount; pickIndex++) {
-			clues = cluesLookUpTable[i][pickIndex] & ~(1 << 15);
-			const groupSize = groupSizesByClues[i][clues];
+			clues = cluesLUT[pickIndex];
+			const groupSize = groupSizeByClues[clues];
 			if (maxGroupSize < groupSize) {
 				maxGroupSize = groupSize;
 			}
@@ -678,7 +699,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		const n = result.length;
 		for (let i = 0; i < n; i++) {
 			const item = result[i];
-			item.clues = cluesLookUpTable[targetWordIndex][item.wordIndex] & ~(1 << 15);
+			item.clues = cluesLookUpTable[targetWordIndex][item.wordIndex];
 		}	
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "boardGroup") as ArrayUtils.SortOrderObjType[];
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
