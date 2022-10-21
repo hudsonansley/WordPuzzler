@@ -10,6 +10,10 @@
   --bg-wrong-index: 181, 159, 59;
   --bg-wrong: 58, 58, 60;
   --bg-deselect-opacity: 0.5;
+  --selected-group0-color: #707070;
+  --selected-group1-color: #008080;
+  --selected-group2-color: #808000;
+  --selected-group3-color: #800080;
 }
 
 html {
@@ -150,20 +154,6 @@ button#reset {
   min-width: 2rem;
 }
 
-.bg-mem-button-selected {
-  background-color: #727278; 
-}
-.bg-mem-button-deselected {
-  background-color: #424248; 
-}
-
-.bg-qmem-button-selected {
-  background: conic-gradient(rgb(var(--bg-correct)) 90deg, rgb(var(--bg-wrong-index)) 90deg 180deg, rgb(var(--bg-correct)) 180deg 270deg, rgb(var(--bg-wrong)) 270deg);
-}
-.bg-qmem-button-deselected {
-  background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
-}
-
 .hidden {
   visibility: hidden;
 }
@@ -241,44 +231,61 @@ tr {
   background-color: #800000;
 }
 
+.bg-qmem-button-selected {
+  background: conic-gradient(rgb(var(--bg-correct)) 90deg, rgb(var(--bg-wrong-index)) 90deg 180deg, rgb(var(--bg-correct)) 180deg 270deg, rgb(var(--bg-wrong)) 270deg);
+  border-color: white;
+}
+.bg-qmem-button-deselected {
+  background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
+  border-color: var(--selected-group0-color);
+}
+
 .group0Bg {
   background-color: #202020;
+  border-color: var(--selected-group0-color);
 }
 .altGroup0Bg {
   background-color: #404040;
 }
 .selectedGroup0Bg {
-  background-color: #606060;
+  background-color: var(--selected-group0-color);
+  border-color: white;
 }
 
 .group1Bg {
   background-color: #004040;
+  border-color: var(--selected-group1-color);
 }
 .altGroup1Bg {
   background-color: #005050;
 }
 .selectedGroup1Bg {
-  background-color: #008080;
+  background-color: var(--selected-group1-color);
+  border-color: white;
 }
 
 .group2Bg {
   background-color: #404000;
+  border-color: var(--selected-group2-color);
 }
 .altGroup2Bg {
   background-color: #505000;
 }
 .selectedGroup2Bg {
-  background-color: #808000;
+  background-color: var(--selected-group2-color);
+  border-color: white;
 }
 
 .group3Bg {
   background-color: #400040;
+  border-color: var(--selected-group3-color);
 }
 .altGroup3Bg {
   background-color: #500050;
 }
 .selectedGroup3Bg {
-  background-color: #800080;
+  background-color: var(--selected-group3-color);
+  border-color: white;
 }
 
 td th {
@@ -304,6 +311,7 @@ tbody {
   max-width: 340px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 20px;
   border: 1px solid gray;
   color: white;
   line-height: var(--stats-table-line-height);
