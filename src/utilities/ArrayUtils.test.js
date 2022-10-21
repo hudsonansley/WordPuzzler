@@ -133,10 +133,15 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
         {index: "cluesGroupCount", decending: true},
         {index: "boardGroup", decending: true},
     ];
+    const testWordIndices = new Uint16Array([1,2,3,4,5]);
     const sortOrder = initialSortOrder.slice();
     const t0 = new Date().getTime();
     WordleUtils.initWordleIndexPartitions();
     const t1 = new Date().getTime();
+    WordleUtils.filterWordleIndexPartitions(testWordIndices)
+    const t2 = new Date().getTime();
+    WordleUtils.filterWordleIndexPartitions(testWordIndices);
+    const t3 = new Date().getTime();
     const wordSetInfo = {
         words: [WordleUtils.wordleAll, [], [], []],
         wordSetIndex: 0,
@@ -144,20 +149,22 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
         wordCount: WordleUtils.wordleAll.length,
     }
     const stats = WordleUtils.getWordleDisplayStats(wordSetInfo, sortOrder, "trace");
-    const t2 = new Date().getTime();
+    const t4 = new Date().getTime();
     sortOrder.reverse();
     ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
-    const t3 = new Date().getTime();
-    ArrayUtils.sortArrayOfStringToAnyMaps(stats, initialSortOrder);
-    const t4 = new Date().getTime();
-    ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
     const t5 = new Date().getTime();
+    ArrayUtils.sortArrayOfStringToAnyMaps(stats, initialSortOrder);
+    const t6 = new Date().getTime();
+    ArrayUtils.sortArrayOfStringToAnyMaps(stats, sortOrder);
+    const t7 = new Date().getTime();
     console.log("stats.length ",stats.length);
     console.log("initWordleIndexPartitions ", (t1 - t0) / 1000 );
-    console.log("getWordleDisplayStats ", (t2 - t1) / 1000 );
-    console.log("sortArrayOfStringToAnyMaps rev ", (t3 - t2) / 1000 );
-    console.log("sortArrayOfStringToAnyMaps init ", (t4 - t3) / 1000 );
-    console.log("sortArrayOfStringToAnyMaps rev2 ", (t5 - t4) / 1000 );
+    console.log("filterWordleIndexPartitions large change ", (t2 - t1) / 1000 );
+    console.log("filterWordleIndexPartitions no change", (t3 - t2) / 1000 );
+    console.log("getWordleDisplayStats ", (t4 - t3) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps rev ", (t5 - t4) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps init ", (t6 - t5) / 1000 );
+    console.log("sortArrayOfStringToAnyMaps rev2 ", (t7 - t6) / 1000 );
 })
 
 test('ArrayUtils.getMinIndices works properly', () => {
