@@ -683,15 +683,19 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
-		if (result[0] && result[0]["maxGroupSize"] - 1 > 0.000001) {
-			let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
-			while (n > 0 && (nonAnswerPicks.length + nonAnswerNotPicks.length > 2)) {
-				n--;
-				if (nonAnswerPicks[0]["maxGroupSize"] <= nonAnswerNotPicks[0]["maxGroupSize"]) {
-					result.push(nonAnswerPicks.shift());
-				} else {
-					result.push(nonAnswerNotPicks.shift());
-				}
+		const bestAnswerNumberOfGroups = result[0]?.numberOfGroups ?? 100;
+		let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
+		while (n > 0 && (nonAnswerPicks.length > 1 || nonAnswerNotPicks.length > 1)) {
+			n--;
+			if (nonAnswerPicks[0].numberOfGroups > bestAnswerNumberOfGroups
+				|| nonAnswerNotPicks[0].numberOfGroups > bestAnswerNumberOfGroups) {
+					if (nonAnswerNotPicks[0].numberOfGroups > nonAnswerPicks[0].numberOfGroups) {
+						result.push(nonAnswerNotPicks.shift());
+					} else {
+						result.push(nonAnswerPicks.shift());
+					}
+			} else {
+				n = 0; // don't add any more non-answer words
 			}
 		}
 	} else {
