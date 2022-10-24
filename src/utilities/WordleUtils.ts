@@ -400,6 +400,7 @@ let cluesLookUpTableBuffer:ArrayBuffer;
 let groupSizesByCluesBuffer:ArrayBuffer;
 let wordFlags:Uint8Array[];
 let wordFlagIndex = 0;
+let wordSetCount = 4; //set in getwordleDisplayStats
 let wordIndicesBuffer:ArrayBuffer; // scratch array for converting strings to word indicies
 const wordToIndexLUTable:StringToNumberMap = {};
 export let cluesLookUpTable:Uint16Array[];
@@ -582,7 +583,6 @@ const getWordIndicies = (words:string[]):Uint16Array => {
 const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Array, collectNonAnswers:boolean):[wordleDisplayStatsType[], wordleDisplayStatsType[], wordleDisplayStatsType[]] => {
 	filterWordleIndexPartitions(wordIndices);
 	const partStats = getStatsFromIndexPartitionFast(collectNonAnswers);
-	const freqStats:NumberToNumberMap = wordleFreqStats(wordIndices);
 	const result:wordleDisplayStatsType[] = [];
 	const nonAnswerPicks:wordleDisplayStatsType[] = [];
 	const nonAnswerNotPicks:wordleDisplayStatsType[] = [];
@@ -593,7 +593,6 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 	while (i < partStats.length && wordsLeft > 0) {
 		const partStat = partStats[i];
 		const wordIndex = partStat[0];
-		const freqStat:number = freqStats[wordIndex] ?? 0;
 		const wordIndicesIndex = wordsLU[wordIndex];
 		const item:wordleDisplayStatsType = {
 			word:"",
@@ -602,7 +601,6 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 			avgGroupSize:0,
 			numberOfGroups:partStat[1].numberOfGroups, 
 			maxGroupSize:partStat[1].largestGroup, 
-			letterFrequency:freqStat,
 			cluesGroupCount:0, 
 			cluesGroupDivider:0,
 			boardGroup: boardGroupIsNumber ? boardGroup : boardGroup[wordIndicesIndex],
@@ -611,6 +609,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 			result.push(item);
 			wordsLeft--;
 		} else if (collectNonAnswers) {
+			item.boardGroup = wordSetCount;
 			if (wordIndex < picksCount) {
 				nonAnswerPicks.push(item);
 			} else {
@@ -634,8 +633,7 @@ export type wordleDisplayStatsType = {
 	clues:number, 
 	avgGroupSize:number,
 	numberOfGroups:number, 
-	maxGroupSize:number, 
-	letterFrequency:number, 
+	maxGroupSize:number,
 	cluesGroupCount:number, 
 	cluesGroupDivider:number, 
 	boardGroup:number
@@ -657,6 +655,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		console.error("getWordleDisplayStats called before partitions resolved");
 		return [];
 	}
+	wordSetCount = wordInfo.words.length;
 	let result:wordleDisplayStatsType[] = [];
 	let nonAnswerPicks:wordleDisplayStatsType[] = [];
 	let nonAnswerNotPicks:wordleDisplayStatsType[] = [];
@@ -680,7 +679,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, wordInfo.wordSetIndex, true);
 	}
 	if (targetWordIndex < 0) {
-		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, letterFrequency:0, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: -1};
+		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: -1};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
@@ -728,6 +727,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		}
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "clues") as ArrayUtils.SortOrderObjType[];
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "cluesGroupCount") as ArrayUtils.SortOrderObjType[];
+		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "boardGroup") as ArrayUtils.SortOrderObjType[];
 	}
 	const resultCount = result.length;
 	if (wordInfo.combinedBoardMode) {

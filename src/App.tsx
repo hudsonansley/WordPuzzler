@@ -15,7 +15,7 @@ import * as WordleUtils from './utilities/WordleUtils';
 // belongs to. Could just be shown on top of group b/c groups don't overlap
 // unless the clues are the same
 // : don't enter letters when viewing completed board
-// : color outlines of disabled board buttons to match selected color
+// : don't recalculate stats just for sort or new target word
 // : show table header when item clicked immediately, then the 
 // rest of the table when calculation is finished
 // : ditch "letter scores", add group number column so that can be sorted
@@ -291,12 +291,20 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
   }
 
-  const getBoardColorClass = (boardGroup:number, alt:boolean, altString:string = "selected"):string => {
-    return `${alt ? altString + "Group" : "group"}${boardGroup}Bg`;
+  const getBoardColorClass = (boardGroup:number, alt:boolean, typeString:string = "button", altString:string = "selected"):string => {
+    if (boardGroup < storedBoardStates.length) {
+      const groupNumStr:string = (boardGroup < 0) ? "" : boardGroup.toString();
+      const prefix = alt ?
+        altString + typeString.charAt(0).toUpperCase() + typeString.slice(1)
+        : typeString;
+      return `${prefix}${groupNumStr}Bg`;
+    } else {
+      return "impossibleWordBg";
+    }
   }
 
   const wordSetButton = (type: WordleDict.wordSet) => {
-    let bgClassName:string = getBoardColorClass(0, type === WordleUtils.currentWordSetType);
+    let bgClassName:string = getBoardColorClass(-1, type === WordleUtils.currentWordSetType);
     return (
       <button 
         onClick={() => switchToWordSet(type)} 

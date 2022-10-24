@@ -10,7 +10,6 @@ type StatsOrderInfo = {primaryIndex: wordleDisplayStatsKeys, targetWord:string};
 const initialSortOrder: StatsSortOrder[] = [
     {index: "avgGroupSize", decending: true}, 
     {index: "maxGroupSize", decending: true}, 
-    {index: "letterFrequency", decending: false}, 
     {index: "word", decending: true}, 
     {index: "clues", decending: true}, 
     {index: "cluesGroupCount", decending: true},
@@ -57,7 +56,16 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     }
 
     const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
-        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0, "alt");
+        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0, "group", "alt");
+    }
+
+    const getBoardNumberDisplay = (wordStats:wordleDisplayStatsType):string => {
+        const groupNum = wordStats.boardGroup;
+        if (typeof groupNum === "number" && groupNum >= 0 && groupNum < statsInfo.words.length) {
+            return (groupNum + 1).toString();
+        } else {
+            return "";
+        }
     }
 
     if (hasPartitions()) {
@@ -88,11 +96,13 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             max<br/>group<br/>size
                         </button>
                     </th>
-                    <th key="letterFrequency">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"letterFrequency", targetWord: ""})}} >
-                            letter<br/>scores
+                    {statsInfo.combinedBoardMode && (
+                    <th key="boardGroup">
+                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
+                            grp<br/>num
                         </button>
                     </th>
+                    )}
                 </tr>
                 </thead>
                 <tbody>
@@ -128,7 +138,9 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             </td>
                             <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
                             <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
-                            <td key="letterFrequency">{Math.round(1000 * wordInfo.letterFrequency)}</td>
+                            {statsInfo.combinedBoardMode && (
+                            <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
+                            )}
                         </tr>
                         )
                     })
@@ -158,17 +170,19 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             max<br/>group<br/>size
                         </button>
                     </th>
-                    <th key="letterFrequency">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"letterFrequency", targetWord: ""})}} >
-                            letter<br/>scores
+                    {statsInfo.combinedBoardMode && (
+                    <th key="boardGroup">
+                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
+                            grp<br/>num
                         </button>
                     </th>
+                    )}
                 </tr>
                 </thead>
                 <tbody>
                 {wordleDisplayStats.map( wordInfo => {
                     return (
-                        <tr className={wordInfo.letterFrequency > 0 ? "possibleWordBg" : "impossibleWordBg"} key={wordInfo.word} >
+                        <tr className={getRowClassName(wordInfo)} key={wordInfo.word} >
                             <td key="word">
                                 <button onClick={() => {onTapListWord(wordInfo.word)}} >
                                     {wordInfo.word.toUpperCase()}
@@ -176,7 +190,9 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             </td>
                             <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
                             <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
-                            <td key="letterFrequency">{Math.round(1000 * wordInfo.letterFrequency)}</td>
+                            {statsInfo.combinedBoardMode && (
+                            <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
+                            )}
                         </tr>
                         )
                     })

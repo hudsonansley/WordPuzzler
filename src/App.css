@@ -10,7 +10,8 @@
   --bg-wrong-index: 181, 159, 59;
   --bg-wrong: 58, 58, 60;
   --bg-deselect-opacity: 0.5;
-  --selected-group0-color: #707070;
+  --selected-button-color: #707070;
+  --selected-group0-color: #008000;
   --selected-group1-color: #008080;
   --selected-group2-color: #808000;
   --selected-group3-color: #800080;
@@ -228,7 +229,8 @@ tr {
   background-color: #008000;
 }
 .impossibleWordBg {
-  background-color: #800000;
+  color: #709090;
+  background-color: #600000;
 }
 
 .bg-qmem-button-selected {
@@ -240,50 +242,71 @@ tr {
   border-color: var(--selected-group0-color);
 }
 
+.buttonBg {
+  background-color: #404040;
+  border-color: var(--selected-button-color);
+}
+.selectedButtonBg {
+  background-color: var(--selected-button-color);
+  border-color: white;
+}
+
 .group0Bg {
-  background-color: #202020;
-  border-color: var(--selected-group0-color);
+  background-color: var(--selected-group0-color);
 }
 .altGroup0Bg {
-  background-color: #404040;
+  background-color: #006000;
 }
-.selectedGroup0Bg {
+.button0Bg {
+  background-color: #004000;
+  border-color: var(--selected-group0-color);
+}
+.selectedButton0Bg {
   background-color: var(--selected-group0-color);
   border-color: white;
 }
 
 .group1Bg {
-  background-color: #004040;
-  border-color: var(--selected-group1-color);
+  background-color: var(--selected-group1-color);
 }
 .altGroup1Bg {
   background-color: #005050;
 }
-.selectedGroup1Bg {
+.button1Bg {
+  background-color: #004040;
+  border-color: var(--selected-group1-color);
+}
+.selectedButton1Bg {
   background-color: var(--selected-group1-color);
   border-color: white;
 }
 
 .group2Bg {
-  background-color: #404000;
-  border-color: var(--selected-group2-color);
+  background-color: var(--selected-group2-color);
 }
 .altGroup2Bg {
   background-color: #505000;
 }
-.selectedGroup2Bg {
+.button2Bg {
+  background-color: #404000;
+  border-color: var(--selected-group2-color);
+}
+.selectedButton2Bg {
   background-color: var(--selected-group2-color);
   border-color: white;
 }
 
 .group3Bg {
-  background-color: #400040;
-  border-color: var(--selected-group3-color);
+  background-color: var(--selected-group3-color);
 }
 .altGroup3Bg {
   background-color: #500050;
 }
-.selectedGroup3Bg {
+.button3Bg {
+  background-color: #400040;
+  border-color: var(--selected-group3-color);
+}
+.selectedButton3Bg {
   background-color: var(--selected-group3-color);
   border-color: white;
 }
