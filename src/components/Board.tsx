@@ -16,7 +16,7 @@ const Board = () => {
         (<Letter rowIndex={i} letterIndex={j} key={key}/>)
       );
     }
-    const classes = `gameRow gameRow--${(i <= curRow) ? 'active' : ''}`;
+    const classes = `game-row game-row--${(i <= curRow) ? 'active' : ''}`;
     const row = React.createElement(GameRow, {classes, rowIndex:i, key: i, items});
     gameRows.push(row);
   }

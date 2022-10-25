@@ -67,12 +67,12 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
 
     if (hasPartitions()) {
         return (
-            <div id="statsTable">
-            <table className="statTable">
+            <div id="stats-table">
+            <table className="stat-table">
                 <thead>
                 <tr>
                     <th key="clues">
-                        <div className="cluesColumn">
+                        <div className="clues-column">
                             <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord, false)}} >
                                 {statsOrderInfo.targetWord.toUpperCase()}
                             </button>
@@ -117,13 +117,13 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                         <tr className={getRowClassName(wordInfo)} key={wordInfo.word} >
                             <td 
                                 key="clues"
-                                className={`cluesContainer`}
+                                className={"clues-container"}
                             >
                                 {(Math.abs(wordInfo.cluesGroupDivider) > 1) && 
                                     ArrayUtils.numberToArray(wordInfo.clues, 2, lettersPerWord).map((clue, i) => (
                                         <div 
                                             key = {`key_${clue}_${i}`}
-                                            className={`clueBox clueBox--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} 
+                                            className={`clue-box clue-box--${clue===WORDLE_CORRECT ? 'correct' : clue===WORDLE_WRONG_POSITION ? 'wrongIndex' : 'wrong'}`} 
                                         />
                                     ))
                                 }
@@ -148,8 +148,8 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
         )
     } else {
         return (
-            <div id="statsTable">
-            <table className="statTable">
+            <div id="stats-table">
+            <table className="stat-table">
                 <thead>
                 <tr>
                     <th key="word">

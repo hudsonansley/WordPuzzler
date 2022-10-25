@@ -12,10 +12,10 @@ const InitProgress = ({ progress }) => {
     }
     return (
         <>
-        <div className="gameRow gameRow--active">
+        <div className="game-row game-row--active">
             {boxes}
         </div>
-        <div className="gameRow">
+        <div className="game-row">
             calculating word groups...
         </div>
         </>

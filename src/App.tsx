@@ -297,15 +297,20 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
 
   const getBoardColorClass = (boardGroup:number, alt:boolean, typeString:string = "button", altString:string = "selected"):string => {
+    const items = [];
     if (boardGroup < storedBoardStates.length) {
-      const groupNumStr:string = (boardGroup < 0) ? "" : boardGroup.toString();
-      const prefix = alt ?
-        altString + typeString.charAt(0).toUpperCase() + typeString.slice(1)
-        : typeString;
-      return `${prefix}${groupNumStr}Bg`;
+      if (alt) {
+        items.push(altString);
+      }
+      items.push(typeString);
+      if (boardGroup >= 0) {
+        items.push(boardGroup.toString());
+      }
     } else {
-      return "impossibleWordBg";
+      items.push("impossible", "word");
     }
+    items.push("bg");
+    return items.join("-");
   }
 
   const wordSetButton = (type: WordleDict.wordSet) => {
@@ -339,7 +344,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   return (
     <div className="App">
       <nav>
-        <div className='navButtons'>
+        <div className='nav-buttons'>
           <button 
             id="help" 
             onClick={onShowHelp} 
@@ -363,7 +368,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
           </div>
           </div>
         </div>
-        <div className="navSpacer" />
+        <div className="nav-spacer" />
         <h1>{`${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}`}&nbsp;Helper</h1>
         <div className={`memory-button-container${(wordSetType === "quordle") ? "" : " hidden"}`}>
           <div className="quordle-button-container">

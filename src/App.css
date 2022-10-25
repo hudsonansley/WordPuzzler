@@ -70,7 +70,7 @@ nav h1 {
   }
 }
 
-.navButtons {
+.nav-buttons {
   display: flex;
   direction: row;
   align-items: center;
@@ -78,7 +78,7 @@ nav h1 {
   width:7rem;
 }
 
-.navSpacer {
+.nav-spacer {
   display: flex;
   flex: 0 40 1rem;
 }
@@ -188,14 +188,14 @@ button#reset {
   flex-direction: column;
 }
 
-.gameRow {
+.game-row {
   display: flex;
   min-height: 20px;
   flex-shrink: 1;
   margin: 3px;
 }
 
-.gameRow--active {
+.game-row--active {
   min-height: 50px;
 }
 
@@ -225,10 +225,7 @@ button#reset {
 tr {
   line-height: var(--stats-table-line-height);
 }
-.possibleWordBg {
-  background-color: #008000;
-}
-.impossibleWordBg {
+.impossible-word-bg {
   color: #709090;
   background-color: #600000;
 }
@@ -242,71 +239,71 @@ tr {
   border-color: var(--selected-group0-color);
 }
 
-.buttonBg {
+.button-bg {
   background-color: #404040;
   border-color: var(--selected-button-color);
 }
-.selectedButtonBg {
+.selected-button-bg {
   background-color: var(--selected-button-color);
   border-color: white;
 }
 
-.group0Bg {
+.group-0-bg {
   background-color: var(--selected-group0-color);
 }
-.altGroup0Bg {
+.alt-group-0-bg {
   background-color: #006000;
 }
-.button0Bg {
+.button-0-bg {
   background-color: #004000;
   border-color: var(--selected-group0-color);
 }
-.selectedButton0Bg {
+.selected-button-0-bg {
   background-color: var(--selected-group0-color);
   border-color: white;
 }
 
-.group1Bg {
+.group-1-bg {
   background-color: var(--selected-group1-color);
 }
-.altGroup1Bg {
+.alt-group-1-bg {
   background-color: #005050;
 }
-.button1Bg {
+.button-1-bg {
   background-color: #004040;
   border-color: var(--selected-group1-color);
 }
-.selectedButton1Bg {
+.selected-button-1-bg {
   background-color: var(--selected-group1-color);
   border-color: white;
 }
 
-.group2Bg {
+.group-2-bg {
   background-color: var(--selected-group2-color);
 }
-.altGroup2Bg {
+.alt-group-2-bg {
   background-color: #505000;
 }
-.button2Bg {
+.button-2-bg {
   background-color: #404000;
   border-color: var(--selected-group2-color);
 }
-.selectedButton2Bg {
+.selected-button-2-bg {
   background-color: var(--selected-group2-color);
   border-color: white;
 }
 
-.group3Bg {
+.group-3-bg {
   background-color: var(--selected-group3-color);
 }
-.altGroup3Bg {
+.alt-group-3-bg {
   background-color: #500050;
 }
-.button3Bg {
+.button-3-bg {
   background-color: #400040;
   border-color: var(--selected-group3-color);
 }
-.selectedButton3Bg {
+.selected-button-3-bg {
   background-color: var(--selected-group3-color);
   border-color: white;
 }
@@ -327,7 +324,7 @@ tbody {
   overflow-y: auto;
 }
 
-.statTable {
+.stat-table {
   font-family: 'Ubunto Mono', monospace, 'DejaVu Sans Mono', 'Courier New', Courier;
   font-weight: bold;
   min-width: 260px;
@@ -354,11 +351,11 @@ p {
   text-indent: 2em;
 }
 
-.cluesColumn {
+.clues-column {
   min-width: var(--stats-clues-min-width);
 }
 
-.cluesContainer {
+.clues-container {
   display: inline-flex;
   justify-content: space-around;
   min-width: 100%;
@@ -366,22 +363,22 @@ p {
   margin-bottom: 2px;
 }
 
-.clueBox {
+.clue-box {
   width: var(--stats-clues-block-size);
   height: var(--stats-clues-block-size);
   display: inline-flex;
   border: 0.5px solid white;
 }
 
-.clueBox--correct {
+.clue-box--correct {
   background-color: #68a963;
 }
 
-.clueBox--wrongIndex {
+.clue-box--wrongIndex {
   background-color: #f0c105;
 }
 
-.clueBox--wrong {
+.clue-box--wrong {
   background-color: #787c7e;
 }
 
