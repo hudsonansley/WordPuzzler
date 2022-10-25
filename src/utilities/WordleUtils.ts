@@ -392,7 +392,7 @@ let cluesLookUpTableBuffer:ArrayBuffer;
 let groupSizesByCluesBuffer:ArrayBuffer;
 let wordFlags:Uint8Array[];
 let wordFlagIndex = 0;
-let wordIndicesBuffer:ArrayBuffer; // scratch array for converting strings to word indicies
+let wordIndicesBuffer:ArrayBuffer; // scratch array for converting strings to word indices
 const wordToIndexLUTable:StringToNumberMap = {};
 export let cluesLookUpTable:Uint16Array[];
 export let groupSizesByClues:Uint16Array[];
@@ -562,7 +562,7 @@ const getStatsFromIndexPartitionFast = (includeDecoys:boolean):partionStats[] =>
 	return result;
 }
 
-const getWordIndicies = (words:string[]):Uint16Array => {
+const getWordIndices = (words:string[]):Uint16Array => {
 	const n = words.length;
 	const result = new Uint16Array(wordIndicesBuffer, 0, n);
 	for (let i = 0; i < n; i++) {
@@ -651,21 +651,21 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 	let nonAnswerNotPicks:wordleDisplayStatsType[] = [];
 
 	const targetWordIndex = wordToIndexLUTable[targetWord] ?? -1;
-	const boardWordIndicies:Uint16Array[] = [];
+	const boardWordIndices:Uint16Array[] = [];
 	if (wordInfo.combinedBoardIndexStrings) {
-		const boardIndicies = new Array(wordInfo.wordCount);
-		const totalWordIndicies = new Uint16Array(wordInfo.wordCount);
+		const boardIndices = new Array(wordInfo.wordCount);
+		const totalWordIndices = new Uint16Array(wordInfo.wordCount);
 		let offset = 0;
 		for (let i = 0; i < wordInfo.wordSets.length; i++) {
-			const wordIndices = getWordIndicies(wordInfo.wordSets[i]);
-			totalWordIndicies.set(wordIndices, offset);
-			boardWordIndicies[i] = totalWordIndicies.subarray(offset, offset + wordIndices.length);
-			boardIndicies.fill(wordInfo.combinedBoardIndexStrings[i], offset, offset + wordIndices.length);
+			const wordIndices = getWordIndices(wordInfo.wordSets[i]);
+			totalWordIndices.set(wordIndices, offset);
+			boardWordIndices[i] = totalWordIndices.subarray(offset, offset + wordIndices.length);
+			boardIndices.fill(wordInfo.combinedBoardIndexStrings[i], offset, offset + wordIndices.length);
 			offset += wordIndices.length;
 		}
-		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(totalWordIndicies, boardIndicies, targetWordIndex < 0);
+		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(totalWordIndices, boardIndices, targetWordIndex < 0);
 	} else {
-		const wordIndices = getWordIndicies(wordInfo.wordSets[wordInfo.wordSetIndex]);
+		const wordIndices = getWordIndices(wordInfo.wordSets[wordInfo.wordSetIndex]);
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, (wordInfo.wordSetIndex + 1).toString(), true);
 	}
 	if (targetWordIndex < 0) {
@@ -741,7 +741,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		for (let i = 0; i < resultCount; i++) {
 			boardGroupInfo[i] = {groupCount:0, maxGroupSize: 0};
 		}
-		boardWordIndicies.forEach( wordIndices => {
+		boardWordIndices.forEach( wordIndices => {
 			filterWordleIndexPartitions(wordIndices);
 			for (let i = 0; i < resultCount; i++) {
 				const wordIndex = result[i].wordIndex;
