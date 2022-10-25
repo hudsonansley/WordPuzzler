@@ -684,16 +684,28 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
 		const bestAnswerNumberOfGroups = result[0]?.numberOfGroups ?? 100;
+		const bestAnswerMaxGroupSize = result[0]?.maxGroupSize ?? 0;
 		let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
 		while (n > 0 && (nonAnswerPicks.length > 1 || nonAnswerNotPicks.length > 1)) {
 			n--;
-			if (nonAnswerPicks[0].numberOfGroups > bestAnswerNumberOfGroups
-				|| nonAnswerNotPicks[0].numberOfGroups > bestAnswerNumberOfGroups) {
+			const betterNumberOfGroups = (nonAnswerPicks[0].numberOfGroups > bestAnswerNumberOfGroups
+				|| nonAnswerNotPicks[0].numberOfGroups > bestAnswerNumberOfGroups);
+			const betterMaxGroupSize = (nonAnswerPicks[0].maxGroupSize < bestAnswerMaxGroupSize
+				|| nonAnswerNotPicks[0].maxGroupSize < bestAnswerMaxGroupSize);
+			if (betterNumberOfGroups || betterMaxGroupSize) {
+				if (betterNumberOfGroups) {
 					if (nonAnswerNotPicks[0].numberOfGroups > nonAnswerPicks[0].numberOfGroups) {
 						result.push(nonAnswerNotPicks.shift());
 					} else {
 						result.push(nonAnswerPicks.shift());
 					}
+				} else {
+					if (nonAnswerNotPicks[0].maxGroupSize < nonAnswerPicks[0].maxGroupSize) {
+						result.push(nonAnswerNotPicks.shift());
+					} else {
+						result.push(nonAnswerPicks.shift());
+					}
+				}
 			} else {
 				n = 0; // don't add any more non-answer words
 			}
