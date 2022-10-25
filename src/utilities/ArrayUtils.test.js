@@ -143,7 +143,7 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
     WordleUtils.filterWordleIndexPartitions(testWordIndices);
     const t3 = new Date().getTime();
     const wordSetInfo = {
-        words: [WordleUtils.wordleAll, [], [], []],
+        wordSets: [WordleUtils.wordleAll, [], [], []],
         wordSetIndex: 0,
         combinedBoardMode: false,
         wordCount: WordleUtils.wordleAll.length,
