@@ -11,21 +11,6 @@ import Information, { InfoType } from './components/Information';
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordleUtils from './utilities/WordleUtils';
 
-//TODO: add column for partitions view that gives which board(s) the word 
-// belongs to. Could just be shown on top of group b/c groups don't overlap
-// unless the clues are the same
-// : don't enter letters when viewing completed board
-// : don't recalculate stats just for sort or new target word
-// : show table header when item clicked immediately, then the 
-// rest of the table when calculation is finished
-// : ditch "letter scores", add group number column so that can be sorted
-// : improve responsive layout for devices
-// : convert css to react native styles
-// : implement react native, submit to stores
-// : add word definitions
-// : improve look of table using flex layout, add lines between
-// boad/clue groups and use one color per board
-
 export const AppContext = createContext(undefined);
 const initStatsInfo:WordleUtils.WordSetInfoType = {
   words: [[],[],[],[]],
