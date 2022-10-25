@@ -23,14 +23,6 @@ export const setVerbose = (verbose:boolean):void => {
 	gVerbose = verbose;
 }
 
-const makeLookupNumMap = (words:Uint16Array):numberToBooleanMap => {
-	const results: numberToBooleanMap = {};
-	words.forEach( word => {
-		results[word] = true;
-	});
-	return results;
-}
-
 export const makeIndexLookupMap = (words:string[]):StringToNumberMap => {
 	const results: StringToNumberMap = {};
 	words.forEach( (word, index) => {
