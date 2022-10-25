@@ -392,7 +392,6 @@ let cluesLookUpTableBuffer:ArrayBuffer;
 let groupSizesByCluesBuffer:ArrayBuffer;
 let wordFlags:Uint8Array[];
 let wordFlagIndex = 0;
-let wordSetCount = 4; //set in getwordleDisplayStats
 let wordIndicesBuffer:ArrayBuffer; // scratch array for converting strings to word indicies
 const wordToIndexLUTable:StringToNumberMap = {};
 export let cluesLookUpTable:Uint16Array[];
@@ -572,14 +571,14 @@ const getWordIndicies = (words:string[]):Uint16Array => {
 	return result;
 }
 
-const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Array, collectNonAnswers:boolean):[wordleDisplayStatsType[], wordleDisplayStatsType[], wordleDisplayStatsType[]] => {
+const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:string | string[], collectNonAnswers:boolean):[wordleDisplayStatsType[], wordleDisplayStatsType[], wordleDisplayStatsType[]] => {
 	filterWordleIndexPartitions(wordIndices);
 	const partStats = getStatsFromIndexPartitionFast(collectNonAnswers);
 	const result:wordleDisplayStatsType[] = [];
 	const nonAnswerPicks:wordleDisplayStatsType[] = [];
 	const nonAnswerNotPicks:wordleDisplayStatsType[] = [];
 	const wordsLU = makeIndexUint16LookupMap(wordIndices);
-	const boardGroupIsNumber = typeof boardGroup === "number";
+	const boardGroupIsString = typeof boardGroup === "string";
 	let i = 0;
 	let wordsLeft = wordIndices.length;
 	while (i < partStats.length && wordsLeft > 0) {
@@ -595,13 +594,13 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 			maxGroupSize:partStat[1].largestGroup, 
 			cluesGroupCount:0, 
 			cluesGroupDivider:0,
-			boardGroup: boardGroupIsNumber ? boardGroup : boardGroup[wordIndicesIndex],
+			boardGroup: boardGroupIsString ? boardGroup : boardGroup[wordIndicesIndex],
 		};
 		if (typeof wordIndicesIndex === "number") {
 			result.push(item);
 			wordsLeft--;
 		} else if (collectNonAnswers) {
-			item.boardGroup = wordSetCount;
+			item.boardGroup = "";
 			if (wordIndex < picksCount) {
 				nonAnswerPicks.push(item);
 			} else {
@@ -616,7 +615,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:number | Uint8Ar
 export type WordSetInfoType = {
     words: string[][],
     wordSetIndex: number,
-    combinedBoardMode: boolean,
+    combinedBoardIndexStrings: string[] | null,
 	wordCount: number,
 };
 export type wordleDisplayStatsType = {
@@ -628,7 +627,7 @@ export type wordleDisplayStatsType = {
 	maxGroupSize:number,
 	cluesGroupCount:number, 
 	cluesGroupDivider:number, 
-	boardGroup:number
+	boardGroup:string
 };
 export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
 /**
@@ -647,31 +646,30 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		console.error("getWordleDisplayStats called before partitions resolved");
 		return [];
 	}
-	wordSetCount = wordInfo.words.length;
 	let result:wordleDisplayStatsType[] = [];
 	let nonAnswerPicks:wordleDisplayStatsType[] = [];
 	let nonAnswerNotPicks:wordleDisplayStatsType[] = [];
 
 	const targetWordIndex = wordToIndexLUTable[targetWord] ?? -1;
 	const boardWordIndicies:Uint16Array[] = [];
-	if (wordInfo.combinedBoardMode) {
-		const boardIndicies = new Uint8Array(wordInfo.wordCount);
+	if (wordInfo.combinedBoardIndexStrings) {
+		const boardIndicies = new Array(wordInfo.wordCount);
 		const totalWordIndicies = new Uint16Array(wordInfo.wordCount);
 		let offset = 0;
 		for (let i = 0; i < wordInfo.words.length; i++) {
 			const wordIndices = getWordIndicies(wordInfo.words[i]);
 			totalWordIndicies.set(wordIndices, offset);
 			boardWordIndicies[i] = totalWordIndicies.subarray(offset, offset + wordIndices.length);
-			boardIndicies.fill(i, offset, offset + wordIndices.length);
+			boardIndicies.fill(wordInfo.combinedBoardIndexStrings[i], offset, offset + wordIndices.length);
 			offset += wordIndices.length;
 		}
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(totalWordIndicies, boardIndicies, targetWordIndex < 0);
 	} else {
 		const wordIndices = getWordIndicies(wordInfo.words[wordInfo.wordSetIndex]);
-		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, wordInfo.wordSetIndex, true);
+		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, (wordInfo.wordSetIndex + 1).toString(), true);
 	}
 	if (targetWordIndex < 0) {
-		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: -1};
+		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: ""};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
 		// only add non-answer words if best possible average group size > 1
@@ -738,7 +736,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		sortOrder = ArrayUtils.updatePrimaryIndex(sortOrder, "boardGroup") as ArrayUtils.SortOrderObjType[];
 	}
 	const resultCount = result.length;
-	if (wordInfo.combinedBoardMode) {
+	if (wordInfo.combinedBoardIndexStrings) {
 		const boardGroupInfo:{groupCount:number, maxGroupSize:number}[] = Array(resultCount);
 		for (let i = 0; i < resultCount; i++) {
 			boardGroupInfo[i] = {groupCount:0, maxGroupSize: 0};

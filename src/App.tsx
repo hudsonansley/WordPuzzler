@@ -30,7 +30,7 @@ export const AppContext = createContext(undefined);
 const initStatsInfo:WordleUtils.WordSetInfoType = {
   words: [[],[],[],[]],
   wordSetIndex: 0,
-  combinedBoardMode: false,
+  combinedBoardIndexStrings: null,
   wordCount: 0,
 };
 const initBoardStr = "";
@@ -90,7 +90,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
 
   const updateStatsInfo = () => {
-    statsInfo.wordCount = statsInfo.combinedBoardMode ?
+    statsInfo.wordCount = statsInfo.combinedBoardIndexStrings ?
         statsInfo.words.reduce((acc, list) => acc + list.length, 0) :
         statsInfo.words[statsInfo.wordSetIndex].length;
     if (statsInfo.wordCount > 0) {
@@ -108,7 +108,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
 
   const onEnter = () => {
-    statsInfo.combinedBoardMode = false;
+    statsInfo.combinedBoardIndexStrings = null;
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
       statsInfo.words[statsInfo.wordSetIndex] = [];
       updateStatsInfo();
@@ -201,7 +201,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
 
   const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
-    if (statsInfo.combinedBoardMode) {
+    if (statsInfo.combinedBoardIndexStrings) {
       alert(`Switching back to board ${statsInfo.wordSetIndex + 1}`)
       switchToBoard (statsInfo.wordSetIndex);
       return;
@@ -224,16 +224,22 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
 
   const calcCombinedWords = () => {
     const numBoards = storedBoardStates.length;
+    statsInfo.combinedBoardIndexStrings = Array(numBoards);
+    let boardIndices:number[];
     const tempBoardStates = storedBoardStates.slice();
     for (let index = 0; index < numBoards; index++) {
+      boardIndices = [index + 1];
       const boardStr = tempBoardStates[index];
       let otherIndex = tempBoardStates.length - 1;
       while (otherIndex > index) {
         if (boardStr === tempBoardStates[otherIndex]) {
           tempBoardStates[otherIndex] = "";
+          boardIndices.push(otherIndex + 1);
         }
         otherIndex--;
       }
+      boardIndices.sort();
+      statsInfo.combinedBoardIndexStrings[index] = boardIndices.join(",");
       if (storedBoardCompleted[index] || tempBoardStates[index] === "") {
         statsInfo.words[index] = [];
       } else {
@@ -246,10 +252,9 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const switchToBoard = (boardIndex:number) => {
     if (initProgress === 1 && ((wordSetType === "quordle") || boardIndex === 0)) {
       if (boardIndex < 0) {
-        statsInfo.combinedBoardMode = true;
         calcCombinedWords();
       } else {
-        statsInfo.combinedBoardMode = false;
+        statsInfo.combinedBoardIndexStrings = null;
         statsInfo.wordSetIndex = boardIndex;
         const newBoardStr = storedBoardStates[statsInfo.wordSetIndex];
         setBoardStr(newBoardStr);
@@ -317,9 +322,9 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const memoryButton = (index:number) => {
     let bgClassName:string;
     if (index < 0) {
-      bgClassName = (statsInfo.combinedBoardMode) ? "bg-qmem-button-selected" : "bg-qmem-button-deselected";
+      bgClassName = (statsInfo.combinedBoardIndexStrings) ? "bg-qmem-button-selected" : "bg-qmem-button-deselected";
     } else {
-      bgClassName = getBoardColorClass(index, !statsInfo.combinedBoardMode && index === statsInfo.wordSetIndex);
+      bgClassName = getBoardColorClass(index, !statsInfo.combinedBoardIndexStrings && index === statsInfo.wordSetIndex);
     }
     return (
       <button 
@@ -376,7 +381,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         value={{
           addWordToBoard,
           storedBoardStates,
-          combinedBoardMode: statsInfo.combinedBoardMode,
+          combinedBoardMode: !!statsInfo.combinedBoardIndexStrings,
           boardStr,
           setBoardStr,
           curLetterLoc,

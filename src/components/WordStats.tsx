@@ -22,7 +22,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     const targetWordRef = useRef("");
     const wordsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
-    const combinedBoardModeRef = useRef(statsInfo.combinedBoardMode);
+    const combinedBoardIndexStringsRef = useRef(statsInfo.combinedBoardIndexStrings);
 
     const hasPartitions = () => {
         return statsOrderInfo.targetWord !== "";
@@ -31,11 +31,11 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     const wordleDisplayStats:wordleDisplayStatsType[] = useMemo<wordleDisplayStatsType[]>(() => {
             let resetSortOrder = (targetWordRef.current === statsOrderInfo.targetWord);
             if (wordsRef.current !== statsInfo.words[statsInfo.wordSetIndex] ||
-                combinedBoardModeRef.current !== statsInfo.combinedBoardMode) {
+                combinedBoardIndexStringsRef.current !== statsInfo.combinedBoardIndexStrings) {
                 statsOrderInfo.targetWord = ""; 
                 resetSortOrder = true;
             }
-            combinedBoardModeRef.current = statsInfo.combinedBoardMode;
+            combinedBoardIndexStringsRef.current = statsInfo.combinedBoardIndexStrings;
             targetWordRef.current = statsOrderInfo.targetWord;
             wordsRef.current = statsInfo.words[statsInfo.wordSetIndex];
             const newSortOrder = resetSortOrder ?
@@ -56,16 +56,13 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     }
 
     const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
-        return getBoardColorClass(wordStats.boardGroup, wordStats.cluesGroupDivider > 0, "group", "alt");
+        let boardNum = parseInt(wordStats.boardGroup.split(",")[0]) - 1;
+        if (isNaN(boardNum)) {boardNum = statsInfo.words.length}
+        return getBoardColorClass(boardNum, wordStats.cluesGroupDivider > 0, "group", "alt");
     }
 
     const getBoardNumberDisplay = (wordStats:wordleDisplayStatsType):string => {
-        const groupNum = wordStats.boardGroup;
-        if (typeof groupNum === "number" && groupNum >= 0 && groupNum < statsInfo.words.length) {
-            return (groupNum + 1).toString();
-        } else {
-            return "";
-        }
+        return wordStats.boardGroup;
     }
 
     if (hasPartitions()) {
@@ -96,7 +93,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             max<br/>group<br/>size
                         </button>
                     </th>
-                    {statsInfo.combinedBoardMode && (
+                    {statsInfo.combinedBoardIndexStrings && (
                     <th key="boardGroup">
                         <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
                             grp<br/>num
@@ -138,7 +135,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             </td>
                             <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
                             <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
-                            {statsInfo.combinedBoardMode && (
+                            {statsInfo.combinedBoardIndexStrings && (
                             <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
                             )}
                         </tr>
@@ -170,7 +167,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             max<br/>group<br/>size
                         </button>
                     </th>
-                    {statsInfo.combinedBoardMode && (
+                    {statsInfo.combinedBoardIndexStrings && (
                     <th key="boardGroup">
                         <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
                             grp<br/>num
@@ -190,7 +187,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                             </td>
                             <td key="avgGroupSize">{wordInfo.avgGroupSize.toFixed(3)}</td>
                             <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
-                            {statsInfo.combinedBoardMode && (
+                            {statsInfo.combinedBoardIndexStrings && (
                             <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
                             )}
                         </tr>
