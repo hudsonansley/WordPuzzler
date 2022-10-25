@@ -187,8 +187,12 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
 
   const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
     if (statsInfo.combinedBoardIndexStrings) {
-      alert(`Switching back to board ${statsInfo.wordSetIndex + 1}`)
-      switchToBoard (statsInfo.wordSetIndex);
+      let boardIndex = 0;
+      while (boardIndex < storedBoardCompleted.length && storedBoardCompleted[boardIndex]) {
+        boardIndex++;
+      }
+      alert(`Switching to board ${boardIndex + 1}`);
+      switchToBoard(boardIndex);
       return;
     }
     let newBoardStr = extendCurBoardStrToLongest();
