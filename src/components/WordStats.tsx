@@ -20,7 +20,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     const { addWordToBoard, getBoardColorClass } = useContext(AppContext);
     const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
     const targetWordRef = useRef("");
-    const wordsRef = useRef(null);
+    const wordSetsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
     const combinedBoardIndexStringsRef = useRef(statsInfo.combinedBoardIndexStrings);
 
@@ -30,14 +30,14 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
 
     const wordleDisplayStats:wordleDisplayStatsType[] = useMemo<wordleDisplayStatsType[]>(() => {
             let resetSortOrder = (targetWordRef.current === statsOrderInfo.targetWord);
-            if (wordsRef.current !== statsInfo.words[statsInfo.wordSetIndex] ||
+            if (wordSetsRef.current !== statsInfo.wordSets[statsInfo.wordSetIndex] ||
                 combinedBoardIndexStringsRef.current !== statsInfo.combinedBoardIndexStrings) {
                 statsOrderInfo.targetWord = ""; 
                 resetSortOrder = true;
             }
             combinedBoardIndexStringsRef.current = statsInfo.combinedBoardIndexStrings;
             targetWordRef.current = statsOrderInfo.targetWord;
-            wordsRef.current = statsInfo.words[statsInfo.wordSetIndex];
+            wordSetsRef.current = statsInfo.wordSets[statsInfo.wordSetIndex];
             const newSortOrder = resetSortOrder ?
                 sortOrder.current.slice() : initialSortOrder.slice();
             sortOrder.current = ArrayUtils.updatePrimaryIndex(newSortOrder, statsOrderInfo.primaryIndex) as StatsSortOrder[];
@@ -57,7 +57,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
 
     const getRowClassName = (wordStats:wordleDisplayStatsType):string => {
         let boardNum = parseInt(wordStats.boardGroup.split(",")[0]) - 1;
-        if (isNaN(boardNum)) {boardNum = statsInfo.words.length}
+        if (isNaN(boardNum)) {boardNum = statsInfo.wordSets.length}
         return getBoardColorClass(boardNum, wordStats.cluesGroupDivider > 0, "group", "alt");
     }
 

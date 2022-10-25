@@ -613,7 +613,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:string | string[
 }
  
 export type WordSetInfoType = {
-    words: string[][],
+    wordSets: string[][],
     wordSetIndex: number,
     combinedBoardIndexStrings: string[] | null,
 	wordCount: number,
@@ -656,8 +656,8 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		const boardIndicies = new Array(wordInfo.wordCount);
 		const totalWordIndicies = new Uint16Array(wordInfo.wordCount);
 		let offset = 0;
-		for (let i = 0; i < wordInfo.words.length; i++) {
-			const wordIndices = getWordIndicies(wordInfo.words[i]);
+		for (let i = 0; i < wordInfo.wordSets.length; i++) {
+			const wordIndices = getWordIndicies(wordInfo.wordSets[i]);
 			totalWordIndicies.set(wordIndices, offset);
 			boardWordIndicies[i] = totalWordIndicies.subarray(offset, offset + wordIndices.length);
 			boardIndicies.fill(wordInfo.combinedBoardIndexStrings[i], offset, offset + wordIndices.length);
@@ -665,7 +665,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		}
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(totalWordIndicies, boardIndicies, targetWordIndex < 0);
 	} else {
-		const wordIndices = getWordIndicies(wordInfo.words[wordInfo.wordSetIndex]);
+		const wordIndices = getWordIndicies(wordInfo.wordSets[wordInfo.wordSetIndex]);
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, (wordInfo.wordSetIndex + 1).toString(), true);
 	}
 	if (targetWordIndex < 0) {

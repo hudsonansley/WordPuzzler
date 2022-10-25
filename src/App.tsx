@@ -13,7 +13,7 @@ import * as WordleUtils from './utilities/WordleUtils';
 
 export const AppContext = createContext(undefined);
 const initStatsInfo:WordleUtils.WordSetInfoType = {
-  words: [[],[],[],[]],
+  wordSets: [[],[],[],[]],
   wordSetIndex: 0,
   combinedBoardIndexStrings: null,
   wordCount: 0,
@@ -76,8 +76,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
 
   const updateStatsInfo = () => {
     statsInfo.wordCount = statsInfo.combinedBoardIndexStrings ?
-        statsInfo.words.reduce((acc, list) => acc + list.length, 0) :
-        statsInfo.words[statsInfo.wordSetIndex].length;
+        statsInfo.wordSets.reduce((acc, list) => acc + list.length, 0) :
+        statsInfo.wordSets[statsInfo.wordSetIndex].length;
     if (statsInfo.wordCount > 0) {
       setInfoType("stats");
       setStatsInfo({...statsInfo});
@@ -95,7 +95,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const onEnter = () => {
     statsInfo.combinedBoardIndexStrings = null;
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
-      statsInfo.words[statsInfo.wordSetIndex] = [];
+      statsInfo.wordSets[statsInfo.wordSetIndex] = [];
       updateStatsInfo();
       return;
     }
@@ -115,7 +115,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     }
 
     const newWords = WordleUtils.wordle(WordleUtils.wordlePicks, storedBoardStates[statsInfo.wordSetIndex]);
-    statsInfo.words[statsInfo.wordSetIndex] = newWords;
+    statsInfo.wordSets[statsInfo.wordSetIndex] = newWords;
     updateStatsInfo();      
   }
 
@@ -226,9 +226,9 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       boardIndices.sort();
       statsInfo.combinedBoardIndexStrings[index] = boardIndices.join(",");
       if (storedBoardCompleted[index] || tempBoardStates[index] === "") {
-        statsInfo.words[index] = [];
+        statsInfo.wordSets[index] = [];
       } else {
-        statsInfo.words[index] = WordleUtils.wordle(WordleUtils.wordlePicks, boardStr);
+        statsInfo.wordSets[index] = WordleUtils.wordle(WordleUtils.wordlePicks, boardStr);
       }
     };
     updateStatsInfo();
@@ -252,7 +252,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
           onShowHelp();
         } else if (storedBoardLetterStateDirty[statsInfo.wordSetIndex] ||
           !storedBoardLettersDirty[statsInfo.wordSetIndex]) {
-          statsInfo.words[statsInfo.wordSetIndex] = WordleUtils.wordle(WordleUtils.wordlePicks, newBoardStr);
+          statsInfo.wordSets[statsInfo.wordSetIndex] = WordleUtils.wordle(WordleUtils.wordlePicks, newBoardStr);
           updateStatsInfo();
         } else {
           setInfoType("needsAdjustment");
