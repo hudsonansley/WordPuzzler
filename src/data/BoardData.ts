@@ -188,6 +188,6 @@ export const boardIsComplete = (board:BoardDataType):boolean => {
 
 export const getBoardWords = (boardStr:string):string[] => {
     return boardStr.split("_")
-        .map(wordStr => wordStr.toLowerCase().replace(/[=\/-]/g, ""))
+        .map(wordStr => wordStr.toLowerCase().replace(/[=/-]/g, ""))
         .filter(word => word !== "");
   }
