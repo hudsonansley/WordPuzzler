@@ -1,12 +1,12 @@
 TODO:
 * don't enter letters when viewing completed board
 * don't recalculate stats just for sort or new target word
-* show table header when item clicked immediately, then the 
- rest of the table when calculation is finished
+* show table header when item clicked immediately, then the rest of the table when calculation is finished
 * improve responsive layout for small devices
 * convert css to react native styles
 * implement react native, submit to stores
 * add word definitions
-* improve look of table using flex layout, add lines between
- boad/clue groups and use one color per board
-
+* improve look of table using flex layout, add lines between boad/clue groups and use one color per board
+* mark letters with red outline if the clue selection contradicts previous clue selections
+* add ability to enter arbitrary target word
+* show typing while initialization is happening
