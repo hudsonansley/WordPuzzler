@@ -18,10 +18,26 @@ in other colors are. You can sort by the column by tapping on that column header
 * "&lt;" will add the target word to the board if the clue column is showing.
 * "&gt;" will set the clues column target word to the last word on the board (experimantal).
 
-## Challenges
+## Setup
+
+This has been tested with Node version 15.12 and 18.1, so should work with versions in that range
+
+`> npm init`
+to install the necessary node modules
+
+`> npm start` 
+to run the app in a local server page
+
+`> npm test`
+to run the unit tests
+
+
+## Code notes
 The calculation of wordle groups in an efficient manner is accomplished by precalculating the groups based on clues from all the possible word combinations. The word groups for Wordle and Quordle have diverged, so this calculation is performed when switching between the two modes.
 
 This seemed like a natural use for [WebAssembly](https://webassembly.org/) to improve the initial calculation speed, but it turned out that the javascript jit compiler out performed the precompiled web assembly version. This exercise did lead to use of typed arrays in the JS for all of the base data, including the word lists (converted to Int32Arrays with five bits per letter, for up to six letter words) which I suspect allowed the JS jit compiler to better optimize that code. It also avoids constantly re-creating the base data arrays, avoiding unnecessary garbage collection.
+
+The conic-gradient css function was useful for the quordle button backgrounds in the combined board mode.
 
 ### TODO
 - [ ] don't enter letters when viewing completed board
