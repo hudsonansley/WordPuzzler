@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { AppContext } from "../App";
+import React from "react";
+import { publish } from "../utilities/Events";
 
 interface parameters {
     keyLabel: string,
@@ -7,19 +7,12 @@ interface parameters {
 }
 
 const Key = ({ keyLabel }:parameters) => {
-    const { onRotateLetterState, curLetterLoc, onSelectLetter, onDelete, onEnter } = 
-        useContext(AppContext);
-
     const selectLetter = () => {
-        if (keyLabel === "ENTER") {
-            onEnter();
-        } else if (keyLabel === "DELETE") {
-            onDelete();
-        } else if (keyLabel.length ===  1) {
-            onSelectLetter(keyLabel);
-        } else { // spacebar
-            onRotateLetterState(curLetterLoc);
+        let key = keyLabel.toUpperCase();
+        if (key.length > 1 && key !== "ENTER" && key !== "DELETE") {
+            key = ' ';
         }
+        publish('keyTapped', {key});
     };
     const size = keyLabel.length === 1 ? "" : keyLabel.length < 8 ? "big" : "spacebar";
 

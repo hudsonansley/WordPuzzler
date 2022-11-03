@@ -2,10 +2,6 @@ import * as ArrayUtils from './ArrayUtils';
 import * as WordleUtils from './WordleUtils';
 import * as WordleDict from '../data/dictionaries/Wordle';
 
-beforeAll(() => {
-    WordleUtils.initDataLists();
-  })
-
 test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
     let array = [];
     let sortOrder = [];
@@ -123,7 +119,8 @@ test('ArrayUtils.sortArrayOfStringToAnyMaps works properly', () => {
     expect(array).toEqual(expected);
 })
 
-test('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
+test.skip('ArrayUtils.sortArrayOfStringToAnyMaps test performance', () => {
+    WordleUtils.initDataLists();
     const initialSortOrder = [
         {index: "avgGroupSize", decending: true}, 
         {index: "maxGroupSize", decending: true}, 

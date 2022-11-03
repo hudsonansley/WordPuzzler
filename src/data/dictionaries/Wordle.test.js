@@ -41,7 +41,6 @@ test('Wordle.wordleAllNums wordlePicksNums wordleDecoysNums have the same words 
     expect(wordlePicks).toEqual(wordlePicksWords);
     expect(wordleAll.length).toEqual(wordleAllWords.length);
     expect(wordleAll).toEqual(wordleAllWords);
-    console.log(wordleAll.length, wordlePicks.length);
 });
 test.skip('Wordle.wordleAll has all wordle picks and decoys exactly both combined', () => {
     // only unskip if want to check updated dictionaries,

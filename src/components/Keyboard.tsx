@@ -1,51 +1,44 @@
-import React, { useCallback, useEffect, useContext } from "react";
+import React, { useCallback, useEffect } from "react";
 import Key from "./Key";
-import { AppContext } from "../App";
+import { publish } from "../utilities/Events"
 
 const keyLabels = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-  ["Z", "X", "C", "V", "B", "N", "M", "DELETE"],
-  ["Change Letter Color", "ENTER"]
+  ["A", "S", "D", "F", "G", "H", "J", "K", "L", "delete"],
+  ["Z", "X", "C", "V", "B", "N", "M", "<", ">"],
+  ["Change Letter Color", "enter"]
 ];
 
 const Keyboard = ({hidden}) => {
 
-  const {
-    curLetterLoc,
-    onSelectLetter,
-    onEnter,
-    onDelete,
-    onRotateLetterState,
-    switchToBoard,
-    onShowHelp,
-  } = useContext(AppContext);
-
   const handleKeyboard = useCallback(
     (event) => {
-      const key = event.key.toUpperCase();
-      if (key === "ENTER") {
+      let key = '';
+      let eventKey = event.key.toUpperCase();
+      if (eventKey === 'ENTER' || eventKey === 'BACKSPACE') {
         event.preventDefault();
-        onEnter();
-      } else if (key === "BACKSPACE") {
-        onDelete();
+        key = eventKey;
       } else if (event.keyCode === 32) {
         event.preventDefault();
-        onRotateLetterState(curLetterLoc);
-      } else if (key === "?" || key === "/") {
-        onShowHelp();
-      } else if (key >= "0" && key <= "4") {
-        switchToBoard(parseInt(key) - 1);
+        key = ' ';
+      } else if (eventKey === '?' || eventKey === '/') {
+        key = '?';
+      } else if (eventKey === '<' || eventKey === ',') {
+        key = '<';
+      } else if (eventKey === '>' || eventKey === '.') {
+        key = '>';
+      } else if (eventKey.length === 1 &&
+          ((eventKey >= '0' && eventKey <= '4') ||
+          (eventKey >= 'A' && eventKey <= 'Z'))) {
+        key = eventKey;
       } else {
-        keyLabels.forEach(keyRow => {
-          if (keyRow.indexOf(key) >= 0) {
-            onSelectLetter(key);
-          }
-        });
+        event.preventDefault();
       }
-    },
-    [curLetterLoc, onDelete, onEnter, onRotateLetterState, onSelectLetter, switchToBoard, onShowHelp]
-  );
+      if (key.length > 0) {
+        publish('keyTapped', {key});
+      }      
+  }, []);
+
   useEffect(() => {
     document.addEventListener("keydown", handleKeyboard);
     return () => {

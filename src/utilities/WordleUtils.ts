@@ -584,7 +584,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:string | string[
 	while (i < partStats.length && wordsLeft > 0) {
 		const partStat = partStats[i];
 		const wordIndex = partStat[0];
-		const wordIndicesIndex = wordsLU[wordIndex];
+		const wordIndicesIndex = wordsLU[wordIndex] ?? -1;
 		const item:wordleDisplayStatsType = {
 			word:"",
 			wordIndex, 
@@ -596,7 +596,7 @@ const getDisplayStatsRaw = (wordIndices:Uint16Array, boardGroup:string | string[
 			cluesGroupDivider:0,
 			boardGroup: boardGroupIsString ? boardGroup : boardGroup[wordIndicesIndex],
 		};
-		if (typeof wordIndicesIndex === "number") {
+		if (wordIndicesIndex >= 0) {
 			result.push(item);
 			wordsLeft--;
 		} else if (collectNonAnswers) {
@@ -638,7 +638,7 @@ export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
  * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
  *  useful for display in the word data table
  */
-export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
+export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", userWordChoices: number[] = [], maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
 	if (wordInfo.wordCount === 0) {
 		return [];
 	}
@@ -669,15 +669,41 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		[result, nonAnswerPicks, nonAnswerNotPicks] = getDisplayStatsRaw(wordIndices, (wordInfo.wordSetIndex + 1).toString(), true);
 	}
 	if (targetWordIndex < 0) {
+		const wordChoices = userWordChoices.slice();
+		if (wordChoices.length > 0) {
+			const checkWordChoice = (index: number, itemList:wordleDisplayStatsType[]) => {
+				const item = itemList[index];
+				const userChoiceIndex = wordChoices.indexOf(item.wordIndex);
+				if (userChoiceIndex >= 0) {
+					wordChoices.splice(userChoiceIndex, 1);
+					result.push(item);
+					itemList[index] = null;
+				}
+			}
+			let i = 0;
+			let n = nonAnswerPicks.length;
+			while (i < n && wordChoices.length > 0) {
+				checkWordChoice(i, nonAnswerPicks);
+				i++;
+			}
+			i = 0;
+			n = nonAnswerNotPicks.length;
+			while (i < n && wordChoices.length > 0) {
+				checkWordChoice(i, nonAnswerNotPicks);
+				i++;
+			}
+		}
 		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: ""};
 		nonAnswerPicks.push(dummyBadChoice);
 		nonAnswerNotPicks.push(dummyBadChoice);
-		// only add non-answer words if best possible average group size > 1
+		// only add non-answer words if better scores than answer words
 		const bestAnswerNumberOfGroups = result[0]?.numberOfGroups ?? 100;
 		const bestAnswerMaxGroupSize = result[0]?.maxGroupSize ?? 0;
 		let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
 		while (n > 0 && (nonAnswerPicks.length > 1 || nonAnswerNotPicks.length > 1)) {
 			n--;
+			while (!nonAnswerPicks[0]) {nonAnswerPicks.shift()};
+			while (!nonAnswerNotPicks[0]) {nonAnswerNotPicks.shift()};
 			const betterNumberOfGroups = (nonAnswerPicks[0].numberOfGroups > bestAnswerNumberOfGroups
 				|| nonAnswerNotPicks[0].numberOfGroups > bestAnswerNumberOfGroups);
 			const betterMaxGroupSize = (nonAnswerPicks[0].maxGroupSize < bestAnswerMaxGroupSize

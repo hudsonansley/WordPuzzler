@@ -1,12 +1,17 @@
-import React, { useState, useMemo, useContext, useRef }  from "react";
-import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys, WordSetInfoType } from '../utilities/WordleUtils';
-import { AppContext } from "../App";
+import React, { useState, useMemo, useEffect, useRef }  from "react";
+import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys, WordSetInfoType, getIndexFromWord } from '../utilities/WordleUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
 import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordleUtils";
 import { lettersPerWord } from "../data/BoardData";
+import { getBoardColorClass } from "../utilities/Styles";
+import { publish, subscribe, unsubscribe } from "../utilities/Events";
 
 type StatsSortOrder = {index: wordleDisplayStatsKeys, decending: boolean};
-type StatsOrderInfo = {primaryIndex: wordleDisplayStatsKeys, targetWord:string};
+type StatsOrderInfo = {
+    primaryIndex: wordleDisplayStatsKeys, 
+    targetWord:string,
+    userWordChoices: number[],
+};
 const initialSortOrder: StatsSortOrder[] = [
     {index: "avgGroupSize", decending: true}, 
     {index: "maxGroupSize", decending: true}, 
@@ -17,15 +22,59 @@ const initialSortOrder: StatsSortOrder[] = [
 ];
 
 export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
-    const { addWordToBoard, getBoardColorClass } = useContext(AppContext);
-    const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: ""});
+    const [ statsOrderInfo, setStatsOrderInfo] = useState<StatsOrderInfo>({primaryIndex: "avgGroupSize", targetWord: "", userWordChoices: []});
     const targetWordRef = useRef("");
     const wordSetsRef = useRef(null);
     const sortOrder = useRef(initialSortOrder);
     const combinedBoardIndexStringsRef = useRef(statsInfo.combinedBoardIndexStrings);
 
+    useEffect(() => {
+        const handleAddTargetWordToBoard = (_:CustomEvent) => {
+            let word = statsOrderInfo.targetWord;
+            let final = (wordleDisplayStats.length === 1);
+            if (word.length === 0 && final) {
+                word = wordleDisplayStats[0].word;
+            }
+            if (word.length > 0) {
+                publish("addWordToBoard", {word, final});
+            }
+        }
+    
+        const handleSetTargetWord = (event:CustomEvent) => {
+            const word = event.detail?.word ?? "";
+            const wordIndex = getIndexFromWord(word);
+            if (wordIndex >= 0) {
+                const userWordChoices = statsOrderInfo.userWordChoices.slice();
+                let targetWord = statsOrderInfo.targetWord;
+                let update = false;
+                if (userWordChoices.indexOf(wordIndex) < 0) {
+                    userWordChoices.push(wordIndex);
+                    update = true;
+                }
+                if (targetWord !== "") {
+                    targetWord = word;
+                    update = true;
+                }
+                if (update) {
+                    setStatsOrderInfo({...statsOrderInfo, targetWord, userWordChoices});
+                }
+            }
+        }
+    
+        subscribe("setTargetWord", handleSetTargetWord);
+        subscribe("addTargetWordToBoard", handleAddTargetWordToBoard);
+        return () => {
+          unsubscribe("setTargetWord", handleSetTargetWord);
+          unsubscribe("addTargetWordToBoard", handleAddTargetWordToBoard);
+        }
+    });
+
     const hasPartitions = () => {
         return statsOrderInfo.targetWord !== "";
+    }
+
+    const addWordToBoard = (word:string, final:boolean = false) => {
+        publish("addWordToBoard", {word, final});
     }
 
     const wordleDisplayStats:wordleDisplayStatsType[] = useMemo<wordleDisplayStatsType[]>(() => {
@@ -41,7 +90,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
             const newSortOrder = resetSortOrder ?
                 sortOrder.current.slice() : initialSortOrder.slice();
             sortOrder.current = ArrayUtils.updatePrimaryIndex(newSortOrder, statsOrderInfo.primaryIndex) as StatsSortOrder[];
-            const result = getWordleDisplayStats(statsInfo, sortOrder.current, statsOrderInfo.targetWord);
+            const result = getWordleDisplayStats(statsInfo, sortOrder.current, statsOrderInfo.targetWord, statsOrderInfo.userWordChoices);
             return result;
         },
         [statsInfo, statsOrderInfo]
@@ -51,7 +100,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
         if (wordleDisplayStats.length === 1 && wordleDisplayStats[0].word === word) {
             addWordToBoard(word, true);
         } else {
-            setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: word});
+            setStatsOrderInfo({...statsOrderInfo, primaryIndex:"avgGroupSize", targetWord: word});
         }
     }
 
@@ -79,23 +128,23 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                         </div>
                     </th>
                     <th key="word">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"word", targetWord: ""})}} >
                             words<br/>({statsInfo.wordCount})
                         </button>
                     </th>
                     <th key="avgGroupSize">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"avgGroupSize", targetWord: ""})}} >
                             average<br/>group<br/>size
                         </button>
                     </th>
                     <th key="maxGroupSize">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"maxGroupSize", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"maxGroupSize", targetWord: ""})}} >
                             max<br/>group<br/>size
                         </button>
                     </th>
                     {statsInfo.combinedBoardIndexStrings && (
                     <th key="boardGroup">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"boardGroup", targetWord: ""})}} >
                             grp<br/>num
                         </button>
                     </th>
@@ -153,23 +202,23 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                 <thead>
                 <tr>
                     <th key="word">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"word", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"word", targetWord: ""})}} >
                             words<br/>({statsInfo.wordCount})
                         </button>
                     </th>
                     <th key="avgGroupSize">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"avgGroupSize", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"avgGroupSize", targetWord: ""})}} >
                             average<br/>group<br/>size
                         </button>
                     </th>
                     <th key="maxGroupSize">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"maxGroupSize", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"maxGroupSize", targetWord: ""})}} >
                             max<br/>group<br/>size
                         </button>
                     </th>
                     {statsInfo.combinedBoardIndexStrings && (
                     <th key="boardGroup">
-                        <button onClick={() => {setStatsOrderInfo({primaryIndex:"boardGroup", targetWord: ""})}} >
+                        <button onClick={() => {setStatsOrderInfo({...statsOrderInfo, primaryIndex:"boardGroup", targetWord: ""})}} >
                             grp<br/>num
                         </button>
                     </th>

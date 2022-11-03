@@ -348,7 +348,7 @@ tbody {
 }
 
 p {
-  text-indent: 2em;
+  text-indent: 1rem;
 }
 
 .clues-column {
@@ -410,11 +410,11 @@ p {
 }
 
 .big {
-  min-width: 75px;
+  min-width: 60px;
   max-width: 22%;
 }
 .spacebar {
-  min-width: 225px;
+  min-width: 210px;
   max-width: 66%;
 }
 .disabled {

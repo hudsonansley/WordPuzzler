@@ -1,6 +1,7 @@
 import React, { useContext, useMemo }  from "react";
 import { AppContext } from "../App";
-import * as BoardData from "../data/BoardData"
+import * as BoardData from "../data/BoardData";
+import { publish } from "../utilities/Events";
 
 interface parameters {
     rowIndex: number,
@@ -9,11 +10,12 @@ interface parameters {
 }
 
 const Letter = ({ rowIndex, letterIndex }:parameters) => {
-    const { boardStr, onRotateLetterState, combinedBoardMode,
+    const { boardStr, 
+        combinedBoardMode,
         storedBoardStates} = useContext(AppContext);
 
     const rotateLetterState = () => {
-        onRotateLetterState({rowIndex:rowIndex, letterIndex:letterIndex});
+        publish("rotateLetterState", {rowIndex:rowIndex, letterIndex:letterIndex});
     }
 
     const [bgStyle, letterChar] = useMemo(() => {

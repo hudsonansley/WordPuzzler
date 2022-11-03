@@ -1,7 +1,7 @@
-import './App.css';
 
 import React, { useState, createContext, useEffect } from 'react';
 
+import './App.css';
 import * as BoardData from "./data/BoardData"
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
@@ -10,7 +10,15 @@ import { WordStats } from "./components/WordStats";
 import Information, { InfoType } from './components/Information';
 import * as WordleDict from './data/dictionaries/Wordle'
 import * as WordleUtils from './utilities/WordleUtils';
+import { getBoardColorClass } from './utilities/Styles';
+import { subscribe, unsubscribe, publish } from './utilities/Events';
 
+export type EventName = (
+  "keyTapped" | 
+  "addWordToBoard" | 
+  "setTargetWord" |
+  "rotateLetterState" | 
+  "addTargetWordToBoard");
 export const AppContext = createContext(undefined);
 const initStatsInfo:WordleUtils.WordSetInfoType = {
   wordSets: [[],[],[],[]],
@@ -38,15 +46,69 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     setInitProgress(WordleUtils.initWordleIndexPartitionsProg(wordSetType));
   }, [initProgress, wordSetType]);    
 
+  useEffect(() => {
+    const handleKeyTapped = (event) => {
+      const key = event.detail?.key ?? "";
+      if (key) {
+        switch (key) {
+          case "ENTER":
+            onEnter();
+            break;
+            case "DELETE":
+            case "BACKSPACE":
+            onDelete();
+            break;
+          case " ":
+            onRotateLetterState(curLetterLoc);
+            break;
+          case "?":
+            onShowHelp();
+            break;
+          case "<":
+            publish("addTargetWordToBoard");
+            break;
+          case ">":
+            setTargetWord();
+            break;
+          case "0":
+          case "1":
+          case "2":
+          case "3":
+          case "4":
+            switchToBoard(parseInt(key) - 1);
+            break;
+          default:  
+            onSelectLetter(key);
+        }
+        }
+    }
+  
+    const handleAddWordToBoard = (event) => {
+      const {word, final}:{word:string, final:boolean} = event.detail;
+      addWordToBoard(word, final ?? false);
+    }
+  
+    const handleRotateLetterState = (event) => {
+      const letterLoc:BoardData.LetterLocType = event.detail;
+      onRotateLetterState(letterLoc);
+    }
+  
+    subscribe("keyTapped", handleKeyTapped);
+    subscribe("addWordToBoard", handleAddWordToBoard);
+    subscribe("rotateLetterState", handleRotateLetterState);
+    return () => {
+      unsubscribe("keyTapped", handleKeyTapped);
+      unsubscribe("addWordToBoard", handleAddWordToBoard);
+      unsubscribe("rotateLetterState", handleRotateLetterState);
+    }
+  });
+
   const addRowToBoard = (boardRowStr:string) => {
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
       return;
     }
     boardRowStr = boardRowStr.toUpperCase();
     const otherBoardStrs = boardRowStr.replace(/=/g, '-');
-    // const word = otherBoardStrs.replace(/-/g, '');
-    // navigator.clipboard.writeText(word); // so user can paste into quordle/wordle
-    //  Disabled because pasting does not work in wordle/quordle
     for (let index = 0; index < storedBoardStates.length; index++) {
       if (!storedBoardCompleted[index]) {
         const storedBoard = storedBoardStates[index];
@@ -72,6 +134,11 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         const boardRow = letters.reduce((acc, letter) => acc += letter + clue, "");
         addRowToBoard(boardRow);
     }
+  }
+
+  const setTargetWord = () => {
+    const word = BoardData.getBoardWords(boardStr).pop();
+    publish("setTargetWord", {word});    
   }
 
   const updateStatsInfo = () => {
@@ -163,8 +230,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         storedBoardLettersDirty[index] = true;
       }
     }
-    const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
-    if (!storedBoardCompleted[statsInfo.wordSetIndex]) {
+    if (statsInfo.combinedBoardIndexStrings || !storedBoardCompleted[statsInfo.wordSetIndex]) {
+      const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
       setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     }
@@ -285,23 +352,6 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   }
   }
 
-  const getBoardColorClass = (boardGroup:number, alt:boolean, typeString:string = "button", altString:string = "selected"):string => {
-    const items = [];
-    if (boardGroup < storedBoardStates.length) {
-      if (alt) {
-        items.push(altString);
-      }
-      items.push(typeString);
-      if (boardGroup >= 0) {
-        items.push(boardGroup.toString());
-      }
-    } else {
-      items.push("impossible", "word");
-    }
-    items.push("bg");
-    return items.join("-");
-  }
-
   const wordSetButton = (type: WordleDict.wordSet) => {
     let bgClassName:string = getBoardColorClass(-1, type === WordleUtils.currentWordSetType);
     return (
@@ -373,20 +423,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       </nav>
       <AppContext.Provider
         value={{
-          addWordToBoard,
           storedBoardStates,
           combinedBoardMode: !!statsInfo.combinedBoardIndexStrings,
           boardStr,
-          setBoardStr,
           curLetterLoc,
-          getBoardColorClass,
-          setCurLetterLoc,
-          onSelectLetter,
-          onDelete,
-          onEnter,
-          onRotateLetterState,
-          switchToBoard,
-          onShowHelp,
         }}
       >
       <div className='content'>
