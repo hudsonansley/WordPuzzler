@@ -21,7 +21,7 @@ in other colors are. You can sort by the column by tapping on that column header
 ## Challenges
 The calculation of wordle groups in an efficient manner is accomplished by precalculating the groups based on clues from all the possible word combinations. The word groups for Wordle and Quordle have diverged, so this calculation is performed when switching between the two modes.
 
-This seemed like a natural use for [WebAssembly](https://webassembly.org/) to improve the initial calculation speed, but it turned out that the javascript jit compiler out performed the precompiled web assembly version. This exercise did lead to use of typed arrays in the JS for all of the base data, including the word lists (converted to Int32Arrays with five bits per letter, for up to six letter words) which I suspect allowed the JS compiler to better optimize that code. It also avoids constantly re-creating the base data arrays, avoiding unnecessary garbage collection.
+This seemed like a natural use for [WebAssembly](https://webassembly.org/) to improve the initial calculation speed, but it turned out that the javascript jit compiler out performed the precompiled web assembly version. This exercise did lead to use of typed arrays in the JS for all of the base data, including the word lists (converted to Int32Arrays with five bits per letter, for up to six letter words) which I suspect allowed the JS jit compiler to better optimize that code. It also avoids constantly re-creating the base data arrays, avoiding unnecessary garbage collection.
 
 ### TODO
 - [ ] don't enter letters when viewing completed board
@@ -36,3 +36,5 @@ This seemed like a natural use for [WebAssembly](https://webassembly.org/) to im
 - [ ] mark letters with red outline if the clue selection contradicts previous clue selections
 - [x] add ability to enter arbitrary target word
 - [ ] show typing while initialization is happening
+- [ ] show keyboard keys as disabled when not functional, e.g., the "<" key only works when a target word is set, or only one word remains
+- [ ] add auto code formatter

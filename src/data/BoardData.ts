@@ -23,6 +23,12 @@ export const getBoardStart = (): BoardDataType => {
     return getBoardFromString("");
 };
 
+/**
+ * @param  {BoardDataType} board
+ * @returns LetterLocType
+ *  returns the letter location {rowIndex, LetterIndex} for the next entry
+ * based on the given board
+ */
 export const getLetterLoc = (board: BoardDataType): LetterLocType => {
     let rowIndex = board.length;
     let letterIndex = lettersPerWord;
@@ -73,6 +79,7 @@ export const getLetterFromString = (letterString:string): LetterType => {
 /**
  * @param  {string} cluesString string representing wordle board, expected to be well formed
  * @returns BoardDataType
+ *  returns a board array based on the given string of letters and clues
  */
 export const getBoardFromString = (cluesString: string): BoardDataType => {
     let result: BoardDataType = [];
@@ -97,11 +104,22 @@ export const getBoardFromString = (cluesString: string): BoardDataType => {
     }
     return result;
 }
-
+/**
+ * @param  {LetterLocType} loc
+ * @returns number
+ *  returns the index of the character in a board string from the 
+ * given letter loc
+ */
 export const getCharIndexFromLoc = (loc: LetterLocType):number => {
     return (2 * lettersPerWord + 1) * loc.rowIndex + 2 * loc.letterIndex;
 }
-
+/**
+ * @param  {string} boardString
+ * @param  {LetterLocType} loc
+ * @returns LetterType
+ *  returns a letter object of the letter at the given letter loc in the
+ * given board string
+ */
 export const getLetterInBoardString = (boardString:string, loc:LetterLocType):LetterType => {
     const charIndex = getCharIndexFromLoc(loc);
     if (charIndex < boardString.length - 1) {
@@ -110,7 +128,14 @@ export const getLetterInBoardString = (boardString:string, loc:LetterLocType):Le
         return getBlankLetter();
     }
 }
-
+/**
+ * @param  {string} boardString
+ * @param  {LetterLocType} letterLoc
+ * @param  {LetterType} letter
+ * @returns string
+ *  Sets the letter at the given letter location to the given letter
+ * in the given board string and returns the resulting board string
+ */
 export const setLetterInBoardString = (boardString:string, letterLoc:LetterLocType, letter:LetterType):string => {
     const charIndex = 2 * letterLoc.letterIndex;
     const rows = boardString.split("_");
@@ -185,7 +210,11 @@ export const boardIsComplete = (board:BoardDataType):boolean => {
     }
     return result;
 }
-
+/**
+ * @param  {string} boardStr
+ * @returns string[]
+ *  returns a list of the words in the given board string (without clue data) 
+ */
 export const getBoardWords = (boardStr:string):string[] => {
     return boardStr.split("_")
         .map(wordStr => wordStr.toLowerCase().replace(/[=/-]/g, ""))

@@ -102,7 +102,11 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       unsubscribe("rotateLetterState", handleRotateLetterState);
     }
   });
-
+  /**
+   * @param  {string} boardRowStr string containing letters and clues
+   *  given string is used to set the next row in the board with both
+   * letters and clues specified
+   */
   const addRowToBoard = (boardRowStr:string) => {
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
       return;
@@ -126,6 +130,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     }
   }
 
+  /**
+   * @param  {string} word the word to add to the board
+   * @param  {boolean} final if true, the word is set to all correct, otherwise just entered without clue settings
+   */
   const addWordToBoard = (word:string, final: boolean) => {
     const boardWords = storedBoardStates.reduce((acc, boardStr) => acc.concat(BoardData.getBoardWords(boardStr)), []);
     if (boardWords.indexOf(word) < 0) {
@@ -141,6 +149,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     publish("setTargetWord", {word});    
   }
 
+  /**
+   *  does some final calculations based on statsInfo data and
+   * updates the state of both infoType and statsInfo
+   */
   const updateStatsInfo = () => {
     statsInfo.wordCount = statsInfo.combinedBoardIndexStrings ?
         statsInfo.wordSets.reduce((acc, list) => acc + list.length, 0) :
@@ -158,7 +170,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
   const onShowHelp = () => {
     setInfoType("help");
   }
-
+  /**
+   *  Sets statsInfo based on the current board state, forcing
+   * the update of the stats data
+   */
   const onEnter = () => {
     statsInfo.combinedBoardIndexStrings = null;
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
@@ -186,6 +201,9 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     updateStatsInfo();      
   }
 
+  /**
+   *  removed the last letter on the board
+   */
   const onDelete = () => {
     if (curLetterLoc.rowIndex < 0) return;
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
@@ -214,7 +232,11 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     }
   }
-
+  /**
+   * @param  {string} key
+   *  enters the given key character onto the board in the last 
+   * position
+   */
   const onSelectLetter = (key: string) => {
     const loc = BoardData.incrementLetterLoc(curLetterLoc);
     if (loc.rowIndex >= BoardData.maxRows) return;
@@ -236,7 +258,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     }
   }
-
+  /**
+   * @returns string
+   *  finds the longest board string of all the boards and retuns it
+   */
   const extendCurBoardStrToLongest = ():string => {
     let newBoardStr = storedBoardStates[statsInfo.wordSetIndex];
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
@@ -251,7 +276,14 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     }
     return newBoardStr;
   }
-
+  /**
+   * @param  {BoardData.LetterLocType} letterLoc
+   *  rotates letter clue at the given location between the three
+   * possible states:
+   *  wrong letter (gray)
+   *  wrong placement (yellow)
+   *  correct letter and placement (green)
+   */
   const onRotateLetterState = (letterLoc:BoardData.LetterLocType) => {
     if (statsInfo.combinedBoardIndexStrings) {
       let boardIndex = 0;
@@ -277,7 +309,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       storedBoardLetterStateDirty[statsInfo.wordSetIndex] = true;
     }
   }
-
+  /**
+   *  Calcultes the word sets based on the stored board strings
+   * and keeps track of which boards are duplicates
+   */
   const calcCombinedWords = () => {
     const numBoards = storedBoardStates.length;
     statsInfo.combinedBoardIndexStrings = Array(numBoards);
@@ -304,7 +339,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     };
     updateStatsInfo();
   }
-
+  /**
+   * @param  {number} boardIndex
+   *  sets the current board display to the given board index
+   */
   const switchToBoard = (boardIndex:number) => {
     if (initProgress === 1 && ((wordSetType === "quordle") || boardIndex === 0)) {
       if (boardIndex < 0) {
@@ -331,7 +369,9 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       }
     }
   }
-
+  /**
+   *  resets board data for a new game
+   */
   const onReset = () => {
     for (let i = 0; i < storedBoardStates.length; i++) {
       storedBoardStates[i] = initBoardStr;
@@ -341,7 +381,12 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     }
     switchToBoard(0);
   }
-
+  
+  /**
+   * @param  {WordleDict.wordSet} type
+   *  switches the words used based on the given type and
+   * recalculates initial word groups
+   */
   const switchToWordSet = (type: WordleDict.wordSet) => {
     if (window) {
       window.location.search = type === "quordle" ? "quordle" : "";
@@ -351,7 +396,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     onReset();
   }
   }
-
+  /**
+   * @param  {WordleDict.wordSet} type
+   *  renders a wordSetButton for the given type
+   */
   const wordSetButton = (type: WordleDict.wordSet) => {
     let bgClassName:string = getBoardColorClass(-1, type === WordleUtils.currentWordSetType);
     return (
@@ -362,7 +410,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       </button>
     )
   }
-
+  /**
+   * @param  {number} index
+   *  renders a board memory button for the given index
+   */
   const memoryButton = (index:number) => {
     let bgClassName:string;
     if (index < 0) {
