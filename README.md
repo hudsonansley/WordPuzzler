@@ -40,7 +40,6 @@ This seemed like a natural use for [WebAssembly](https://webassembly.org/) to im
 The conic-gradient css function was useful for the quordle button backgrounds in the combined board mode.
 
 ### TODO
-- [ ] don't enter letters when viewing completed board
 - [ ] don't recalculate stats just for sort or new target word
 - [ ] show table header when item clicked immediately, then the rest of the table when calculation is finished
 - [ ] improve responsive layout for small devices
@@ -50,7 +49,6 @@ The conic-gradient css function was useful for the quordle button backgrounds in
 - [ ] improve look of table using flex layout, add lines between boad/clue groups and use one color per board
 - [ ] add dark mode
 - [ ] mark letters with red outline if the clue selection contradicts previous clue selections
-- [x] add ability to enter arbitrary target word
 - [ ] show typing while initialization is happening
 - [ ] show keyboard keys as disabled when not functional, e.g., the "<" key only works when a target word is set, or only one word remains
 - [ ] add auto code formatter

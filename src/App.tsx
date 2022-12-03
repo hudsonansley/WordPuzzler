@@ -226,7 +226,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         storedBoardLettersDirty[index] = true;
       }
     }
-    if (!storedBoardCompleted[statsInfo.wordSetIndex]) {
+    if (statsInfo.combinedBoardIndexStrings || !storedBoardCompleted[statsInfo.wordSetIndex]) {
       const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
       setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
@@ -315,6 +315,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
    */
   const calcCombinedWords = () => {
     const numBoards = storedBoardStates.length;
+    let updateWordSetIndex = true;
     statsInfo.combinedBoardIndexStrings = Array(numBoards);
     let boardIndices:number[];
     const tempBoardStates = storedBoardStates.slice();
@@ -335,6 +336,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         statsInfo.wordSets[index] = [];
       } else {
         statsInfo.wordSets[index] = WordleUtils.wordle(WordleUtils.wordlePicks, boardStr);
+      }
+      if (!storedBoardCompleted[index] && updateWordSetIndex) {
+        statsInfo.wordSetIndex = index;
+        updateWordSetIndex = false;
       }
     };
     updateStatsInfo();
