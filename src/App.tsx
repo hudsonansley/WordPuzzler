@@ -493,7 +493,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
               :
               (<Board />)
               }
-              <Keyboard hidden={initProgress < 1}/>
+              <Keyboard hidden={false}/>
             </div>
           <div className='stats column'>
               {infoType === "stats" ?

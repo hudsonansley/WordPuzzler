@@ -4,6 +4,7 @@
 		"types": ["node"],
 		"target": "es6",
 		"lib": ["es6", "es2020", "dom"],
+		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"downlevelIteration": true,
 		"jsx": "react",

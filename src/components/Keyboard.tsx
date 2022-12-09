@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import Key from "./Key";
 import { publish } from "../utilities/Events"
+import useEventListener from '@use-it/event-listener'
 
 const keyLabels = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -11,8 +12,7 @@ const keyLabels = [
 
 const Keyboard = ({hidden}) => {
 
-  const handleKeyboard = useCallback(
-    (event) => {
+  const handleKeyboard = (event) => {
       let key = '';
       let eventKey = event.key.toUpperCase();
       if (eventKey === 'ENTER' || eventKey === 'BACKSPACE') {
@@ -37,14 +37,9 @@ const Keyboard = ({hidden}) => {
       if (key.length > 0) {
         publish('keyTapped', {key});
       }      
-  }, []);
+  };
 
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyboard);
-    return () => {
-      document.removeEventListener("keydown", handleKeyboard);
-    };
-  }, [handleKeyboard]);
+  useEventListener("keydown", handleKeyboard);
 
   return (
     <div className="keyboard" onKeyDown={handleKeyboard}>
