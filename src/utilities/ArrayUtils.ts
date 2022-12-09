@@ -351,3 +351,35 @@ export const Int16ArrayToNestedArrayOfNumber = (array:Int16Array):number[][][] =
 	});
 	return result;
 }
+/**
+ * @param  {T[]} a an array of type T
+ * @returns {T[][]} returns an array of all the permutations of the given array
+ * based on Heap's method http://homepage.math.uiowa.edu/~goodman/22m150.dir/2007/Permutation%20Generation%20Methods.pdf
+ * from this SO post https://stackoverflow.com/questions/9960908/permutations-in-javascript
+ */
+ export const permutations = <T>(a:T[]):T[][] => {
+	const n = a.length;
+	let perm = a.slice();
+	const result = [perm];
+	const swaps = new Array(n).fill(0);
+	let i = 1;
+	let k: number;
+	let temp: T;
+
+	while (i < n) {
+		if (swaps[i] < i) {
+			perm = perm.slice();
+			k = i % 2 ? swaps[i] : 0;
+			temp = perm[i];
+			perm[i] = perm[k];
+			perm[k] = temp;
+			swaps[i]++;
+			i = 1;
+			result.push(perm);
+		} else {
+			swaps[i] = 0;
+			i++;
+		}
+	}
+	return result;
+}

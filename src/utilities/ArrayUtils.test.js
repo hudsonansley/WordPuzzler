@@ -460,3 +460,68 @@ test('numberToArray works as expected', () => {
     result = ArrayUtils.numberToArray(num, 4, expected.length);
     expect(result).toEqual(expected);
 })
+
+test('permutations works as expected', () => {
+    let a = [];
+    let ap = ArrayUtils.permutations(a);
+    let expected = [[]];
+    expect(ap).toEqual(expected);
+    a = [0];
+    ap = ArrayUtils.permutations(a);
+    expected = [[0]];
+    expect(ap).toEqual(expected);
+    a = [0,1,2];
+    ap = ArrayUtils.permutations(a);
+    ap.sort();
+    expected = [
+        [0, 1, 2],
+        [0, 2, 1],
+        [1, 0, 2],
+        [1, 2, 0],
+        [2, 0, 1],
+        [2, 1, 0],
+    ];
+    expect(ap).toEqual(expected);
+    a = [0,1,2,3];
+    ap = ArrayUtils.permutations(a);
+    ap.sort();
+    ap.sort();
+    expected = [
+        [ 0, 1, 2, 3 ], 
+        [ 0, 1, 3, 2 ],
+        [ 0, 2, 1, 3 ],
+        [ 0, 2, 3, 1 ], 
+        [ 0, 3, 1, 2 ], 
+        [ 0, 3, 2, 1 ],
+        [ 1, 0, 2, 3 ],
+        [ 1, 0, 3, 2 ], 
+        [ 1, 2, 0, 3 ], 
+        [ 1, 2, 3, 0 ],
+        [ 1, 3, 0, 2 ],
+        [ 1, 3, 2, 0 ], 
+        [ 2, 0, 1, 3 ], 
+        [ 2, 0, 3, 1 ],
+        [ 2, 1, 0, 3 ],
+        [ 2, 1, 3, 0 ], 
+        [ 2, 3, 0, 1 ], 
+        [ 2, 3, 1, 0 ],
+        [ 3, 0, 1, 2 ],
+        [ 3, 0, 2, 1 ], 
+        [ 3, 1, 0, 2 ], 
+        [ 3, 1, 2, 0 ],
+        [ 3, 2, 0, 1 ],
+        [ 3, 2, 1, 0 ],       
+    ]
+    expect(ap).toEqual(expected);
+    a = ["a","b","c"];
+    ap = ArrayUtils.permutations(a);
+    ap.sort();
+    expected = [
+        ["a", "b", "c"],
+        ["a", "c", "b"],
+        ["b", "a", "c"],
+        ["b", "c", "a"],
+        ["c", "a", "b"],
+        ["c", "b", "a"],
+    ];
+})
