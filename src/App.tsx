@@ -111,6 +111,10 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     if (curLetterLoc.letterIndex !== (BoardData.lettersPerWord - 1)) {
       return;
     }
+    if (storedBoardCompleted[statsInfo.wordSetIndex]) {
+      const firstNotCompletedIndex = storedBoardCompleted.findIndex(completed =>!completed);
+      statsInfo.wordSetIndex = firstNotCompletedIndex < 0 ? 0 : firstNotCompletedIndex;
+    }
     boardRowStr = boardRowStr.toUpperCase();
     const otherBoardStrs = boardRowStr.replace(/=/g, '-');
     for (let index = 0; index < storedBoardStates.length; index++) {
