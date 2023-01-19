@@ -6,10 +6,11 @@ import { publish } from "../utilities/Events";
 interface parameters {
     rowIndex: number,
     letterIndex: number,
+    showProg: boolean,
     key?: string,
 }
 
-const Letter = ({ rowIndex, letterIndex }:parameters) => {
+const Letter = ({ rowIndex, letterIndex, showProg }:parameters) => {
     const { boardStr, 
         combinedBoardMode,
         storedBoardStates} = useContext(AppContext);
@@ -21,10 +22,12 @@ const Letter = ({ rowIndex, letterIndex }:parameters) => {
     const [bgStyle, letterChar] = useMemo(() => {
         let bgStyle:React.CSSProperties;
         let letterChar:string;
+        let letterState:string;
         const bgCssVals = { 
             "correct": getComputedStyle(document.documentElement).getPropertyValue('--bg-correct'),
             "wrongIndex": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong-index'),
             "wrong": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong'),
+            "calc": getComputedStyle(document.documentElement).getPropertyValue('--bg-calc'),
         }
         if (combinedBoardMode) {
             const letters:BoardData.LetterType[] = storedBoardStates.map(brdStr => BoardData.getLetterInBoardString(brdStr, { rowIndex, letterIndex }));
@@ -35,12 +38,13 @@ const Letter = ({ rowIndex, letterIndex }:parameters) => {
         } else {
             const letter:BoardData.LetterType = BoardData.getLetterInBoardString(boardStr, { rowIndex, letterIndex });
             letterChar = letter.letter;
+            letterState = showProg ? "calc" : letter.state;
             bgStyle = {
-                backgroundColor: `rgb(${bgCssVals[letter.state]})`
+                backgroundColor: `rgb(${bgCssVals[letterState]})`
             }
         }
         return [bgStyle, letterChar];
-    }, [storedBoardStates, combinedBoardMode, boardStr, rowIndex, letterIndex])
+    }, [storedBoardStates, combinedBoardMode, boardStr, rowIndex, letterIndex, showProg])
 
     return (
         <div className='letter'

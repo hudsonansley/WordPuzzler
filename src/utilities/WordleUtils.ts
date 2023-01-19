@@ -432,7 +432,7 @@ export const initDataLists = (type:WordleDict.wordSet = "quordle"):void => {
 	wordlePicks = WordleDict.getWordlePicks(type);
 	wordleAll = WordleDict.getWordleAll(type);
 	wordsProcessed = 0;
-	wordsPerInitChunk = Math.ceil(wordCount / 10);
+	wordsPerInitChunk = Math.ceil(wordCount / 40);
 
 	wordIndicesBuffer = new ArrayBuffer(wordCount * 2);
 	wordFlags = [new Uint8Array(picksCount), new Uint8Array(picksCount)];
@@ -699,7 +699,7 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 		// only add non-answer words if better scores than answer words
 		const bestAnswerNumberOfGroups = result[0]?.numberOfGroups ?? 100;
 		const bestAnswerMaxGroupSize = result[0]?.maxGroupSize ?? 0;
-		let n = Math.min(Math.floor(1.5 * wordInfo.wordCount), maxNonAnswerWords);
+		let n = Math.min(wordInfo.wordCount, maxNonAnswerWords);
 		while (n > 0 && (nonAnswerPicks.length > 1 || nonAnswerNotPicks.length > 1)) {
 			n--;
 			while (!nonAnswerPicks[0]) {nonAnswerPicks.shift()};

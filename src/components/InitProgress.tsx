@@ -1,14 +1,14 @@
 import React from "react";
+import Letter from "./Letter";
 
 const InitProgress = ({ progress }) => {
     const boxCount = 5;
     const boxes = [];
     for (let i = 0; i < boxCount; i++) {
+        const showProg = i / boxCount <= progress;
         boxes.push(
-            <div key={`_box_${i}`}
-                className={`letter letter--${i / boxCount <= progress ? 'correct' : 'wrong' }`} 
-            />
-        )
+            (<Letter rowIndex={0} letterIndex={i} key={`_box_${i}`} showProg={showProg}/>)
+        );
     }
     return (
         <>

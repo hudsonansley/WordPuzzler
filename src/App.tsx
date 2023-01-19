@@ -82,22 +82,25 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         }
         }
     }
-  
+
+    subscribe("keyTapped", handleKeyTapped);
+    return () => {
+      unsubscribe("keyTapped", handleKeyTapped);
+    }
+  });    
+
+  useEffect(() => {
     const handleAddWordToBoard = (event) => {
       const {word, final}:{word:string, final:boolean} = event.detail;
       addWordToBoard(word, final ?? false);
     }
-  
     const handleRotateLetterState = (event) => {
       const letterLoc:BoardData.LetterLocType = event.detail;
       onRotateLetterState(letterLoc);
     }
-  
-    subscribe("keyTapped", handleKeyTapped);
     subscribe("addWordToBoard", handleAddWordToBoard);
     subscribe("rotateLetterState", handleRotateLetterState);
     return () => {
-      unsubscribe("keyTapped", handleKeyTapped);
       unsubscribe("addWordToBoard", handleAddWordToBoard);
       unsubscribe("rotateLetterState", handleRotateLetterState);
     }
@@ -259,7 +262,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     if (statsInfo.combinedBoardIndexStrings || !storedBoardCompleted[statsInfo.wordSetIndex]) {
       const newBoard = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
       setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
-      setCurLetterLoc(BoardData.getLetterLoc(newBoard));
+      const newLoc = BoardData.getLetterLoc(newBoard);
+      setCurLetterLoc(newLoc);
     }
   }
   /**

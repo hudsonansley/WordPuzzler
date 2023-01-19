@@ -13,7 +13,7 @@ const Board = () => {
     for (let j = 0; j < lettersPerWord; j++) {
       const key = `_${i}_${j}`;
       items.push(
-        (<Letter rowIndex={i} letterIndex={j} key={key}/>)
+        (<Letter rowIndex={i} letterIndex={j} key={key} showProg={false}/>)
       );
     }
     const classes = `game-row game-row--${(i <= curRow) ? 'active' : ''}`;

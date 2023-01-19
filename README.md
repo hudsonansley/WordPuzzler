@@ -49,6 +49,6 @@ The conic-gradient css function was useful for the quordle button backgrounds in
 - [ ] improve look of table using flex layout, add lines between boad/clue groups and use one color per board
 - [ ] add dark mode
 - [ ] mark letters with red outline if the clue selection contradicts previous clue selections
-- [ ] show typing while initialization is happening
+- [ x ] show typing while initialization is happening
 - [ ] show keyboard keys as disabled when not functional, e.g., the "<" key only works when a target word is set, or only one word remains
 - [ ] add auto code formatter
