@@ -32,7 +32,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
         const handleAddTargetWordToBoard = (_:CustomEvent) => {
             let word = statsOrderInfo.targetWord;
             let final = (wordleDisplayStats.length === 1);
-            if (word.length === 0 && final) {
+            if (word.length === 0) {
                 word = wordleDisplayStats[0].word;
             }
             if (word.length > 0) {
