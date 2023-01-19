@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3000/",
-  "homepage": "./",
+  "homepage": ".",
   "moduleResolution": "node",
   "dependencies": {
     "@csstools/postcss-cascade-layers": "^1.0.5",
@@ -22,7 +22,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "env-cmd -e production react-scripts build",
+    "local": "env-cmd -e local react-scripts build && serve -s build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "words": "ts-node --esm ./wordcmd.ts"
