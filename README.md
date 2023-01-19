@@ -46,7 +46,7 @@ The conic-gradient css function was useful for the quordle button backgrounds in
 - [ ] convert css to react native styles
 - [ ] implement react native, submit to stores
 - [ ] add word definitions
-- [ ] improve look of table using flex layout, add lines between boad/clue groups and use one color per board
+- [ x ] improve look of table using flex layout, add lines between boad/clue groups and use one color per board
 - [ ] add dark mode
 - [ ] mark letters with red outline if the clue selection contradicts previous clue selections
 - [ x ] show typing while initialization is happening
