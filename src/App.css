@@ -16,10 +16,11 @@
   --selected-group1-color: #008080;
   --selected-group2-color: #808000;
   --selected-group3-color: #800080;
+  --main-background-color: #121212;
 }
 
 html {
-  background-color: #121212;
+  background-color: var(--main-background-color);
   height: 100%;
 }
 
@@ -229,6 +230,10 @@ tr {
 .impossible-word-bg {
   color: #709090;
   background-color: #600000;
+}
+.decoy-word-bg {
+  color: #B0B0B0;
+  background-color: var(--main-background-color);
 }
 
 .bg-qmem-button-selected {

@@ -43,6 +43,9 @@ test('WordUtils.wordle properly reduces wordlist', () => {
   expect(words).toContain("gruel");
   expect(words).not.toContain("green");
   expect(words.length).toEqual(1);
+  words = WordleUtils.wordle(picks, 'd=a/a=a/l-');
+  expect(words).toContain("drama");
+  expect(words.length).toEqual(1);
 })
 
 test('WordUtils.unique finds words with all unique letters properly', () => {

@@ -242,8 +242,10 @@ export const wordle = (words:string[], clues:string):string[] => {
 				ArrayUtils.addNoRepeats(notSomewhereLetters, letter);
 			} else if (mod === "?" || mod === "/") {
 				ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
+				if (!somewhereLetters.includes(letter)) {
+					ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
+				}
 				ArrayUtils.addNoRepeats(somewhereLetters, letter);
-				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
 			} else {
 				console.error(`place indicator not recognize: ${mod}`);
 				error = true;
@@ -273,8 +275,8 @@ export const wordle = (words:string[], clues:string):string[] => {
 		} else {
 			const letters = notLetters[i];
 			regex += "[";
-			for (let j=0; j< letters.length; j++) {
-				regex += "^" + letters[j];
+			for (const letter of letters) {
+				regex += "^" + letter;
 			}
 			regex += "]";
 		}
@@ -378,8 +380,6 @@ function getWordleCluesFast(pick:number):number {
 		result |= clues[i] << (i << 1);
 	}
 	return result;
-
-	// return (clues[4] << 8) | (clues[3] << 6) | (clues[2] << 4) | (clues[1] << 2) | clues[0];
 }
 
 let cluesLookUpTableBuffer:ArrayBuffer;
@@ -721,11 +721,11 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 						wordIndex, 
 						clues:0, 
 						avgGroupSize:0,
-						numberOfGroups:0, 
-						maxGroupSize:0, 
+						numberOfGroups:0,
+						maxGroupSize:Infinity,
 						cluesGroupCount:0, 
 						cluesGroupDivider:0,
-						boardGroup: "-",
+						boardGroup: "0",
 					};
 					result.push(item);
 				});

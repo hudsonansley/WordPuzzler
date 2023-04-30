@@ -114,8 +114,12 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
         return wordStats.boardGroup;
     }
 
-    const getAvgGrpSizeDisplay = (avg:number):string => {
-        return isFinite(avg) ? avg.toFixed(3) : "n/a";
+    const getAvgGrpSizeDisplay = (n:number):string => {
+        return isFinite(n) ? n.toFixed(3) : "-";
+    }
+
+    const getMaxGrpSizeDisplay = (n:number):string => {
+        return isFinite(n) ? n.toString() : "-";
     }
 
     if (hasPartitions()) {
@@ -187,7 +191,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                                 </button>
                             </td>
                             <td key="avgGroupSize">{getAvgGrpSizeDisplay(wordInfo.avgGroupSize)}</td>
-                            <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
+                            <td key="maxGroupSize">{getMaxGrpSizeDisplay(wordInfo.maxGroupSize)}</td>
                             {statsInfo.combinedBoardIndexStrings && (
                             <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
                             )}
@@ -239,7 +243,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                                 </button>
                             </td>
                             <td key="avgGroupSize">{getAvgGrpSizeDisplay(wordInfo.avgGroupSize)}</td>
-                            <td key="maxGroupSize">{wordInfo.maxGroupSize}</td>
+                            <td key="maxGroupSize">{getMaxGrpSizeDisplay(wordInfo.maxGroupSize)}</td>
                             {statsInfo.combinedBoardIndexStrings && (
                             <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
                             )}
