@@ -509,8 +509,8 @@ export const filterWordleIndexPartitions = (wordIndexLists:Uint16Array[]):void =
 	const numWordIndexLists = wordIndexLists.length;
 	for (let i = 0; i < numWordIndexLists; i++) {
 		const wordIndices = wordIndexLists[i];
-		for (let j = 0; j < wordIndices.length; j++) {
-			curWordFlags[wordIndices[j]] = i + 1;
+		for (const wordIndex of wordIndices) {
+			curWordFlags[wordIndex] = i + 1;
 		}
 	}
 	let groupCount:number;
@@ -643,6 +643,7 @@ const getDisplayStatsRaw = (wordIndexLists:Uint16Array[], boardGroups:string[], 
 export type WordSetInfoType = {
     wordSets: string[][],
     wordSetIndex: number,
+	boardStates: string[],
     combinedBoardIndexStrings: string[] | null,
 	wordCount: number,
 };
@@ -667,9 +668,6 @@ export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
  *  useful for display in the word data table
  */
 export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayUtils.SortOrderObjType[], targetWord: string = "", userWordChoices: number[] = [], maxNonAnswerWords:number = 50):wordleDisplayStatsType[] => {
-	if (wordInfo.wordCount === 0) {
-		return [];
-	}
 	if (!wordleIndexPartitionsInitialized()) {
 		console.error("getWordleDisplayStats called before partitions resolved");
 		return [];
@@ -709,6 +707,28 @@ export const getWordleDisplayStats = (wordInfo:WordSetInfoType, sortOrder:ArrayU
 			while (i < n && wordChoices.length > 0) {
 				checkWordChoice(i, nonAnswerNotPicks);
 				i++;
+			}
+		}
+		if (!wordInfo.combinedBoardIndexStrings && result.length < 6) {
+			const decoys = WordleDict.wordleDecoysNums[currentWordSetType];
+			const decoyWords = Array.from(decoys, wordNum => WordleDict.numToWord(wordNum));
+			const answerNotPickWords = wordle(decoyWords, wordInfo.boardStates[wordInfo.wordSetIndex]);
+			if (answerNotPickWords.length > 0) {
+				answerNotPickWords.forEach(word => {
+					const wordIndex = getIndexFromWord(word);
+					const item:wordleDisplayStatsType = {
+						word,
+						wordIndex, 
+						clues:0, 
+						avgGroupSize:0,
+						numberOfGroups:0, 
+						maxGroupSize:0, 
+						cluesGroupCount:0, 
+						cluesGroupDivider:0,
+						boardGroup: "-",
+					};
+					result.push(item);
+				});
 			}
 		}
 		const dummyBadChoice:wordleDisplayStatsType = {word:"dummyBadWord", wordIndex:-1, clues:0, avgGroupSize:10000, numberOfGroups:1, maxGroupSize:10000, cluesGroupCount:0, cluesGroupDivider:0, boardGroup: ""};

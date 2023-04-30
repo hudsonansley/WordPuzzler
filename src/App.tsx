@@ -20,14 +20,15 @@ export type EventName = (
   "rotateLetterState" | 
   "addTargetWordToBoard");
 export const AppContext = createContext(undefined);
+const initBoardStr = "";
+const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
 const initStatsInfo:WordleUtils.WordSetInfoType = {
   wordSets: [[],[],[],[]],
   wordSetIndex: 0,
   combinedBoardIndexStrings: null,
+  boardStates: storedBoardStates,
   wordCount: 0,
 };
-const initBoardStr = "";
-const storedBoardStates = [initBoardStr, initBoardStr, initBoardStr, initBoardStr];
 const storedBoardLetterStateDirty = [false, false, false, false];
 const storedBoardLettersDirty = [false, false, false, false];
 const storedBoardCompleted = [false, false, false, false];
@@ -164,13 +165,13 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     statsInfo.wordCount = statsInfo.combinedBoardIndexStrings ?
         statsInfo.wordSets.reduce((acc, list) => acc + list.length, 0) :
         statsInfo.wordSets[statsInfo.wordSetIndex].length;
-    if (statsInfo.wordCount > 0) {
+    if (storedBoardCompleted[statsInfo.wordSetIndex]) {
+      setInfoType("completed");
+    } else {
       setInfoType("stats");
-      setStatsInfo({...statsInfo});
+      setStatsInfo({...statsInfo, boardStates: storedBoardStates});
       storedBoardLetterStateDirty[statsInfo.wordSetIndex] = false;
       storedBoardLettersDirty[statsInfo.wordSetIndex] = false;
-    } else {
-      setInfoType(storedBoardCompleted[statsInfo.wordSetIndex] ? "completed" : "empty");
     }
   }
 
