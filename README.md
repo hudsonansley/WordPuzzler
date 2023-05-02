@@ -1,6 +1,6 @@
 # Wordle/Quordle Helper 
 
-This project is designed to help solve [Wordle](https://www.nytimes.com/games/wordle/index.html) and [Quordle](https://www.quordle.com/#/) by providing a list of the possible answers given your current progress in the games and show the breakdown of groups given specific word choices. This is a work in progress.
+This project is designed to help solve [Wordle](https://www.nytimes.com/games/wordle/index.html) and [Quordle](https://www.merriam-webster.com/games/quordle/#/) by providing a list of the possible answers given your current progress in the games and show the breakdown of groups given specific word choices. This is a work in progress. The webpage is live [here](https://hudsonansley.com/wordleHelper/).
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
