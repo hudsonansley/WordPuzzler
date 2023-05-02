@@ -45,7 +45,7 @@ export const getLetterLoc = (board: BoardDataType): LetterLocType => {
 
 export const getLetterString = (letter: LetterType):string => {
     const stateChar = (letter.state === "correct") ? "=" :
-    (letter.state === "wrongIndex") ? "/" : "-";
+        (letter.state === "wrongIndex") ? "/" : "-";
     return letter.letter.toUpperCase() + stateChar;
 }
 
@@ -65,7 +65,7 @@ export const getBoardString = (board: BoardDataType) => {
     return rows.join("_");
 }
 
-export const getLetterStateFromString = (stateChar:String):LetterState => {
+export const getLetterStateFromString = (stateChar:string):LetterState => {
     return (stateChar === "-") ? "wrong" :
         (stateChar === "=") ? "correct" : "wrongIndex";
 }
