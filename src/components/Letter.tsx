@@ -3,14 +3,14 @@ import { AppContext } from "../App";
 import * as BoardData from "../data/BoardData";
 import { publish } from "../utilities/Events";
 
-interface parameters {
+interface Parameters {
     rowIndex: number,
     letterIndex: number,
     showProg: boolean,
     key?: string,
 }
 
-const Letter = ({ rowIndex, letterIndex, showProg }:parameters) => {
+const Letter = ({ rowIndex, letterIndex, showProg }:Parameters) => {
     const { boardStr, 
         combinedBoardMode,
         storedBoardStates} = useContext(AppContext);

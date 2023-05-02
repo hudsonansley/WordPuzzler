@@ -213,6 +213,9 @@ button#reset {
   user-select: none;
   cursor: pointer;
 }
+.letter--not-in-dictionary {
+  color:#c00000
+}
 
 .letter--correct {
   background-color: rgb(var(--bg-correct));
@@ -231,7 +234,7 @@ tr {
   color: #709090;
   background-color: #600000;
 }
-.decoy-word-bg {
+.group-bg, .alt-group-bg {
   color: #B0B0B0;
   background-color: var(--main-background-color);
 }

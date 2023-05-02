@@ -4,9 +4,7 @@ const NUMBER_OF_BOARDS = 4;
 
 export const getBoardColorClass = (boardGroup:number, alt:boolean, typeString:string = "button", altString:string = "selected"):string => {
     const items = [];
-    if (boardGroup < 0) {
-        items.push("decoy", "word");
-    } else if (boardGroup < NUMBER_OF_BOARDS) {
+    if (boardGroup < NUMBER_OF_BOARDS) {
         if (alt) {
             items.push(altString);
         }
@@ -20,4 +18,3 @@ export const getBoardColorClass = (boardGroup:number, alt:boolean, typeString:st
     items.push("bg");
     return items.join("-");
 }
-

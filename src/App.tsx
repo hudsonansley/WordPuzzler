@@ -339,7 +339,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         }
         otherIndex--;
       }
-      boardIndices.sort();
+      boardIndices.sort((a, b) => a - b);
       statsInfo.combinedBoardIndexStrings[index] = boardIndices.join(",");
       if (storedBoardCompleted[index] || tempBoardStates[index] === "") {
         statsInfo.wordSets[index] = [];
