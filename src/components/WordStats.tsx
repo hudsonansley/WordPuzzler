@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef }  from "react";
-import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys, WordSetInfoType, getIndexFromWord } from '../utilities/WordleUtils';
+import { getWordleDisplayStats, wordleDisplayStatsType, wordleDisplayStatsKeys, WordSetInfoType, getIndexFromWord, WORDLE_CORRECT, WORDLE_WRONG_POSITION } from '../utilities/WordleUtils';
 import * as ArrayUtils from "../utilities/ArrayUtils";
-import { WORDLE_CORRECT, WORDLE_WRONG_POSITION } from "../utilities/WordleUtils";
 import { lettersPerWord } from "../data/BoardData";
 import { getBoardColorClass } from "../utilities/Styles";
 import { publish, subscribe, unsubscribe } from "../utilities/Events";
@@ -39,7 +38,6 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                 publish("addWordToBoard", {word, final});
             }
         }
-    
         const handleSetTargetWord = (event:CustomEvent) => {
             const word = event.detail?.word ?? "";
             const wordIndex = getIndexFromWord(word);

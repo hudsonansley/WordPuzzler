@@ -7,17 +7,17 @@ let gVerbose = false;
 
 export interface StringMap {[key: string]: string; }
 export interface StringToBooleanMap {[key: string]: boolean; }
-export interface numberToBooleanMap {[key: number]: boolean; }
+export interface NumberToBooleanMap {[key: number]: boolean; }
 export interface StringToNumberMap {[key: string]: number; }
 export interface NumberToNumberMap {[key: number]: number; }
 export interface StringToArrayMap {[key: string]: string[]; }
 export interface StringToStringToArrayMap {[key: string]: StringToArrayMap; }
 export interface StringToStringToNumberMap {[key: string]: StringToNumberMap; }
-export interface partitionWordStat {
+export interface PartitionWordStat {
 	numberOfGroups : number,
 	largestGroup : number,
 }
-export type partionStats = [number, partitionWordStat];
+export type partionStats = [number, PartitionWordStat];
 
 export const setVerbose = (verbose:boolean):void => {
 	gVerbose = verbose;
@@ -663,7 +663,7 @@ export type wordleDisplayStatsKeys = keyof wordleDisplayStatsType;
  * @param  {WordSetInfoType} wordInfo
  * @param  {ArrayUtils.SortOrderObjType[]} sortOrder
  * @param  {string} targetWord
- * @param  {number} maxNonPickWords
+ * @param  {number} maxNonAnswerWords
  * @returns {wordleDisplayStatsType[]} the stats massaged into a format 
  *  useful for display in the word data table
  */

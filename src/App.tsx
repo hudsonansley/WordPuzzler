@@ -1,5 +1,5 @@
 
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, useMemo } from 'react';
 
 import './App.css';
 import * as BoardData from "./data/BoardData"
@@ -147,7 +147,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     if (boardWords.indexOf(word) < 0) {
         const letters = word.split("");
         const clue = final ? "=" : "-";
-        const boardRow = letters.reduce((acc, letter) => acc += letter + clue, "");
+        const boardRow = letters.reduce((acc, letter) => acc + letter + clue, "");
         addRowToBoard(boardRow);
     }
   }
@@ -445,6 +445,15 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
     )
   }
 
+  const getProviderProps = useMemo(() => {
+    return {
+      storedBoardStates,
+      combinedBoardMode: !!statsInfo.combinedBoardIndexStrings,
+      boardStr,
+      curLetterLoc,
+    }
+  }, [statsInfo.combinedBoardIndexStrings, boardStr, curLetterLoc])
+
   return (
     <div className="App">
       <nav>
@@ -487,12 +496,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
         </div>
       </nav>
       <AppContext.Provider
-        value={{
-          storedBoardStates,
-          combinedBoardMode: !!statsInfo.combinedBoardIndexStrings,
-          boardStr,
-          curLetterLoc,
-        }}
+        value={getProviderProps}
       >
       <div className='content'>
         <div className='row'>
