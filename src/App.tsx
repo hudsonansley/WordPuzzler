@@ -194,16 +194,6 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
       return;
     }
 
-    if (curLetterLoc.rowIndex >= 0) {
-      let curWord = "";
-      const board = BoardData.getBoardFromString(storedBoardStates[statsInfo.wordSetIndex]);
-      board[curLetterLoc.rowIndex].forEach(letter => { curWord += letter.letter.toLowerCase() });
-  
-      if (WordleUtils.getIndexFromWord(curWord) < 0) {
-        alert(`Note: "${curWord}" is not in our dictionary`);
-      }
-    }
-
     const newWords = WordleUtils.wordle(WordleUtils.wordlePicks, storedBoardStates[statsInfo.wordSetIndex]);
     statsInfo.wordSets[statsInfo.wordSetIndex] = newWords;
     updateStatsInfo();      

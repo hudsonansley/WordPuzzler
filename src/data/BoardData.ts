@@ -69,7 +69,7 @@ export const getBoardString = (board: BoardDataType) => {
     return rows.join("_");
 }
 
-export const getLetterStateFromString = (stateChar:string):LetterState => {
+const getLetterStateFromString = (stateChar:string):LetterState => {
     if (stateChar === "/") {
         return "wrongIndex";
     } else {
@@ -77,10 +77,19 @@ export const getLetterStateFromString = (stateChar:string):LetterState => {
     }
 }
 
-export const getLetterFromString = (letterString:string): LetterType => {
+const getLetterFromString = (letterString:string): LetterType => {
     const letter = letterString.charAt(0);
     const state:LetterState = getLetterStateFromString(letterString.charAt(1));
     return { letter, state };
+}
+
+export const getWordFromBoardString = ( cluesString:string, rowIndex:number) => {
+    const clueArray = cluesString.split("_");
+    if (rowIndex < clueArray.length) {
+        return clueArray[rowIndex].split("").reduce((acc, ch, i) => acc + (i % 2 || ch === " " ? "" : ch), "").toLowerCase();
+    } else {
+        return "";
+    }
 }
 
 /**
@@ -90,13 +99,13 @@ export const getLetterFromString = (letterString:string): LetterType => {
  */
 export const getBoardFromString = (cluesString: string): BoardDataType => {
     let result: BoardDataType = [];
-    let clueArray = cluesString.split("_");
+    const clueArray = cluesString.split("_");
     for (const clueString of clueArray) {
         const row: LetterType[] = [];
         const chars = clueString.split("");
         for (let index = 0; index < chars.length; index += 2) {
             const state:LetterState = getLetterStateFromString(chars[index + 1]);
-            row.push({ letter: chars[index], state: state });
+            row.push({ letter: chars[index], state });
         }
         if (row.length === lettersPerWord) {
             result.push(row);

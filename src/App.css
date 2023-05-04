@@ -21,6 +21,7 @@
   --selected-group2-color: #808000;
   --selected-group3-color: #800080;
   --main-background-color: #121212;
+  --not-in-dictionary: #a00000;  
 }
 
 html {
@@ -30,7 +31,7 @@ html {
 
 .App {
   text-align: center;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
   color: white;
 }
 
@@ -177,7 +178,6 @@ button#reset {
   align-items: center;
   display: flex;
   flex-direction: column;
-
 }
 
 .game-row {
@@ -192,19 +192,17 @@ button#reset {
 }
 
 .letter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border: 0.05rem solid grey;
   margin: 0.1rem;
   width: var(--letter-width);
-  display: grid;
-  place-items: center;
-  font-size: 1rem;
-  font-weight: bolder;
+  font-size: 1.5rem;
+  font-weight: bold;
   color: white;
   user-select: none;
   cursor: pointer;
-}
-.letter--not-in-dictionary {
-  color:#c00000
 }
 
 .letter--correct {

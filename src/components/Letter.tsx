@@ -2,6 +2,7 @@ import React, { useContext, useMemo }  from "react";
 import { AppContext } from "../App";
 import * as BoardData from "../data/BoardData";
 import { publish } from "../utilities/Events";
+import { getIndexFromWord } from "../utilities/WordleUtils";
 
 interface Parameters {
     rowIndex: number,
@@ -16,19 +17,21 @@ const Letter = ({ rowIndex, letterIndex, showProg }:Parameters) => {
         storedBoardStates} = useContext(AppContext);
 
     const rotateLetterState = () => {
-        publish("rotateLetterState", {rowIndex:rowIndex, letterIndex:letterIndex});
+        publish("rotateLetterState", {rowIndex, letterIndex});
     }
 
     const [bgStyle, letterChar] = useMemo(() => {
         let bgStyle:React.CSSProperties;
         let letterChar:string;
         let letterState:string;
-        const bgCssVals = { 
-            "correct": getComputedStyle(document.documentElement).getPropertyValue('--bg-correct'),
-            "wrongIndex": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong-index'),
-            "wrong": getComputedStyle(document.documentElement).getPropertyValue('--bg-wrong'),
-            "calc": getComputedStyle(document.documentElement).getPropertyValue('--bg-calc'),
+        const computedStyle = getComputedStyle(document.documentElement);
+        const bgCssVals = {
+            "correct": computedStyle.getPropertyValue('--bg-correct'),
+            "wrongIndex": computedStyle.getPropertyValue('--bg-wrong-index'),
+            "wrong": computedStyle.getPropertyValue('--bg-wrong'),
+            "calc": computedStyle.getPropertyValue('--bg-calc'),
         }
+        let wordInDict = true;
         if (combinedBoardMode) {
             const letters:BoardData.LetterType[] = storedBoardStates.map(brdStr => BoardData.getLetterInBoardString(brdStr, { rowIndex, letterIndex }));
             letterChar = (letters.find(letter => letter.letter !== BoardData.blankLetter) ?? letters[0]).letter;
@@ -37,11 +40,16 @@ const Letter = ({ rowIndex, letterIndex, showProg }:Parameters) => {
             }
         } else {
             const letter:BoardData.LetterType = BoardData.getLetterInBoardString(boardStr, { rowIndex, letterIndex });
+            const word = BoardData.getWordFromBoardString(boardStr, rowIndex);
+            wordInDict = word.length === BoardData.lettersPerWord ? getIndexFromWord(word) >= 0 : true;
             letterChar = letter.letter;
             letterState = showProg ? "calc" : letter.state;
             bgStyle = {
                 backgroundColor: `rgb(${bgCssVals[letterState]})`
             }
+        }
+        if (!wordInDict) {
+            bgStyle.color = computedStyle.getPropertyValue('--not-in-dictionary');
         }
         return [bgStyle, letterChar];
     }, [storedBoardStates, combinedBoardMode, boardStr, rowIndex, letterIndex, showProg])
