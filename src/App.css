@@ -6,7 +6,7 @@
   --stats-table-line-height: 0.75rem;
   --nav-height: 3rem;
   --square-button-width: 1.5rem;
-  --key-width: 1.4rem;
+  --key-width: 1.8rem;
   --game-top-padding: 0.25rem;
   --game-width: 16rem;
   /* in rgb components for use in rgba() */
@@ -68,11 +68,6 @@ nav h1 {
   direction: row;
   align-items: center;
   width: 24%;
-}
-
-.nav-spacer {
-  display: flex;
-  flex: 0 20 1rem;
 }
 
 button#help {
@@ -169,13 +164,14 @@ button#reset {
 .column {
   display: flex;
   flex-direction: column;
+  max-width: 100%;
+  min-width: 50%;
 }
 
 .game {
   align-items: center;
   padding-top: var(--game-top-padding);
   flex-grow: 1;
-  width: var(--game-width);
 }
 
 .board {
@@ -319,16 +315,15 @@ tbody {
 }
 
 .stats {
-  padding-top: 0.5rem;
+  padding: 0.5rem;
   flex-grow: 1;
-  width: var(--game-width);
   overflow-y: auto;
 }
 
 .stat-table {
   font-family: 'Ubunto Mono', monospace, 'DejaVu Sans Mono', 'Courier New', Courier;
   font-weight: bold;
-  width: var(--game-width);
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 1rem;
@@ -339,7 +334,6 @@ tbody {
 }
 
 .info {
-  width: 16rem;
   margin-left: auto;
   margin-right: auto;
   font-size: 0.8rem;
@@ -384,7 +378,6 @@ p {
 .keyboard {
   margin-top: 0.5rem;
   background-color: #121212;
-  width: var(--game-width);
 }
 
 .line {
@@ -396,8 +389,9 @@ p {
 }
 
 .key {
-  width: var(--key-width);
-  height: var(--key-width);
+  max-width: var(--key-width);
+  min-width: 8%;
+  aspect-ratio: 1;
   margin: 0.05rem;
   border-radius: 0.15rem;
   display: grid;
@@ -410,12 +404,14 @@ p {
 }
 
 .big {
-  min-width: 3.5rem;
+  min-width: 3.3rem;
   max-width: 22%;
+  aspect-ratio: auto;
 }
 .spacebar {
   min-width: 10.5rem;
   max-width: 66%;
+  aspect-ratio: auto;
 }
 .disabled {
   background-color: #3a393c;
