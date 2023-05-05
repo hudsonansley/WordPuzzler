@@ -471,8 +471,7 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
           </div>
           </div>
         </div>
-        <div className="nav-spacer" />
-        <h1>{`${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}`}&nbsp;Helper</h1>
+        <h1>{`${wordSetType[0].toUpperCase()}${wordSetType.slice(1)}`} Helper</h1>
         <div className={`memory-button-container${(wordSetType === "quordle") ? "" : " hidden"}`}>
           <div className="quordle-button-container">
             {memoryButton(-1)}
