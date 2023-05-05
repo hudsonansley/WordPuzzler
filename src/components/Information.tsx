@@ -41,17 +41,18 @@ export const Information = ({infoType}:{infoType:InfoType}) => {
                     </p>
                     <p>
                     Rows in red are not in the list of possible answers, those 
-                    in other colors are. 
-                    You can sort by the column by tapping on that column header.
+                    in other colors are. Rows with a black background are words not in 
+                    the known 'picks' list, but may have been added.
                     </p>
                     <p>
-                    You can see the group breakdown for a word by tapping on it.
+                    Tap on a column header to sort by that column.
+                    Tap on a word in a row to see the group breakdown for that word.
                     A new column headed by that target word will show the groups 
                     based on the clues that would be shown if the word in each row 
                     was the answer and the target word were entered.
                     </p>
                     <p>
-                    Tapping the selected word group breakdown header enters that word 
+                    Tap the selected word group breakdown header to enter that word 
                     on the board.
                     </p>
                     <p>
