@@ -230,7 +230,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 				ArrayUtils.removeFromArray(notLetters[letIndex], letter);
 				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
 			} else if (mod === "-") {
-				if (somewhereLetters.indexOf(letter) === -1 || correctLetters.indexOf(letter) >= 0) {
+				if (somewhereLetters.indexOf(letter) === -1) {
 					for (let j=0; j < wordLen; j++) {
 						if (correctLetters[j] !== letter) {
 							ArrayUtils.addNoRepeatsArrays(notLetters, letter, j);
@@ -242,9 +242,7 @@ export const wordle = (words:string[], clues:string):string[] => {
 				ArrayUtils.addNoRepeats(notSomewhereLetters, letter);
 			} else if (mod === "?" || mod === "/") {
 				ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
-				if (!somewhereLetters.includes(letter)) {
-					ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
-				}
+				ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
 				ArrayUtils.addNoRepeats(somewhereLetters, letter);
 			} else {
 				console.error(`place indicator not recognize: ${mod}`);
