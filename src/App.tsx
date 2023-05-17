@@ -92,8 +92,8 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
 
   useEffect(() => {
     const handleAddWordToBoard = (event) => {
-      const {word, final}:{word:string, final:boolean} = event.detail;
-      addWordToBoard(word, final ?? false);
+      const {word}:{word:string} = event.detail;
+      addWordToBoard(word);
     }
     const handleRotateLetterState = (event) => {
       const letterLoc:BoardData.LetterLocType = event.detail;
@@ -140,13 +140,12 @@ const App = ({initWordSetType}: {initWordSetType:WordleDict.wordSet}) => {
 
   /**
    * @param  {string} word the word to add to the board
-   * @param  {boolean} final if true, the word is set to all correct, otherwise just entered without clue settings
    */
-  const addWordToBoard = (word:string, final: boolean) => {
+  const addWordToBoard = (word:string) => {
     const boardWords = storedBoardStates.reduce((acc, boardStr) => acc.concat(BoardData.getBoardWords(boardStr)), []);
     if (boardWords.indexOf(word) < 0) {
         const letters = word.split("");
-        const clue = final ? "=" : "-";
+        const clue = statsInfo.wordCount === 1 ? "=" : "-";
         const boardRow = letters.reduce((acc, letter) => acc + letter + clue, "");
         addRowToBoard(boardRow);
     }

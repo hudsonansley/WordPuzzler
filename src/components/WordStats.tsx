@@ -30,12 +30,11 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     useEffect(() => {
         const handleAddTargetWordToBoard = (_:CustomEvent) => {
             let word = statsOrderInfo.targetWord;
-            let final = (wordleDisplayStats.length === 1);
             if (word.length === 0) {
                 word = wordleDisplayStats[0].word;
             }
             if (word.length > 0) {
-                publish("addWordToBoard", {word, final});
+                publish("addWordToBoard", {word});
             }
         }
         const handleSetTargetWord = (event:CustomEvent) => {
@@ -71,8 +70,8 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
         return statsOrderInfo.targetWord !== "";
     }
 
-    const addWordToBoard = (word:string, final:boolean = false) => {
-        publish("addWordToBoard", {word, final});
+    const addWordToBoard = (word:string) => {
+        publish("addWordToBoard", {word});
     }
 
     const wordleDisplayStats:wordleDisplayStatsType[] = useMemo<wordleDisplayStatsType[]>(() => {
@@ -95,8 +94,8 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
     )
 
     const onTapListWord = (word:string) => {
-        if (wordleDisplayStats.length === 1 && wordleDisplayStats[0].word === word) {
-            addWordToBoard(word, true);
+        if (statsInfo.wordCount === 1) {
+            addWordToBoard(word);
         } else {
             setStatsOrderInfo({...statsOrderInfo, primaryIndex:"avgGroupSize", targetWord: word});
         }
@@ -128,7 +127,7 @@ export const WordStats = ({statsInfo}:{statsInfo: WordSetInfoType}) => {
                 <tr>
                     <th key="clues">
                         <div className="clues-column">
-                            <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord, false)}} >
+                            <button onClick={() => {addWordToBoard(statsOrderInfo.targetWord)}} >
                                 {statsOrderInfo.targetWord.toUpperCase()}
                             </button>
                         </div>
