@@ -120,7 +120,10 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
   }, [statsInfo, statsOrderInfo]);
 
   const onTapListWord = (word: string) => {
-    if (statsInfo.wordCount === 1) {
+    if (
+      statsInfo.wordCount === 1 &&
+      statsInfo.wordSets[statsInfo.wordSetIndex][0] === word
+    ) {
       addWordToBoard(word);
     } else {
       setStatsOrderInfo({
