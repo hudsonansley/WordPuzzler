@@ -12,6 +12,9 @@ const keyLabels = [
 
 const Keyboard = ({ hidden }) => {
   const handleKeyboard = (event) => {
+    if (event.metaKey || event.altKey || event.ctrlKey) {
+      return;
+    }
     let key = "";
     let eventKey = event.key.toUpperCase();
     if (eventKey === "ENTER" || eventKey === "BACKSPACE") {
