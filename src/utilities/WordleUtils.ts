@@ -805,7 +805,7 @@ export const getWordleDisplayStats = (
         i++;
       }
     }
-    if (!wordInfo.combinedBoardIndexStrings && result.length < 6) {
+    if (!wordInfo.combinedBoardIndexStrings && result.length < 16) {
       const decoys = WordleDict.wordleDecoysNums[currentWordSetType];
       const decoyWords = Array.from(decoys, (wordNum) =>
         WordleDict.numToWord(wordNum)
