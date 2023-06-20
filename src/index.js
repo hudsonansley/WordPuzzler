@@ -1,17 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App.tsx';
-import reportWebVitals from './reportWebVitals.js';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
+import reportWebVitals from "./reportWebVitals.js";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-const initWordSetType = window?.location.search.toLowerCase().indexOf("quordle") < 0 ?
-  "wordle" :
-  "quordle";
+const root = ReactDOM.createRoot(document.getElementById("root"));
+const initWordSetType =
+  window?.location.search.toLowerCase().indexOf("quordle") < 0
+    ? "wordle"
+    : "quordle";
 
 root.render(
   <React.StrictMode>
-    <App  initWordSetType={initWordSetType} />
+    <App initWordSetType={initWordSetType} />
   </React.StrictMode>
 );
 

@@ -21,7 +21,7 @@
   --selected-group2-color: #808000;
   --selected-group3-color: #800080;
   --main-background-color: #121212;
-  --not-in-dictionary: #a00000;  
+  --not-in-dictionary: #a00000;
 }
 
 html {
@@ -31,7 +31,7 @@ html {
 
 .App {
   text-align: center;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   color: white;
 }
 
@@ -72,77 +72,77 @@ nav h1 {
 
 button#help {
   border: none;
-  padding-top: .25rem;
+  padding-top: 0.25rem;
   background-color: #121212;
 }
 
 button#reset {
   font-weight: bold;
   font-size: 1.2rem;
-  padding-top: .15rem;
-  padding-left: .25rem;
-  padding-right: .25rem;
+  padding-top: 0.15rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 
 .word-set-button-container {
-  display: grid; 
+  display: grid;
   align-content: center;
-  column-gap: 0; 
+  column-gap: 0;
   width: var(--square-button-width);
 }
 
 .one-by-two-buttons {
   display: grid;
-  grid-template-columns: 1fr; 
-  gap: 0; 
+  grid-template-columns: 1fr;
+  gap: 0;
 }
 
 .memory-button-container {
-  display: grid; 
+  display: grid;
   align-content: center;
-  grid-template-columns: 1fr 1fr; 
-  column-gap: 0; 
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0;
   max-width: 5rem;
   min-width: 4.5rem;
 }
 
 .quordle-button-container {
-  display: grid; 
-  align-content: center; 
-  width: var(--square-button-width); 
+  display: grid;
+  align-content: center;
+  width: var(--square-button-width);
   height: var(--nav-height);
 }
 
 .two-by-two-buttons {
-  display: grid; 
+  display: grid;
   width: var(--nav-height);
   height: var(--nav-height);
-  grid-template-columns: 1fr 1fr; 
-  gap: 0; 
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
 }
 
 .memory-button {
-  box-sizing: border-box; 
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center; 
+  text-align: center;
   width: var(--square-button-width);
   height: var(--square-button-width);
-  border-radius: 0.5rem; 
-  border-width: 0.1rem; 
+  border-radius: 0.5rem;
+  border-width: 0.1rem;
 }
 
 .word-set-button {
-  box-sizing: border-box; 
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
   width: var(--square-button-width);
   height: var(--square-button-width);
-  text-align: center; 
-  border-radius: 0.5rem; 
-  border-width: 0.1rem; 
+  text-align: center;
+  border-radius: 0.5rem;
+  border-width: 0.1rem;
 }
 
 .hidden {
@@ -222,17 +222,28 @@ tr {
   color: #709090;
   background-color: #600000;
 }
-.group-bg, .alt-group-bg {
-  color: #B0B0B0;
+.group-bg,
+.alt-group-bg {
+  color: #b0b0b0;
   background-color: var(--main-background-color);
 }
 
 .bg-qmem-button-selected {
-  background: conic-gradient(rgb(var(--bg-correct)) 90deg, rgb(var(--bg-wrong-index)) 90deg 180deg, rgb(var(--bg-correct)) 180deg 270deg, rgb(var(--bg-wrong)) 270deg);
+  background: conic-gradient(
+    rgb(var(--bg-correct)) 90deg,
+    rgb(var(--bg-wrong-index)) 90deg 180deg,
+    rgb(var(--bg-correct)) 180deg 270deg,
+    rgb(var(--bg-wrong)) 270deg
+  );
   border-color: white;
 }
 .bg-qmem-button-deselected {
-  background: conic-gradient(rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg, rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg, rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg, rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg);
+  background: conic-gradient(
+    rgba(var(--bg-correct), var(--bg-deselect-opacity)) 90deg,
+    rgba(var(--bg-wrong-index), var(--bg-deselect-opacity)) 90deg 180deg,
+    rgba(var(--bg-correct), var(--bg-deselect-opacity)) 180deg 270deg,
+    rgba(var(--bg-wrong), var(--bg-deselect-opacity)) 270deg
+  );
   border-color: var(--selected-group0-color);
 }
 
@@ -321,7 +332,8 @@ tbody {
 }
 
 .stat-table {
-  font-family: 'Ubunto Mono', monospace, 'DejaVu Sans Mono', 'Courier New', Courier;
+  font-family: "Ubunto Mono", monospace, "DejaVu Sans Mono", "Courier New",
+    Courier;
   font-weight: bold;
   width: 100%;
   max-width: 16rem;
