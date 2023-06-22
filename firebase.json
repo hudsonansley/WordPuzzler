@@ -4,23 +4,10 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "cors": [
       {
-        "origin": ["https://hudsonansley.com/wordlehelper"],
+        "origin": ["https://hudsonansley.com"],
         "method": ["GET"],
         "responseHeader": ["Content-Type"],
         "maxAgeSeconds": 3600
-      },
-      {
-        "origin": ["https://wordle.hudsonansley.com/"],
-        "method": ["GET"],
-        "responseHeader": ["Content-Type"],
-        "maxAgeSeconds": 3600
-      }
-    ],
-    "redirects": [
-      {
-        "destination": "https://hudsonansley.com/wordlehelper",
-        "source": "https://wordle.hudsonansley.com",
-        "type": 301
       }
     ],
     "rewrites": [
