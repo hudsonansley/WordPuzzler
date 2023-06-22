@@ -2,13 +2,6 @@
   "hosting": {
     "public": "build",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "redirects": [
-      {
-        "source": "https://hudsonansley.com/wordlehelper",
-        "destination": "https://wordle.hudsonansley.com",
-        "type": 301
-      }
-    ],
     "rewrites": [
       {
         "source": "**",
