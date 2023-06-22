@@ -5,7 +5,8 @@
     "redirects": [
       {
         "source": "https://hudsonansley.com/wordlehelper",
-        "destination": "https://wordle.hudsonansley.com"
+        "destination": "https://wordle.hudsonansley.com",
+        "type": 301
       }
     ],
     "rewrites": [
