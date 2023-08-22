@@ -395,23 +395,22 @@ export const Int16ArrayToNestedArrayOfNumber = (
  */
 export const permutations = <T>(a: T[]): T[][] => {
   const n = a.length;
-  let perm = a.slice();
-  const result = [perm];
-  const swaps = new Array(n).fill(0);
+  const perm = a.slice();
+  const result = [perm.slice()];
+  const swaps = new Uint16Array(n);
   let i = 1;
   let k: number;
   let temp: T;
 
   while (i < n) {
     if (swaps[i] < i) {
-      perm = perm.slice();
       k = i % 2 ? swaps[i] : 0;
       temp = perm[i];
       perm[i] = perm[k];
       perm[k] = temp;
       swaps[i]++;
       i = 1;
-      result.push(perm);
+      result.push(perm.slice());
     } else {
       swaps[i] = 0;
       i++;

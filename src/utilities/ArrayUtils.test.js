@@ -1,6 +1,5 @@
 import * as ArrayUtils from "./ArrayUtils";
 import * as WordleUtils from "./WordleUtils";
-import * as WordleDict from "../data/dictionaries/Wordle";
 
 test("ArrayUtils.sortArrayOfStringToAnyMaps works properly", () => {
   let array = [];
@@ -291,8 +290,8 @@ test("ArrayUtils.sortedArraysIntersection properly returns array intersection", 
   let expected = [];
   let result = ArrayUtils.sortedArraysIntersection(true, a1, a2, a3);
   expect(result).toEqual(expected);
-  expect(result === a1).toBeFalsy;
-  expect(result === a2).toBeFalsy;
+  expect(result).toStrictEqual(a1);
+  expect(result).toStrictEqual(a2);
   a1 = [1, 2, 3, 4];
   a2 = [];
   result = ArrayUtils.sortedArraysIntersection(true, a1, a2);
@@ -328,8 +327,8 @@ test("ArrayUtils.sortedArraysIntersection properly returns array intersection", 
   result = ArrayUtils.sortedArraysIntersection(true, a1, a2);
   expected = ["b", "d", "e", "f", "g"];
   expect(result).toEqual(expected);
-  expect(result === a1).toBeFalsy;
-  expect(result === a2).toBeFalsy;
+  expect(result).toStrictEqual(a1);
+  expect(result).toStrictEqual(a2);
 });
 
 test("ArrayUtils.sortedArraysUnion properly returns array union", () => {
@@ -339,8 +338,8 @@ test("ArrayUtils.sortedArraysUnion properly returns array union", () => {
   let expected = [];
   let result = ArrayUtils.sortedArraysIntersection(true, a1, a2, a3);
   expect(result).toEqual(expected);
-  expect(result === a1).toBeFalsy;
-  expect(result === a2).toBeFalsy;
+  expect(result).toStrictEqual(a1);
+  expect(result).toStrictEqual(a2);
   a1 = [1, 2, 3, 4];
   a2 = [];
   result = ArrayUtils.sortedArraysUnion(true, a1, a2);
@@ -372,8 +371,8 @@ test("ArrayUtils.sortedArraysUnion properly returns array union", () => {
   result = ArrayUtils.sortedArraysUnion(true, a1, a2);
   expected = ["b", "d", "e", "f", "g"];
   expect(result).toEqual(expected);
-  expect(result === a1).toBeFalsy;
-  expect(result === a2).toBeFalsy;
+  expect(result).toStrictEqual(a1);
+  expect(result).toStrictEqual(a2);
   a1 = [1, 2, 3, 4];
   a2 = [2, 4, 5, 6, 8];
   a3 = [0, 10, 11];
@@ -469,7 +468,6 @@ test("numberToArray works as expected", () => {
   expected = [0xff, 0xff, 0xff, 0xff];
   result = ArrayUtils.numberToArray(num, 8, expected.length);
   expect(result).toEqual(expected);
-  num = 0xffffffff;
   expected = [0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf];
   result = ArrayUtils.numberToArray(num, 4, expected.length);
   expect(result).toEqual(expected);
@@ -496,37 +494,6 @@ test("permutations works as expected", () => {
     [2, 1, 0],
   ];
   expect(ap).toEqual(expected);
-  a = [0, 1, 2, 3];
-  ap = ArrayUtils.permutations(a);
-  ap.sort();
-  ap.sort();
-  expected = [
-    [0, 1, 2, 3],
-    [0, 1, 3, 2],
-    [0, 2, 1, 3],
-    [0, 2, 3, 1],
-    [0, 3, 1, 2],
-    [0, 3, 2, 1],
-    [1, 0, 2, 3],
-    [1, 0, 3, 2],
-    [1, 2, 0, 3],
-    [1, 2, 3, 0],
-    [1, 3, 0, 2],
-    [1, 3, 2, 0],
-    [2, 0, 1, 3],
-    [2, 0, 3, 1],
-    [2, 1, 0, 3],
-    [2, 1, 3, 0],
-    [2, 3, 0, 1],
-    [2, 3, 1, 0],
-    [3, 0, 1, 2],
-    [3, 0, 2, 1],
-    [3, 1, 0, 2],
-    [3, 1, 2, 0],
-    [3, 2, 0, 1],
-    [3, 2, 1, 0],
-  ];
-  expect(ap).toEqual(expected);
   a = ["a", "b", "c"];
   ap = ArrayUtils.permutations(a);
   ap.sort();
@@ -538,4 +505,35 @@ test("permutations works as expected", () => {
     ["c", "a", "b"],
     ["c", "b", "a"],
   ];
+  a = [0, 1, 2, 3];
+  ap = ArrayUtils.permutations(a).map((l) => `${l}`);
+  expected = [
+    "0,1,2,3",
+    "0,1,3,2",
+    "0,2,1,3",
+    "0,2,3,1",
+    "0,3,1,2",
+    "0,3,2,1",
+    "1,0,2,3",
+    "1,0,3,2",
+    "1,2,0,3",
+    "1,2,3,0",
+    "1,3,0,2",
+    "1,3,2,0",
+    "2,0,1,3",
+    "2,0,3,1",
+    "2,1,0,3",
+    "2,1,3,0",
+    "2,3,0,1",
+    "2,3,1,0",
+    "3,0,1,2",
+    "3,0,2,1",
+    "3,1,0,2",
+    "3,1,2,0",
+    "3,2,0,1",
+    "3,2,1,0",
+  ];
+  ap.sort();
+  expected.sort();
+  expect(ap).toEqual(expected);
 });
