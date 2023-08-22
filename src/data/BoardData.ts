@@ -1,5 +1,5 @@
 export const lettersPerWord = 5;
-export const maxRows = 8;
+export const maxRows = 9;
 
 export const letterStates = ["wrong", "wrongIndex", "correct"] as const;
 export type LetterState = (typeof letterStates)[number];
