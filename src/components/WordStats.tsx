@@ -296,9 +296,10 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
                   <td key="maxGroupSize">
                     {getMaxGrpSizeDisplay(wordInfo.maxGroupSize)}
                   </td>
-                  {statsInfo.combinedBoardIndexStrings && (
-                    <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
-                  )}
+                  <td key="boardGroup">
+                    {statsInfo.combinedBoardIndexStrings &&
+                      getBoardNumberDisplay(wordInfo)}
+                  </td>
                 </tr>
               );
             })}
@@ -398,9 +399,10 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
                   <td key="maxGroupSize">
                     {getMaxGrpSizeDisplay(wordInfo.maxGroupSize)}
                   </td>
-                  {statsInfo.combinedBoardIndexStrings && (
-                    <td key="boardGroup">{getBoardNumberDisplay(wordInfo)}</td>
-                  )}
+                  <td key="boardGroup">
+                    {statsInfo.combinedBoardIndexStrings &&
+                      getBoardNumberDisplay(wordInfo)}
+                  </td>
                 </tr>
               );
             })}
