@@ -117,14 +117,7 @@ export const runFilterList = (
  * @param  {ArrayUtils.SortOrderArrayType[]} sortOrder
  * @returns the combined letter frequency for each word
  */
-export const wordleFreqStats = (
-  words: Uint16Array,
-  sortOrder: ArrayUtils.SortOrderArrayType[] = [
-    { index: 0, decending: false },
-    { index: 2, decending: true },
-    { index: 1, decending: false },
-  ]
-): NumberToNumberMap => {
+export const wordleFreqStats = (words: Uint16Array): NumberToNumberMap => {
   let letters = new Uint8Array(WORD_LEN);
   const letterFreq: NumberToNumberMap = {};
   let letterCount = 0;
