@@ -805,33 +805,7 @@ export const getWordleDisplayStats = (
         i++;
       }
     }
-    if (!wordInfo.combinedBoardIndexStrings && result.length < 16) {
-      const decoys = WordleDict.wordleDecoysNums[currentWordSetType];
-      const decoyWords = Array.from(decoys, (wordNum) =>
-        WordleDict.numToWord(wordNum)
-      );
-      const answerNotPickWords = wordle(
-        decoyWords,
-        wordInfo.boardStates[wordInfo.wordSetIndex]
-      );
-      if (answerNotPickWords.length > 0) {
-        answerNotPickWords.forEach((word) => {
-          const wordIndex = getIndexFromWord(word);
-          const item: wordleDisplayStatsType = {
-            word,
-            wordIndex,
-            clues: 0,
-            avgGroupSize: 0,
-            numberOfGroups: 0,
-            maxGroupSize: Infinity,
-            cluesGroupCount: 0,
-            cluesGroupDivider: 0,
-            boardGroup: "0",
-          };
-          result.push(item);
-        });
-      }
-    }
+    const choicesCount = result.length;
     const dummyBadChoice: wordleDisplayStatsType = {
       word: "dummyBadWord",
       wordIndex: -1,
@@ -887,6 +861,39 @@ export const getWordleDisplayStats = (
         }
       } else {
         n = 0; // don't add any more non-answer words
+      }
+    }
+    if (!wordInfo.combinedBoardIndexStrings && choicesCount < 16) {
+      const decoys = WordleDict.wordleDecoysNums[currentWordSetType];
+      const decoyWords = Array.from(decoys, (wordNum) =>
+        WordleDict.numToWord(wordNum)
+      );
+      const answerNotPickWords = wordle(
+        decoyWords,
+        wordInfo.boardStates[wordInfo.wordSetIndex]
+      );
+      if (answerNotPickWords.length > 0) {
+        let wordInResult = {};
+        result.forEach((item) => {
+          wordInResult[item.wordIndex] = 1;
+        });
+        answerNotPickWords.forEach((word) => {
+          const wordIndex = getIndexFromWord(word);
+          if (!wordInResult[wordIndex]) {
+            const item: wordleDisplayStatsType = {
+              word,
+              wordIndex,
+              clues: 0,
+              avgGroupSize: 0,
+              numberOfGroups: 0,
+              maxGroupSize: Infinity,
+              cluesGroupCount: 0,
+              cluesGroupDivider: 0,
+              boardGroup: "0",
+            };
+            result.push(item);
+          }
+        });
       }
     }
   } else {

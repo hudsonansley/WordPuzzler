@@ -1727,7 +1727,7 @@ test("WordUtils.getWordleClues gets clues properly", () => {
 });
 
 test("WordleUtils.getWordleDisplayStats works properly", () => {
-  const wordInfo = {
+  let wordInfo = {
     wordSets: [
       ["cease", "chafe", "chase", "scale"],
       [
@@ -2135,11 +2135,45 @@ test("WordleUtils.getWordleDisplayStats works properly", () => {
       decending: true,
     },
   ];
-  const stats = WordleUtils.getWordleDisplayStats(wordInfo, sortOrder);
+  let stats = WordleUtils.getWordleDisplayStats(wordInfo, sortOrder);
   expect(stats[0].word).toEqual("loins");
   expect(stats[0].numberOfGroups).toEqual(115);
   expect(stats[0].maxGroupSize).toEqual(16);
   expect(stats.length).toBeGreaterThanOrEqual(wordInfo.wordCount);
+
+  wordInfo = {
+    wordSets: [
+      [
+        "coral",
+        "cargo",
+        "carol",
+        "cairn",
+        "carry",
+        "cigar",
+        "macro",
+        "scram",
+        "acorn",
+        "scrap",
+        "cobra",
+        "acrid",
+        "vicar",
+      ],
+      [],
+      [],
+      [],
+    ],
+    wordSetIndex: 0,
+    boardStates: ["T-R/A/C/E-"],
+    combinedBoardIndexStrings: null,
+    wordCount: 13,
+  };
+  stats = WordleUtils.getWordleDisplayStats(wordInfo, sortOrder);
+  expect(stats[0].word).toEqual("carom");
+  expect(stats[0].numberOfGroups).toEqual(12);
+  expect(stats[0].maxGroupSize).toEqual(2);
+  expect(stats.length).toBeGreaterThanOrEqual(wordInfo.wordCount);
+  const withColey = stats.filter((item) => item.word === "carom");
+  expect(withColey.length).toEqual(1);
 });
 
 test("WordUtils.filterWordleIndexPartitions works properly", () => {
