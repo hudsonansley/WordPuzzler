@@ -42,11 +42,9 @@ The conic-gradient css function was useful for the quordle button backgrounds in
 ### TODO
 - [ ] don't recalculate stats just for sort or new target word
 - [ ] show table header when item clicked immediately, then the rest of the table when calculation is finished
-- [ ] improve responsive layout for small devices
 - [ ] convert css to react native styles
 - [ ] implement react native, submit to stores
 - [ ] add word definitions
 - [ ] add dark mode
 - [ ] mark letters with red outline if the clue selection contradicts previous clue selections
 - [ ] show keyboard keys as disabled when not functional, e.g., the "<" key only works when a target word is set, or only one word remains
-- [ ] add auto code formatter
