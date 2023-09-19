@@ -1,5 +1,6 @@
 import * as ArrayUtils from "./ArrayUtils";
 import * as WordleDict from "../data/dictionaries/Wordle";
+import { publish } from "./Events";
 
 // import { urlToBuffer } from "../utilities/FileUtils"
 
@@ -452,9 +453,9 @@ export const wordleIndexPartitionsInitialized = (): boolean => {
 export const initWordleIndexPartitions = (
   type: WordleDict.wordSet = "quordle"
 ): void => {
-  let prog = 0;
-  while (prog < 1) {
-    prog = initWordleIndexPartitionsProg(type);
+  let progress = 0;
+  while (progress < 1) {
+    progress = initWordleIndexPartitionsProg(type);
   }
 };
 
@@ -466,7 +467,7 @@ export const initDataLists = (type: WordleDict.wordSet = "quordle"): void => {
   wordlePicks = WordleDict.getWordlePicks(type);
   wordleAll = WordleDict.getWordleAll(type);
   wordsProcessed = 0;
-  wordsPerInitChunk = Math.ceil(wordCount / 40);
+  wordsPerInitChunk = Math.ceil(wordCount / 300);
 
   switch (type) {
     case "quordle":
@@ -505,6 +506,7 @@ export let currentWordSetType: WordleDict.wordSet;
 export const initWordleIndexPartitionsProg = (
   type: WordleDict.wordSet = "quordle"
 ): number => {
+  let progress = 0;
   if (currentWordSetType !== type) {
     wordCount = 0;
     wordsProcessed = 0;
@@ -543,10 +545,12 @@ export const initWordleIndexPartitionsProg = (
       groupMaxSizes[i] = maxGroupSize;
     }
     wordsProcessed = i;
-    return wordsProcessed / wordCount;
+    progress = wordsProcessed / wordCount;
   } else {
-    return 1;
+    progress = 1;
   }
+  publish("initProgressUpdated", { progress });
+  return progress;
 };
 
 // take an array of arrays of words, using index for groupSizdeByClues

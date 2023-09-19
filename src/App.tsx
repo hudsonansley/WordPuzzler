@@ -12,12 +12,6 @@ import * as WordleUtils from "./utilities/WordleUtils";
 import { getBoardColorClass } from "./utilities/Styles";
 import { subscribe, unsubscribe, publish } from "./utilities/Events";
 
-export type EventName =
-  | "keyTapped"
-  | "addWordToBoard"
-  | "setTargetWord"
-  | "rotateLetterState"
-  | "addTargetWordToBoard";
 export const AppContext = createContext(undefined);
 const initBoardStr = "";
 const storedBoardStates = [
@@ -52,8 +46,22 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
   const [infoType, setInfoType] = useState<InfoType>("help");
 
   useEffect(() => {
-    setInitProgress(WordleUtils.initWordleIndexPartitionsProg(wordSetType));
-  }, [initProgress, wordSetType]);
+    const handleInitProgressUpdated = (event: Event): void => {
+      const prog: number = (event as CustomEvent).detail?.progress ?? 0;
+      if (prog) {
+        setInitProgress(prog);
+        if (prog < 1) {
+          setTimeout(() => {
+            WordleUtils.initWordleIndexPartitionsProg(wordSetType);
+          }, 100);
+        } else {
+          unsubscribe("initProgressUpdated", handleInitProgressUpdated);
+        }
+      }
+    };
+    subscribe("initProgressUpdated", handleInitProgressUpdated);
+    WordleUtils.initWordleIndexPartitionsProg(wordSetType);
+  }, []);
 
   useEffect(() => {
     const handleKeyTapped = (event) => {
