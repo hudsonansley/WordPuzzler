@@ -2172,8 +2172,8 @@ test("WordleUtils.getWordleDisplayStats works properly", () => {
   expect(stats[0].numberOfGroups).toEqual(12);
   expect(stats[0].maxGroupSize).toEqual(2);
   expect(stats.length).toBeGreaterThanOrEqual(wordInfo.wordCount);
-  const withColey = stats.filter((item) => item.word === "carom");
-  expect(withColey.length).toEqual(1);
+  const oneWord = stats.filter((item) => item.word === "carom");
+  expect(oneWord.length).toEqual(1);
 });
 
 test("WordUtils.filterWordleIndexPartitions works properly", () => {
