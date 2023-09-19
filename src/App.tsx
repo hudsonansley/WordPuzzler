@@ -53,7 +53,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
         if (prog < 1) {
           setTimeout(() => {
             WordleUtils.initWordleIndexPartitionsProg(wordSetType);
-          }, 100);
+          }, 10);
         } else {
           unsubscribe("initProgressUpdated", handleInitProgressUpdated);
         }
