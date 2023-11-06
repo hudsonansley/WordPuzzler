@@ -34,6 +34,8 @@ const initBoard = BoardData.getBoardFromString(
   storedBoardStates[initStatsInfo.wordSetIndex]
 );
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
+const COMBINED_BOARD_INDEX = -1;
+const FIND_FIRST_UNCOMPLETED_BOARD_INDEX = -2;
 let pendingStatsUpdate = false;
 
 const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
@@ -178,6 +180,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
       const boardRow = letters.reduce((acc, letter) => acc + letter + clue, "");
       addRowToBoard(boardRow);
     }
+    if (statsInfo.combinedBoardIndexStrings) {
+      switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);
+    }
   };
 
   const setTargetWord = () => {
@@ -222,7 +227,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
       return;
     }
     if (curLetterLoc.letterIndex !== BoardData.lettersPerWord - 1) {
-      alert("Fill in full word to calculate words remaining");
+      alert("Fill in full word to calculate word stats");
       return;
     }
 
@@ -275,6 +280,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
       setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
       setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     }
+    if (statsInfo.combinedBoardIndexStrings) {
+      switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);
+    }
   };
   /**
    * @param  {string} key
@@ -311,6 +319,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
       const newLoc = BoardData.getLetterLoc(newBoard);
       setCurLetterLoc(newLoc);
     }
+    if (statsInfo.combinedBoardIndexStrings) {
+      switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);
+    }
   };
   /**
    * @returns string
@@ -344,16 +355,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    */
   const onRotateLetterState = (letterLoc: BoardData.LetterLocType) => {
     if (statsInfo.combinedBoardIndexStrings) {
-      let boardIndex = 0;
-      while (
-        boardIndex < storedBoardCompleted.length &&
-        storedBoardCompleted[boardIndex]
-      ) {
-        boardIndex++;
-      }
-      alert(`Switching to board ${boardIndex + 1}`);
-      switchToBoard(boardIndex);
-      return;
+      switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);
     }
     let newBoardStr = extendCurBoardStrToLongest();
     const newBoard = BoardData.getBoardFromString(newBoardStr);
@@ -418,9 +420,18 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    */
   const switchToBoard = (boardIndex: number) => {
     if (wordSetType === "quordle" || boardIndex === 0) {
-      if (boardIndex < 0) {
+      if (boardIndex === COMBINED_BOARD_INDEX) {
         calcCombinedWords();
       } else {
+        if (boardIndex === FIND_FIRST_UNCOMPLETED_BOARD_INDEX) {
+          boardIndex = 0;
+          while (
+            boardIndex < storedBoardCompleted.length &&
+            storedBoardCompleted[boardIndex]
+          ) {
+            boardIndex++;
+          }
+        }
         statsInfo.combinedBoardIndexStrings = null;
         statsInfo.wordSetIndex = boardIndex;
         const newBoardStr = storedBoardStates[statsInfo.wordSetIndex];
