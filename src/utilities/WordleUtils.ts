@@ -467,7 +467,7 @@ export const initDataLists = (type: WordleDict.wordSet = "quordle"): void => {
   wordlePicks = WordleDict.getWordlePicks(type);
   wordleAll = WordleDict.getWordleAll(type);
   wordsProcessed = 0;
-  wordsPerInitChunk = Math.ceil(wordCount / 300);
+  wordsPerInitChunk = Math.ceil(wordCount / 600);
 
   switch (type) {
     case "quordle":
