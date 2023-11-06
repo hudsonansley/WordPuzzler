@@ -34,6 +34,7 @@ const initBoard = BoardData.getBoardFromString(
   storedBoardStates[initStatsInfo.wordSetIndex]
 );
 const initLetterLoc = BoardData.getLetterLoc(initBoard);
+let pendingStatsUpdate = false;
 
 const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
   const [boardStr, setBoardStr] = useState(initBoardStr);
@@ -56,6 +57,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
           }, 1);
         } else {
           unsubscribe("initProgressUpdated", handleInitProgressUpdated);
+          if (pendingStatsUpdate) {
+            onEnter(true);
+          }
         }
       }
     };
@@ -206,7 +210,11 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    *  Sets statsInfo based on the current board state, forcing
    * the update of the stats data
    */
-  const onEnter = () => {
+  const onEnter = (force = false) => {
+    if (!force && initProgress < 1) {
+      pendingStatsUpdate = true;
+      return;
+    }
     statsInfo.combinedBoardIndexStrings = null;
     if (storedBoardCompleted[statsInfo.wordSetIndex]) {
       statsInfo.wordSets[statsInfo.wordSetIndex] = [];
@@ -368,6 +376,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    * and keeps track of which boards are duplicates
    */
   const calcCombinedWords = () => {
+    if (initProgress < 1) {
+      return;
+    }
     const numBoards = storedBoardStates.length;
     let updateWordSetIndex = true;
     statsInfo.combinedBoardIndexStrings = Array(numBoards);
@@ -406,7 +417,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    *  sets the current board display to the given board index
    */
   const switchToBoard = (boardIndex: number) => {
-    if (initProgress === 1 && (wordSetType === "quordle" || boardIndex === 0)) {
+    if (wordSetType === "quordle" || boardIndex === 0) {
       if (boardIndex < 0) {
         calcCombinedWords();
       } else {
@@ -425,8 +436,9 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
         ) {
           onShowHelp();
         } else if (
-          storedBoardLetterStateDirty[statsInfo.wordSetIndex] ||
-          !storedBoardLettersDirty[statsInfo.wordSetIndex]
+          initProgress === 1 &&
+          (storedBoardLetterStateDirty[statsInfo.wordSetIndex] ||
+            !storedBoardLettersDirty[statsInfo.wordSetIndex])
         ) {
           statsInfo.wordSets[statsInfo.wordSetIndex] = WordleUtils.wordle(
             WordleUtils.wordlePicks,

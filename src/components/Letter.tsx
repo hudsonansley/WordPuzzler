@@ -22,7 +22,6 @@ const Letter = ({ rowIndex, letterIndex, showProg }: Parameters) => {
   const [bgStyle, letterChar] = useMemo(() => {
     let bgStyle: React.CSSProperties;
     let letterChar: string;
-    let letterState: string;
     const computedStyle = getComputedStyle(document.documentElement);
     const bgCssVals = {
       correct: computedStyle.getPropertyValue("--bg-correct"),
@@ -57,9 +56,9 @@ const Letter = ({ rowIndex, letterIndex, showProg }: Parameters) => {
           ? getIndexFromWord(word) >= 0
           : true;
       letterChar = letter.letter;
-      letterState = showProg ? "calc" : letter.state;
+      const bgAlpha = showProg ? 0.5 : 1.0;
       bgStyle = {
-        backgroundColor: `rgb(${bgCssVals[letterState]})`,
+        backgroundColor: `rgba(${bgCssVals[letter.state]},${bgAlpha})`,
       };
     }
     if (!wordInDict) {

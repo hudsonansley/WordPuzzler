@@ -5,7 +5,7 @@ const InitProgress = ({ progress }) => {
   const boxCount = 5;
   const boxes = [];
   for (let i = 0; i < boxCount; i++) {
-    const showProg = i / boxCount <= progress;
+    const showProg = i / boxCount > progress;
     boxes.push(
       <Letter
         rowIndex={0}
