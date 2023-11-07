@@ -32,6 +32,7 @@ html {
 
 .App {
   margin: auto;
+  text-align: center;
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: white;
   max-width: 40rem;
@@ -40,7 +41,6 @@ html {
 }
 
 body {
-  display: ;
   height: 100%;
   width: 100%;
   flex-direction: column;
