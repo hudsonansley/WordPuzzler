@@ -6,7 +6,7 @@
   --stats-table-line-height: 0.75rem;
   --nav-height: 3rem;
   --square-button-width: 1.5rem;
-  --key-width: 1.8rem;
+  --key-width: 1.6rem;
   --game-top-padding: 0.25rem;
   --game-width: 16rem;
   /* in rgb components for use in rgba() */
@@ -22,6 +22,8 @@
   --selected-group3-color: #800080;
   --main-background-color: #121212;
   --not-in-dictionary: #a00000;
+  --text-color: white;
+  --border-color: white;
 }
 
 html {
@@ -34,7 +36,7 @@ html {
   margin: auto;
   text-align: center;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  color: white;
+  color: var(--text-color);
   max-width: 40rem;
   display: flex;
   flex-direction: column;
@@ -62,7 +64,7 @@ nav {
 
 nav h1 {
   margin: auto;
-  color: white;
+  color: var(--text-color);
   font-size: 1.2rem;
   text-align: center;
   line-height: 1.1rem;
@@ -203,7 +205,7 @@ button#reset {
   width: var(--letter-width);
   font-size: 1.5rem;
   font-weight: bold;
-  color: white;
+  color: var(--text-color);
   user-select: none;
   cursor: pointer;
 }
@@ -238,7 +240,7 @@ tr {
     rgb(var(--bg-correct)) 180deg 270deg,
     rgb(var(--bg-wrong)) 270deg
   );
-  border-color: white;
+  border-color: var(--border-color);
 }
 .bg-qmem-button-deselected {
   background: conic-gradient(
@@ -256,7 +258,7 @@ tr {
 }
 .selected-button-bg {
   background-color: var(--selected-button-color);
-  border-color: white;
+  border-color: var(--border-color);
 }
 
 .group-0-bg {
@@ -271,7 +273,7 @@ tr {
 }
 .selected-button-0-bg {
   background-color: var(--selected-group0-color);
-  border-color: white;
+  border-color: var(--border-color);
 }
 
 .group-1-bg {
@@ -286,7 +288,7 @@ tr {
 }
 .selected-button-1-bg {
   background-color: var(--selected-group1-color);
-  border-color: white;
+  border-color: var(--border-color);
 }
 
 .group-2-bg {
@@ -301,7 +303,7 @@ tr {
 }
 .selected-button-2-bg {
   background-color: var(--selected-group2-color);
-  border-color: white;
+  border-color: var(--border-color);
 }
 
 .group-3-bg {
@@ -316,7 +318,7 @@ tr {
 }
 .selected-button-3-bg {
   background-color: var(--selected-group3-color);
-  border-color: white;
+  border-color: var(--border-color);
 }
 
 td th {
@@ -344,7 +346,7 @@ tbody {
   margin-right: auto;
   margin-bottom: 1rem;
   border: 0.05rem solid gray;
-  color: white;
+  color: var(--text-color);
   line-height: var(--stats-table-line-height);
   font-size: var(--stats-table-line-height);
 }
@@ -377,7 +379,7 @@ p {
   width: var(--stats-clues-block-size);
   height: var(--stats-clues-block-size);
   display: inline-flex;
-  border: 0.025rem solid white;
+  border: 0.025rem solid rgb(var(--text-color));
 }
 
 .clue-box--correct {
@@ -406,8 +408,9 @@ p {
 }
 
 .key {
-  max-width: var(--key-width);
-  min-width: 8%;
+  max-width: 8%;
+  min-width: var(--key-width);
+  min-height: var(--key-width);
   aspect-ratio: 1;
   margin: 0.05rem;
   border-radius: 0.15rem;
@@ -415,19 +418,24 @@ p {
   place-items: center;
   font-size: 0.8rem;
   background-color: grey;
-  color: white;
+  color: var(--text-color);
   font-family: Arial, Helvetica, sans-serif;
   cursor: pointer;
 }
 
+.medium {
+  min-width: 1.9rem;
+  max-width: 10%;
+  aspect-ratio: auto;
+}
 .big {
-  min-width: 3.3rem;
-  max-width: 22%;
+  min-width: 3rem;
+  max-width: 18%;
   aspect-ratio: auto;
 }
 .spacebar {
   min-width: 10.5rem;
-  max-width: 66%;
+  max-width: 60%;
   aspect-ratio: auto;
 }
 .disabled {

@@ -7,7 +7,7 @@ const keyLabels = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
   ["A", "S", "D", "F", "G", "H", "J", "K", "L", "delete"],
   ["Z", "X", "C", "V", "B", "N", "M", "<", ">"],
-  ["Change Letter Color", "enter"],
+  ["change letter color", "enter"],
 ];
 
 const Keyboard = ({ hidden }) => {
