@@ -74,7 +74,7 @@ export const matches = (words: string[], regex: string): string[] => {
   const results: string[] = [];
   const re = new RegExp(regex);
   words.forEach((word) => {
-    if (word.match(re)) {
+    if (re.exec(word)) {
       results.push(word);
     }
   });
@@ -847,14 +847,12 @@ export const getWordleDisplayStats = (
           } else {
             result.push(nonAnswerPicks.shift());
           }
+        } else if (
+          nonAnswerNotPicks[0].maxGroupSize < nonAnswerPicks[0].maxGroupSize
+        ) {
+          result.push(nonAnswerNotPicks.shift());
         } else {
-          if (
-            nonAnswerNotPicks[0].maxGroupSize < nonAnswerPicks[0].maxGroupSize
-          ) {
-            result.push(nonAnswerNotPicks.shift());
-          } else {
-            result.push(nonAnswerPicks.shift());
-          }
+          result.push(nonAnswerPicks.shift());
         }
       } else {
         n = 0; // don't add any more non-answer words
