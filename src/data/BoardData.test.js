@@ -59,6 +59,13 @@ test("BoardData.getLetterLoc returns expected value", () => {
       { letter: " ", state: "wrong" },
       { letter: " ", state: "wrong" },
     ],
+    [
+      { letter: " ", state: "wrong" },
+      { letter: " ", state: "wrong" },
+      { letter: " ", state: "wrong" },
+      { letter: " ", state: "wrong" },
+      { letter: " ", state: "wrong" },
+    ],
   ];
   expect(board).toEqual(emptyBoard);
   let loc = BoardData.getLetterLoc(board);
