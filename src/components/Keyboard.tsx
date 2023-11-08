@@ -11,34 +11,32 @@ const keyLabels = [
 ];
 
 const Keyboard = ({ hidden }) => {
+  const transformKey = (key: string): string => {
+    let result = key.toUpperCase();
+    if (result === "?" || result === "/") {
+      result = "?";
+    } else if (result === "<" || result === ",") {
+      result = "<";
+    } else if (result === ">" || result === ".") {
+      result = ">";
+    } else if (
+      result !== "ENTER" &&
+      result !== "BACKSPACE" &&
+      result !== " " &&
+      (result.length !== 1 ||
+        ((result < "0" || result > "4") && (result < "A" || result > "Z")))
+    ) {
+      result = "";
+    }
+    return result;
+  };
   const handleKeyboard = (event) => {
     if (event.metaKey || event.altKey || event.ctrlKey) {
       return;
     }
-    let key = "";
-    let eventKey = event.key.toUpperCase();
-    if (eventKey === "ENTER" || eventKey === "BACKSPACE") {
-      event.preventDefault();
-      key = eventKey;
-    } else if (event.keyCode === 32) {
-      event.preventDefault();
-      key = " ";
-    } else if (eventKey === "?" || eventKey === "/") {
-      key = "?";
-    } else if (eventKey === "<" || eventKey === ",") {
-      key = "<";
-    } else if (eventKey === ">" || eventKey === ".") {
-      key = ">";
-    } else if (
-      eventKey.length === 1 &&
-      ((eventKey >= "0" && eventKey <= "4") ||
-        (eventKey >= "A" && eventKey <= "Z"))
-    ) {
-      key = eventKey;
-    } else {
-      event.preventDefault();
-    }
+    const key = transformKey(event.key);
     if (key.length > 0) {
+      event.preventDefault();
       publish("keyTapped", { key });
     }
   };
