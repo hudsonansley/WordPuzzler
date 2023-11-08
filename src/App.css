@@ -6,7 +6,7 @@
   --stats-table-line-height: 0.75rem;
   --nav-height: 3rem;
   --square-button-width: 1.5rem;
-  --key-width: 1.6rem;
+  --key-width: 1.3rem;
   --game-top-padding: 0.25rem;
   --game-width: 16rem;
   /* in rgb components for use in rgba() */
@@ -424,7 +424,7 @@ p {
 }
 
 .medium {
-  min-width: 1.9rem;
+  min-width: 1.6rem;
   max-width: 10%;
   aspect-ratio: auto;
 }
