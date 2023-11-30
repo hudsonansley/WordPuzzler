@@ -45,16 +45,14 @@ const Keyboard = ({ hidden }) => {
 
   return (
     <div className="keyboard" onKeyDown={handleKeyboard}>
-      {keyLabels.map((keyRow, i) => {
+      {keyLabels.map((keyRow) => {
         return (
-          <div className={`line${hidden ? " hidden" : ""}`} key={`line${i}`}>
+          <div
+            className={`line${hidden ? " hidden" : ""}`}
+            key={keyRow.join("_")}
+          >
             {keyRow.map((keyLabel) => {
-              return (
-                <Key
-                  keyLabel={keyLabel}
-                  key={`_${keyLabel.split(" ").join("")}`}
-                />
-              );
+              return <Key keyLabel={keyLabel} key={keyLabel} />;
             })}
           </div>
         );
