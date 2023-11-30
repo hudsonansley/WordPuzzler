@@ -1,10 +1,7 @@
 import * as WordleUtils from "./WordleUtils";
-import * as WordleDict from "../data/dictionaries/Wordle";
-// import { english3 } from '../data/dictionaries/English'
 
 beforeAll(() => {
   WordleUtils.initWordleIndexPartitions();
-  // WordleUtils.initDataLists();
 });
 
 test("WordUtils.wordle properly reduces wordlist", () => {
@@ -54,6 +51,12 @@ test("WordUtils.wordle properly reduces wordlist", () => {
   expect(words.length).toEqual(4);
   words = WordleUtils.wordle(picks, "c=i/i/a-c=");
   expect(words.length).toEqual(0);
+  words = WordleUtils.wordle(picks, "t=s/s-w/t=");
+  expect(words.length).toEqual(1);
+  expect(words).toContain("twist");
+  words = WordleUtils.wordle(picks, "t=s-s/w/t=");
+  expect(words.length).toEqual(1);
+  expect(words).toContain("twist");
 });
 
 test("WordUtils.unique finds words with all unique letters properly", () => {

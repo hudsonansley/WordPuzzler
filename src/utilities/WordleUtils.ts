@@ -1,6 +1,7 @@
 import * as ArrayUtils from "./ArrayUtils";
 import * as WordleDict from "../data/dictionaries/Wordle";
 import { publish } from "./Events";
+import { lettersPerWord } from "../data/BoardData";
 
 // import { urlToBuffer } from "../utilities/FileUtils"
 
@@ -224,6 +225,38 @@ export const withLetterCount = (
   return result;
 };
 /**
+ * @param  {string} clue
+ * @returns {[string[], string[]]} - an array of the letters and array of modifiers, cleaned up. Both empty if
+ *  errors are found
+ */
+const getLetterAndModArrays = (clue: string): [string[], string[]] => {
+  const chars = clue.toLowerCase().split("");
+  if (chars.length !== 2 * lettersPerWord) {
+    console.error(`wrong clue length ${chars.length}`);
+    return [[], []];
+  }
+  const letters: string[] = new Array(lettersPerWord);
+  const mods: string[] = new Array(lettersPerWord);
+  let badMod = -1;
+  chars.forEach((char, i) => {
+    if (i % 2 === 0) {
+      letters[i >> 1] = char;
+    } else {
+      if (char === "?") char = "/";
+      mods[i >> 1] = char;
+      if (char !== "=" && char !== "/" && char !== "-") {
+        badMod = i;
+      }
+    }
+  });
+  if (badMod >= 0) {
+    console.error(`place indicator not recognize: ${chars[badMod]}`);
+    return [[], []];
+  } else {
+    return [letters, mods];
+  }
+};
+/**
  * @param  {string[]} words
  * @param  {string} clues
  * @returns {string[]} filters words based on the wordle clues string given
@@ -245,52 +278,42 @@ export const wordle = (words: string[], clues: string): string[] => {
   const atLeastLetters: StringToNumberMap = {};
   const atMostLetters: StringToNumberMap = {};
   const rows = clues.toLowerCase().split("_");
-  let n = 0;
-  let wordLen = 0;
   let error = false;
   for (const clue of rows) {
     const atLeastLettersForClue: StringToNumberMap = {};
-    const letters = clue.split("");
-    if (n > 0 && n !== letters.length) {
-      console.error(`clue length incorrect: '${clue}'`);
+    const [letters, mods] = getLetterAndModArrays(clue);
+    if (letters.length === 0) {
       error = true;
       break;
-    } else {
-      n = letters.length;
-      wordLen = n / 2;
     }
-    for (let i = 0; i < n; i += 2) {
-      const letIndex = i / 2;
-      const letter = letters[i];
-      const mod = letters[i + 1];
+    letters.forEach((letter, i) => {
+      const mod = mods[i];
+      if (mod === "/") {
+        ArrayUtils.addNoRepeats(somewhereLetters, letter);
+      }
+    });
+    letters.forEach((letter, letIndex) => {
+      const mod = mods[letIndex];
       if (mod === "=") {
         correctLetters[letIndex] = letter;
         ArrayUtils.removeFromArray(notLetters[letIndex], letter);
         ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
       } else if (mod === "-") {
-        if (somewhereLetters.indexOf(letter) === -1) {
-          for (let j = 0; j < wordLen; j++) {
+        if (somewhereLetters.includes(letter)) {
+          ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
+        } else {
+          for (let j = 0; j < lettersPerWord; j++) {
             if (correctLetters[j] !== letter) {
               ArrayUtils.addNoRepeatsArrays(notLetters, letter, j);
             }
           }
-        } else {
-          ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
         }
         ArrayUtils.addNoRepeats(notSomewhereLetters, letter);
-      } else if (mod === "?" || mod === "/") {
+      } else if (mod === "/") {
         ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
         ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
-        ArrayUtils.addNoRepeats(somewhereLetters, letter);
-      } else {
-        console.error(`place indicator not recognize: ${mod}`);
-        error = true;
-        break;
       }
-    }
-    if (error) {
-      break;
-    }
+    });
     for (const letter in atLeastLettersForClue) {
       const clueCount = atLeastLettersForClue[letter];
       const count = atLeastLetters[letter] ?? 0;
@@ -308,7 +331,7 @@ export const wordle = (words: string[], clues: string): string[] => {
   const wFuncs: WordFilterFunc[] = [];
   const wParamLists: string[][] = [];
   let regex = "^";
-  for (let i = 0; i < wordLen; i++) {
+  for (let i = 0; i < lettersPerWord; i++) {
     const correctLet = correctLetters[i];
     if (typeof correctLet === "string" && correctLet.length > 0) {
       regex += correctLet;
