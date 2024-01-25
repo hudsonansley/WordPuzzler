@@ -229,7 +229,7 @@ export const withLetterCount = (
  * @returns {[string[], string[]]} - an array of the letters and array of modifiers, cleaned up. Both empty if
  *  errors are found
  */
-const getLetterAndModArrays = (clue: string): [string[], string[]] => {
+const _getLetterAndModArrays = (clue: string): [string[], string[]] => {
   const chars = clue.toLowerCase().split("");
   if (chars.length !== 2 * lettersPerWord) {
     console.error(`wrong clue length ${chars.length}`);
@@ -256,6 +256,83 @@ const getLetterAndModArrays = (clue: string): [string[], string[]] => {
     return [letters, mods];
   }
 };
+
+interface LetterInfo {
+  notHere: string[][];
+  somewhere: string[];
+  notSomewhere: string[];
+  correct: string[];
+  atLeast: StringToNumberMap;
+  atMost: StringToNumberMap;
+}
+
+const _updateLetterInfo = (
+  info: LetterInfo,
+  atLeastLettersForClue: StringToNumberMap,
+  letter: string,
+  mod: string,
+  i: number
+) => {
+  if (mod === "=") {
+    info.correct[i] = letter;
+    ArrayUtils.removeFromArray(info.notHere[i], letter);
+    ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
+  } else if (mod === "-") {
+    if (info.somewhere.includes(letter)) {
+      ArrayUtils.addNoRepeatsArrays(info.notHere, letter, i);
+    } else {
+      for (let j = 0; j < lettersPerWord; j++) {
+        if (info.correct[j] !== letter) {
+          ArrayUtils.addNoRepeatsArrays(info.notHere, letter, j);
+        }
+      }
+    }
+    ArrayUtils.addNoRepeats(info.notSomewhere, letter);
+  } else if (mod === "/") {
+    ArrayUtils.addNoRepeatsArrays(info.notHere, letter, i);
+    ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
+  }
+};
+
+const _getCluesInfo = (clues): LetterInfo | undefined => {
+  const info: LetterInfo = {
+    notHere: [],
+    somewhere: [],
+    notSomewhere: [],
+    correct: [],
+    atLeast: {},
+    atMost: {},
+  };
+  const rows = clues.toLowerCase().split("_");
+  for (const clue of rows) {
+    const atLeastLettersForClue: StringToNumberMap = {};
+    const [letters, mods] = _getLetterAndModArrays(clue);
+    if (letters.length === 0) {
+      return;
+    }
+    letters.forEach((letter, i) => {
+      const mod = mods[i];
+      if (mod === "/") {
+        ArrayUtils.addNoRepeats(info.somewhere, letter);
+      }
+    });
+    letters.forEach((letter, letIndex) => {
+      const mod = mods[letIndex];
+      _updateLetterInfo(info, atLeastLettersForClue, letter, mod, letIndex);
+    });
+    for (const letter in atLeastLettersForClue) {
+      const clueCount = atLeastLettersForClue[letter];
+      const count = info.atLeast[letter] ?? 0;
+      if (clueCount >= count) {
+        info.atLeast[letter] = clueCount;
+        if (info.notSomewhere.indexOf(letter) >= 0) {
+          info.atMost[letter] = clueCount;
+        }
+      }
+    }
+  }
+  return info;
+};
 /**
  * @param  {string[]} words
  * @param  {string} clues
@@ -271,72 +348,19 @@ export const wordle = (words: string[], clues: string): string[] => {
   if (clues === "") {
     return words;
   }
-  const notLetters: string[][] = [];
-  const somewhereLetters: string[] = [];
-  const notSomewhereLetters: string[] = [];
-  const correctLetters: string[] = [];
-  const atLeastLetters: StringToNumberMap = {};
-  const atMostLetters: StringToNumberMap = {};
-  const rows = clues.toLowerCase().split("_");
-  let error = false;
-  for (const clue of rows) {
-    const atLeastLettersForClue: StringToNumberMap = {};
-    const [letters, mods] = getLetterAndModArrays(clue);
-    if (letters.length === 0) {
-      error = true;
-      break;
-    }
-    letters.forEach((letter, i) => {
-      const mod = mods[i];
-      if (mod === "/") {
-        ArrayUtils.addNoRepeats(somewhereLetters, letter);
-      }
-    });
-    letters.forEach((letter, letIndex) => {
-      const mod = mods[letIndex];
-      if (mod === "=") {
-        correctLetters[letIndex] = letter;
-        ArrayUtils.removeFromArray(notLetters[letIndex], letter);
-        ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
-      } else if (mod === "-") {
-        if (somewhereLetters.includes(letter)) {
-          ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
-        } else {
-          for (let j = 0; j < lettersPerWord; j++) {
-            if (correctLetters[j] !== letter) {
-              ArrayUtils.addNoRepeatsArrays(notLetters, letter, j);
-            }
-          }
-        }
-        ArrayUtils.addNoRepeats(notSomewhereLetters, letter);
-      } else if (mod === "/") {
-        ArrayUtils.addNoRepeatsArrays(notLetters, letter, letIndex);
-        ArrayUtils.keyCountIncrement(atLeastLettersForClue, letter);
-      }
-    });
-    for (const letter in atLeastLettersForClue) {
-      const clueCount = atLeastLettersForClue[letter];
-      const count = atLeastLetters[letter] ?? 0;
-      if (clueCount >= count) {
-        atLeastLetters[letter] = clueCount;
-        if (notSomewhereLetters.indexOf(letter) >= 0) {
-          atMostLetters[letter] = clueCount;
-        }
-      }
-    }
-  }
-  if (error) {
+  const letterInfo = _getCluesInfo(clues);
+  if (!letterInfo) {
     return [];
   }
   const wFuncs: WordFilterFunc[] = [];
   const wParamLists: string[][] = [];
   let regex = "^";
   for (let i = 0; i < lettersPerWord; i++) {
-    const correctLet = correctLetters[i];
+    const correctLet = letterInfo.correct[i];
     if (typeof correctLet === "string" && correctLet.length > 0) {
       regex += correctLet;
     } else {
-      const letters = notLetters[i];
+      const letters = letterInfo.notHere[i];
       regex += "[";
       for (const letter of letters) {
         regex += "^" + letter;
@@ -347,19 +371,19 @@ export const wordle = (words: string[], clues: string): string[] => {
   regex += "$";
   wFuncs.push(matches);
   wParamLists.push([regex]);
-  somewhereLetters.forEach((letter) => {
+  letterInfo.somewhere.forEach((letter) => {
     if (letter) {
       wFuncs.push(matches);
       wParamLists.push([letter]);
     }
   });
-  Object.entries(atLeastLetters).forEach((letterCount) => {
+  Object.entries(letterInfo.atLeast).forEach((letterCount) => {
     if (letterCount[1] > 1) {
       wFuncs.push(withAtLeastLetterCount);
       wParamLists.push([letterCount.join("_")]);
     }
   });
-  Object.entries(atMostLetters).forEach((letterCount) => {
+  Object.entries(letterInfo.atMost).forEach((letterCount) => {
     if (letterCount[1] > 0) {
       wFuncs.push(withAtMostLetterCount);
       wParamLists.push([letterCount.join("_")]);
