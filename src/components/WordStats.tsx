@@ -84,8 +84,8 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
     return statsOrderInfo.targetWord !== "";
   };
 
-  const addWordToBoard = (word: string) => {
-    publish("addWordToBoard", { word });
+  const addWordToBoard = (word: string, clues: number = 0) => {
+    publish("addWordToBoard", { word, clues });
   };
 
   const wordleDisplayStats: wordleDisplayStatsType[] = useMemo<
@@ -263,23 +263,33 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
               return (
                 <tr className={getRowClassName(wordInfo)} key={wordInfo.word}>
                   <td key="clues" className={"clues-container"}>
-                    {Math.abs(wordInfo.cluesGroupDivider) > 1 &&
-                      ArrayUtils.numberToArray(
-                        wordInfo.clues,
-                        2,
-                        lettersPerWord
-                      ).map((clue, i) => (
-                        <div
-                          key={`key_${clue}_${i}`}
-                          className={`clue-box clue-box--${
-                            clue === WORDLE_CORRECT
-                              ? "correct"
-                              : clue === WORDLE_WRONG_POSITION
-                              ? "wrongIndex"
-                              : "wrong"
-                          }`}
-                        />
-                      ))}
+                    <button
+                      onClick={() => {
+                        console.log(wordInfo);
+                        addWordToBoard(
+                          statsOrderInfo.targetWord,
+                          wordInfo.clues
+                        );
+                      }}
+                    >
+                      {Math.abs(wordInfo.cluesGroupDivider) > 1 &&
+                        ArrayUtils.numberToArray(
+                          wordInfo.clues,
+                          2,
+                          lettersPerWord
+                        ).map((clue, i) => (
+                          <div
+                            key={`key_${clue}_${i}`}
+                            className={`clue-box clue-box--${
+                              clue === WORDLE_CORRECT
+                                ? "correct"
+                                : clue === WORDLE_WRONG_POSITION
+                                ? "wrongIndex"
+                                : "wrong"
+                            }`}
+                          />
+                        ))}
+                    </button>
                   </td>
                   <td key="word">
                     <button

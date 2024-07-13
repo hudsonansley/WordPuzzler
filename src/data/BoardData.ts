@@ -71,6 +71,10 @@ export const getBoardString = (board: BoardDataType) => {
   return rows.join("_");
 };
 
+export const getLetterStateStringFromNumber = (stateNum: number): string => {
+  return stateNum === 0 ? "=" : stateNum === 1 ? "/" : "-";
+};
+
 const getLetterStateFromString = (stateChar: string): LetterState => {
   if (stateChar === "/") {
     return "wrongIndex";

@@ -2,6 +2,7 @@ import React, { useState, createContext, useEffect, useMemo } from "react";
 
 import "./App.css";
 import * as BoardData from "./data/BoardData";
+import * as ArrayUtils from "./utilities/ArrayUtils";
 import Board from "./components/Board";
 import Keyboard from "./components/Keyboard";
 import InitProgress from "./components/InitProgress";
@@ -114,8 +115,8 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
 
   useEffect(() => {
     const handleAddWordToBoard = (event) => {
-      const { word }: { word: string } = event.detail;
-      addWordToBoard(word);
+      const { word, clues = 0 }: { word: string; clues: number } = event.detail;
+      addWordToBoard(word, clues);
     };
     const handleRotateLetterState = (event) => {
       const letterLoc: BoardData.LetterLocType = event.detail;
@@ -145,13 +146,22 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
         firstNotCompletedIndex < 0 ? 0 : firstNotCompletedIndex;
     }
     boardRowStr = boardRowStr.toUpperCase();
-    const otherBoardStrs = boardRowStr.replace(/=/g, "-");
+    const otherBoardStrs = boardRowStr.replace(/[=\/-]/g, "-");
     for (let index = 0; index < storedBoardStates.length; index++) {
       if (!storedBoardCompleted[index]) {
-        const storedBoard = storedBoardStates[index];
-        storedBoardStates[index] =
-          (storedBoard.length === 0 ? "" : storedBoard + "_") +
-          (index === statsInfo.wordSetIndex ? boardRowStr : otherBoardStrs);
+        const storedBoard = storedBoardStates[index].split("_");
+        const lastRow = storedBoard[storedBoard.length - 1].replace(
+          /[=\/-]/g,
+          "-"
+        );
+        const rowToAdd =
+          index === statsInfo.wordSetIndex ? boardRowStr : otherBoardStrs;
+        if (lastRow === otherBoardStrs) {
+          storedBoard[storedBoard.length - 1] = rowToAdd;
+        } else {
+          storedBoard.push(rowToAdd);
+        }
+        storedBoardStates[index] = storedBoard.join("_");
         storedBoardLetterStateDirty[index] = false;
         storedBoardLettersDirty[index] = true;
       }
@@ -159,6 +169,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
     const newBoard = BoardData.getBoardFromString(
       storedBoardStates[statsInfo.wordSetIndex]
     );
+    console.log(storedBoardStates[statsInfo.wordSetIndex]);
     setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     if (BoardData.boardIsComplete(newBoard)) {
@@ -169,17 +180,31 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
   /**
    * @param  {string} word the word to add to the board
    */
-  const addWordToBoard = (word: string) => {
+  const addWordToBoard = (word: string, clues: number = 0) => {
+    console.log("clue num", clues);
     const boardWords = storedBoardStates.reduce(
       (acc, boardStr) => acc.concat(BoardData.getBoardWords(boardStr)),
       []
     );
-    if (boardWords.indexOf(word) < 0) {
-      const letters = word.split("");
+    const letters = word.split("");
+    let clueStrings: Array<string>;
+    if (clues > 0) {
+      clueStrings = ArrayUtils.numberToArray(
+        clues,
+        2,
+        BoardData.lettersPerWord
+      ).map((clueNum) => BoardData.getLetterStateStringFromNumber(clueNum));
+      console.log(clueStrings);
+    } else {
       const clue = statsInfo.wordCount === 1 ? "=" : "-";
-      const boardRow = letters.reduce((acc, letter) => acc + letter + clue, "");
-      addRowToBoard(boardRow);
+      clueStrings = new Array(BoardData.lettersPerWord).fill(clue);
     }
+    const boardRow = letters.reduce(
+      (acc, letter, i) => acc + letter + clueStrings[i],
+      ""
+    );
+    console.log(boardRow);
+    addRowToBoard(boardRow);
     if (statsInfo.combinedBoardIndexStrings) {
       switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);
     }
