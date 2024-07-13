@@ -395,7 +395,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
     }
   };
   /**
-   *  Calcultes the word sets based on the stored board strings
+   *  Calculates the word sets based on the stored board strings
    * and keeps track of which boards are duplicates
    */
   const calcCombinedWords = () => {
