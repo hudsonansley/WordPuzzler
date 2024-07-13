@@ -169,7 +169,6 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
     const newBoard = BoardData.getBoardFromString(
       storedBoardStates[statsInfo.wordSetIndex]
     );
-    console.log(storedBoardStates[statsInfo.wordSetIndex]);
     setBoardStr(storedBoardStates[statsInfo.wordSetIndex]);
     setCurLetterLoc(BoardData.getLetterLoc(newBoard));
     if (BoardData.boardIsComplete(newBoard)) {
@@ -181,7 +180,6 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
    * @param  {string} word the word to add to the board
    */
   const addWordToBoard = (word: string, clues: number = 0) => {
-    console.log("clue num", clues);
     const boardWords = storedBoardStates.reduce(
       (acc, boardStr) => acc.concat(BoardData.getBoardWords(boardStr)),
       []
@@ -194,7 +192,6 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
         2,
         BoardData.lettersPerWord
       ).map((clueNum) => BoardData.getLetterStateStringFromNumber(clueNum));
-      console.log(clueStrings);
     } else {
       const clue = statsInfo.wordCount === 1 ? "=" : "-";
       clueStrings = new Array(BoardData.lettersPerWord).fill(clue);
@@ -203,7 +200,6 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
       (acc, letter, i) => acc + letter + clueStrings[i],
       ""
     );
-    console.log(boardRow);
     addRowToBoard(boardRow);
     if (statsInfo.combinedBoardIndexStrings) {
       switchToBoard(FIND_FIRST_UNCOMPLETED_BOARD_INDEX);

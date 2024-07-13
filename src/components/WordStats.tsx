@@ -265,8 +265,7 @@ export const WordStats = ({ statsInfo }: { statsInfo: WordSetInfoType }) => {
                   <td key="clues" className={"clues-container"}>
                     <button
                       onClick={() => {
-                        console.log(wordInfo);
-                        addWordToBoard(
+Z                        addWordToBoard(
                           statsOrderInfo.targetWord,
                           wordInfo.clues
                         );
