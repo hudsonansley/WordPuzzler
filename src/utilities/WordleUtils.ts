@@ -406,7 +406,7 @@ const clueNumToString = ["e", "p", "n"];
  * @param  {string} pick
  * @returns {string} a string representing the letter scores that would
  *  be returned by Wordle for the given word if the given pick was the
- *  correct answer. "e" if in the correct place, "p" if somewhere but wrond place
+ *  correct answer. "e" if in the correct place, "p" if somewhere but wrong place
  *  and "n" if letter not in the answer
  */
 export const getWordleClues = (word: string, pick: string): string => {
