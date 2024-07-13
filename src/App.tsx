@@ -156,7 +156,7 @@ const App = ({ initWordSetType }: { initWordSetType: WordleDict.wordSet }) => {
         );
         const rowToAdd =
           index === statsInfo.wordSetIndex ? boardRowStr : otherBoardStrs;
-        if (lastRow === otherBoardStrs) {
+        if (lastRow === otherBoardStrs || lastRow === "") {
           storedBoard[storedBoard.length - 1] = rowToAdd;
         } else {
           storedBoard.push(rowToAdd);
