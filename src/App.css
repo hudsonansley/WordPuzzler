@@ -394,6 +394,7 @@ p {
   width: var(--stats-clues-block-size);
   height: var(--stats-clues-block-size);
   display: inline-flex;
+  margin-left: 0.15rem;
   border: 0.025rem solid rgb(var(--text-color));
 }
 
