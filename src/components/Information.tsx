@@ -1,5 +1,5 @@
 import React from "react";
-import VERSION from "../version";
+import { VERSION } from "../version";
 
 export type InfoType =
   | "help"
@@ -71,9 +71,9 @@ export const Information = ({ infoType }: { infoType: InfoType }) => {
           </p>
           <p>
             "&gt;" will set the clues column target word to the last word on the
-            board (experimantal).
+            board (experimental).
           </p>
-          <p>Version: {VERSION}</p>
+          <div className="version">Version: {VERSION}</div>
         </div>
       );
     case "stats":

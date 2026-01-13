@@ -366,6 +366,12 @@ tbody {
   font-size: var(--stats-table-line-height);
 }
 
+.version {
+  font-size: 0.7rem;
+  text-align: right;
+  color: #505050;
+}
+
 .info {
   margin-left: auto;
   margin-right: auto;
