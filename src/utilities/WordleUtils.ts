@@ -333,6 +333,27 @@ const _getCluesInfo = (clues): LetterInfo | undefined => {
   }
   return info;
 };
+
+export const getInitialLetterStates = (
+  clues: string,
+  word: string
+): string[] => {
+  const result = new Array(word.length).fill("wrong");
+  if (clues.length > 0) {
+    const info = _getCluesInfo(clues);
+    for (let i = 0; i < word.length; i++) {
+      const letter = word[i];
+      if (info.correct) {
+        if (letter === info.correct[i]) {
+          result[i] = "correct";
+        } else {
+          result[i] = "error";
+        }
+      }
+    }
+  }
+  return result;
+};
 /**
  * @param  {string[]} words
  * @param  {string} clues

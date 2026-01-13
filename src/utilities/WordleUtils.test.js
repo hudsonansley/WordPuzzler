@@ -1,7 +1,8 @@
 import * as WordleUtils from "./WordleUtils";
 
 beforeAll(() => {
-  WordleUtils.initWordleIndexPartitions();
+  //use the more stable quordle word set for tests
+  WordleUtils.initWordleIndexPartitions("quordle");
 });
 
 test("WordUtils.wordle properly reduces wordlist", () => {
@@ -57,6 +58,9 @@ test("WordUtils.wordle properly reduces wordlist", () => {
   words = WordleUtils.wordle(picks, "t=s-s/w/t=");
   expect(words.length).toEqual(1);
   expect(words).toContain("twist");
+  words = WordleUtils.wordle(picks, "o/u=g/h-t-");
+  expect(words.length).toEqual(1);
+  expect(words).toContain("gumbo");
 });
 
 test("WordUtils.unique finds words with all unique letters properly", () => {

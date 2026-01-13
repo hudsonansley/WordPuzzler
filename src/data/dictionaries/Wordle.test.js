@@ -39,6 +39,10 @@ test("Wordle.wordleAll has wordle some picks and decoys and not other words", ()
   expect(wordleAll).not.toContain("yutes");
   expect(wordlePicks).not.toContain("yutes");
   expect(wordleDecoys).not.toContain("yutes");
+  expect(wordlePicks).toContain("fungo");
+  expect(wordleDecoys).not.toContain("fungo");
+  expect(wordlePicks).toContain("guano");
+  expect(wordleDecoys).not.toContain("guano");
 });
 test("Wordle.wordleAllNums wordlePicksNums wordleDecoysNums have the same words as string lists", () => {
   const wordleAll = WordleUtils.wordleAll;
