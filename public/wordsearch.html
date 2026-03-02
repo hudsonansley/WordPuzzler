@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Professional Word Search Creator</title>
+    <style>
+        :root {
+            --cell-size: 34px;
+            --font-main: 'Segoe UI', Tahoma, sans-serif;
+            --font-puzzle: 'Courier New', Courier, monospace;
+            --border-weight: 2px;
+        }
+
+        body { font-family: var(--font-main); padding: 20px; color: #333; background: #f0f2f5; margin: 0; }
+
+        .no-print {
+            max-width: 600px; margin: 0 auto 30px auto; background: white;
+            padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .input-group { margin-bottom: 15px; }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; color: #475569; }
+        select, input[type="number"], textarea, input[type="text"] {
+            width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem;
+        }
+
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        button { flex: 1; padding: 12px 15px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; min-width: 120px; font-size: 0.8rem; }
+        .btn-main { background: #2563eb; color: white; }
+        .btn-sec { background: #64748b; color: white; }
+        .btn-decoy { background: #94a3b8; color: white; }
+        .btn-print { background: #059669; color: white; }
+        .btn-dl { background: #d97706; color: white; }
+
+        #paper { background: white; width: fit-content; margin: 0 auto; padding: 40px; border: 1px solid #e2e8f0; text-align: center; }
+        #puzzleTitleDisplay { margin-bottom: 20px; font-size: 28px; font-weight: bold; text-transform: uppercase; display: none; color: #000; }
+
+        .grid-wrapper { position: relative; display: inline-block; padding: 0; margin: 0; line-height: 0; }
+
+        .grid {
+            display: grid;
+            border: var(--border-weight) solid #000;
+            background: #000;
+            gap: 1px;
+            box-sizing: content-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cell {
+            background: white;
+            width: var(--cell-size); height: var(--cell-size);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-puzzle); font-weight: bold; font-size: 20px; text-transform: uppercase;
+        }
+
+        .overlay-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            pointer-events: none;
+            display: none;
+        }
+        #decoyCanvas { z-index: 2; }
+        #solutionCanvas { z-index: 3; }
+
+        .word-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; border-top: 2px solid #000; padding-top: 20px; width: 100%; margin-top: 20px; text-align: left;}
+        .word-item { font-weight: 600; font-size: 14px; text-transform: uppercase; }
+
+        @media print {
+            .no-print { display: none !important; }
+            #paper { border: none; box-shadow: none; padding: 0; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print">
+    <h2 style="margin: 0 0 20px 0;">Word Search Creator</h2>
+    <div class="input-group">
+        <label>Puzzle Title:</label>
+        <input type="text" id="titleInput" placeholder="THE DECOY CHALLENGE">
+    </div>
+    <div class="row">
+        <div class="input-group">
+            <label>Grid Size:</label>
+            <input type="number" id="sizeInput" value="15">
+        </div>
+        <div class="input-group">
+            <label>Difficulty (Directions):</label>
+            <select id="diffInput">
+                <option value="easy">Easy (Across/Down)</option>
+                <option value="medium" selected>Medium (+ Diagonals)</option>
+                <option value="hard">Hard (+ Backwards)</option>
+            </select>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>Decoy Level (Mental Traps):</label>
+        <select id="decoyLevelInput">
+            <option value="none">No Decoys</option>
+            <option value="some" selected>Some Decoys (30% chance)</option>
+            <option value="many">Many Decoys (60% chance)</option>
+            <option value="max">Max Decoys (100% chance + multiples)</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>Words:</label>
+        <textarea id="wordsInput">LEMON, CHERRY, ORANGE, BANANA, APPLE, GRAPE, PEACH, BERRY, MELON, MANGO, KIWI, LIME</textarea>
+    </div>
+    <div class="btn-group">
+        <button class="btn-main" onclick="buildPuzzle()">1. Generate</button>
+        <button id="solveBtn" class="btn-sec" onclick="toggleSolution()" style="display:none;">2. Answers</button>
+        <button id="decoyBtn" class="btn-decoy" onclick="toggleDecoys()" style="display:none;">3. Decoys</button>
+        <button id="printBtn" class="btn-print" onclick="window.print()" style="display:none;">4. Print</button>
+        <button id="dlBtn" class="btn-dl" onclick="downloadImage()" style="display:none;">5. Save PNG</button>
+    </div>
+</div>
+
+<div id="paper" style="display:none;">
+    <div id="puzzleTitleDisplay"></div>
+    <div class="grid-wrapper">
+        <div id="gridDisplay" class="grid"></div>
+        <canvas id="decoyCanvas" class="overlay-canvas"></canvas>
+        <canvas id="solutionCanvas" class="overlay-canvas"></canvas>
+    </div>
+    <div id="listDisplay" class="word-list"></div>
+</div>
+
+<canvas id="exportCanvas" style="display:none;"></canvas>
+
+<script>
+    const DIRECTIONS = {
+        right: [0, 1], down: [1, 0], diagDR: [1, 1], diagUR: [-1, 1],
+        left: [0, -1], up: [-1, 0], diagUL: [-1, -1], diagDL: [1, -1]
+    };
+
+    let wordPlacements = [];
+    let decoyPlacements = [];
+    let currentGridData = [];
+    let currentWords = [];
+
+    function buildPuzzle() {
+        const size = parseInt(document.getElementById('sizeInput').value) || 15;
+        const words = document.getElementById('wordsInput').value.toUpperCase().split(/[\s,]+/).filter(w => w.length > 1);
+        const difficulty = document.getElementById('diffInput').value;
+        const decoyLevel = document.getElementById('decoyLevelInput').value;
+
+        let dirs = [DIRECTIONS.right, DIRECTIONS.down];
+        if (difficulty === 'medium') dirs.push(DIRECTIONS.diagDR, DIRECTIONS.diagUR);
+        if (difficulty === 'hard') dirs = Object.values(DIRECTIONS);
+
+        let decoyChance = 0;
+        let decoysPerWord = 1;
+        if (decoyLevel === 'some') decoyChance = 0.3;
+        else if (decoyLevel === 'many') decoyChance = 0.6;
+        else if (decoyLevel === 'max') { decoyChance = 1.0; decoysPerWord = 2; }
+
+        currentGridData = Array(size).fill().map(() => Array(size).fill(''));
+        wordPlacements = [];
+        decoyPlacements = [];
+        currentWords = [...new Set(words)].sort((a,b) => b.length - a.length);
+
+        // 1. Place Real Words
+        currentWords.forEach(word => {
+            placeWord(word, dirs, size, 'real');
+
+            // 2. Place Decoys
+            for(let i=0; i<decoysPerWord; i++) {
+                if (Math.random() < decoyChance) {
+                    // Decoys are length-1 of the original word for maximum confusion
+                    const decoy = word.substring(0, word.length - 1);
+                    if (decoy.length > 1) placeWord(decoy, dirs, size, 'decoy');
+                }
+            }
+        });
+
+        const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        for(let r=0; r<size; r++) {
+            for(let c=0; c<size; c++) {
+                if(!currentGridData[r][c]) currentGridData[r][c] = alpha[Math.floor(Math.random()*26)];
+            }
+        }
+
+        const title = document.getElementById('titleInput').value;
+        document.getElementById('puzzleTitleDisplay').textContent = title || "";
+        document.getElementById('puzzleTitleDisplay').style.display = title ? 'block' : 'none';
+
+        renderGrid(size);
+    }
+
+    function placeWord(word, dirs, size, type) {
+        let placed = false, tries = 0;
+        while(!placed && tries < 150) {
+            let d = dirs[Math.floor(Math.random() * dirs.length)];
+            let r = Math.floor(Math.random() * size), c = Math.floor(Math.random() * size);
+            if(canPlace(currentGridData, word, r, c, d, size)) {
+                for(let i=0; i<word.length; i++){
+                    currentGridData[r + (i * d[0])][c + (i * d[1])] = word[i];
+                }
+                const coords = {startR: r, startC: c, endR: r + (word.length - 1) * d[0], endC: c + (word.length - 1) * d[1]};
+                if(type === 'real') wordPlacements.push(coords);
+                else decoyPlacements.push(coords);
+                placed = true;
+            }
+            tries++;
+        }
+    }
+
+    function canPlace(grid, word, r, c, d, size) {
+        for(let i=0; i<word.length; i++) {
+            let nr = r + (i * d[0]), nc = c + (i * d[1]);
+            if(nr < 0 || nr >= size || nc < 0 || nc >= size) return false;
+            if(grid[nr][nc] !== '' && grid[nr][nc] !== word[i]) return false;
+        }
+        return true;
+    }
+
+    function renderGrid(size) {
+        const display = document.getElementById('gridDisplay');
+        display.innerHTML = '';
+        display.style.gridTemplateColumns = `repeat(${size}, var(--cell-size))`;
+        currentGridData.forEach(row => {
+            row.forEach(char => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.textContent = char;
+                display.appendChild(cell);
+            });
+        });
+
+        const dim = (size * 34) + (size - 1) + 4;
+        [document.getElementById('solutionCanvas'), document.getElementById('decoyCanvas')].forEach(cvs => {
+            cvs.width = dim; cvs.height = dim; cvs.style.display = 'none';
+        });
+
+        document.getElementById('listDisplay').innerHTML = currentWords.map(w => `<div class="word-item">▢ ${w}</div>`).join('');
+        document.getElementById('paper').style.display = 'block';
+        ['solveBtn', 'decoyBtn', 'printBtn', 'dlBtn'].forEach(id => document.getElementById(id).style.display = 'inline-block');
+        document.getElementById('solveBtn').textContent = "2. Show Answers";
+        document.getElementById('decoyBtn').textContent = "3. Show Decoys";
+    }
+
+    function toggleSolution() {
+        const canvas = document.getElementById('solutionCanvas');
+        if (canvas.style.display === 'block') {
+            canvas.style.display = 'none';
+            document.getElementById('solveBtn').textContent = "2. Show Answers";
+        } else {
+            drawCapsules(canvas, wordPlacements, "#2563eb", 15, false);
+            canvas.style.display = 'block';
+            document.getElementById('solveBtn').textContent = "2. Hide Answers";
+        }
+    }
+
+    function toggleDecoys() {
+        const canvas = document.getElementById('decoyCanvas');
+        if (canvas.style.display === 'block') {
+            canvas.style.display = 'none';
+            document.getElementById('decoyBtn').textContent = "3. Show Decoys";
+        } else {
+            drawCapsules(canvas, decoyPlacements, "rgba(239, 68, 68, 0.6)", 10, true);
+            canvas.style.display = 'block';
+            document.getElementById('decoyBtn').textContent = "3. Hide Decoys";
+        }
+    }
+
+    function drawCapsules(canvas, placements, color, radius, isDecoy) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = isDecoy ? 2 : 2;
+        ctx.setLineDash(isDecoy ? [5, 3] : []); // Dashed line for decoys
+        ctx.lineCap = "round";
+        const offset = 17 + 2;
+
+        placements.forEach(p => {
+            const x1 = (p.startC * 35) + offset, y1 = (p.startR * 35) + offset;
+            const x2 = (p.endC * 35) + offset, y2 = (p.endR * 35) + offset;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            ctx.beginPath();
+            ctx.arc(x1, y1, radius, angle + Math.PI/2, angle + (3*Math.PI)/2);
+            ctx.arc(x2, y2, radius, angle - Math.PI/2, angle + Math.PI/2);
+            ctx.closePath();
+            ctx.stroke();
+        });
+    }
+
+    // Reuse existing downloadImage logic from previous version, ensuring it calls the new drawExportCapsule
+    function downloadImage() {
+        const canvas = document.getElementById('exportCanvas');
+        const ctx = canvas.getContext('2d');
+        const cellSize = 40;
+        const size = currentGridData.length;
+        const padding = 60;
+        const titleText = document.getElementById('titleInput').value.toUpperCase();
+        const topOffset = titleText ? padding + 60 : padding;
+
+        canvas.width = (size * cellSize) + (padding * 2);
+        canvas.height = (size * cellSize) + padding + topOffset + (Math.ceil(currentWords.length / 3) * 30 + 40);
+
+        ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if(titleText) {
+            ctx.font = "bold 32px Segoe UI"; ctx.fillStyle = "black"; ctx.textAlign = "center";
+            ctx.fillText(titleText, canvas.width/2, padding + 20);
+        }
+
+        if (document.getElementById('solutionCanvas').style.display === 'block') {
+            ctx.strokeStyle = "#2563eb"; ctx.lineWidth = 2; ctx.setLineDash([]);
+            wordPlacements.forEach(p => drawExportCapsule(ctx, p, padding, topOffset, cellSize, 18));
+        }
+        if (document.getElementById('decoyCanvas').style.display === 'block') {
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.6)"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+            decoyPlacements.forEach(p => drawExportCapsule(ctx, p, padding, topOffset, cellSize, 14));
+        }
+
+        currentGridData.forEach((row, r) => {
+            row.forEach((char, c) => {
+                const x = padding + (c * cellSize), y = topOffset + (r * cellSize);
+                ctx.strokeStyle = "#eee"; ctx.lineWidth = 1; ctx.strokeRect(x, y, cellSize, cellSize);
+                ctx.font = "bold 22px Courier New"; ctx.fillStyle = "black"; ctx.textAlign = "center";
+                ctx.fillText(char, x + 20, y + 28);
+            });
+        });
+
+        ctx.strokeStyle = "black"; ctx.lineWidth = 3; ctx.setLineDash([]);
+        ctx.strokeRect(padding, topOffset, size * cellSize, size * cellSize);
+
+        ctx.font = "bold 16px Segoe UI"; ctx.textAlign = "left";
+        const listStartY = topOffset + (size * cellSize) + 40;
+        currentWords.forEach((word, i) => {
+            const x = padding + (i % 3) * ((size * cellSize) / 3), y = listStartY + Math.floor(i / 3) * 30;
+            ctx.fillText("▢ " + word, x, y);
+        });
+
+        const link = document.createElement('a'); link.download = 'word-search.png';
+        link.href = canvas.toDataURL(); link.click();
+    }
+
+    function drawExportCapsule(ctx, p, pad, top, cell, rad) {
+        const x1 = pad + (p.startC * cell) + 20, y1 = top + (p.startR * cell) + 20;
+        const x2 = pad + (p.endC * cell) + 20, y2 = top + (p.endR * cell) + 20;
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.arc(x1, y1, rad, angle + Math.PI/2, angle + (3*Math.PI)/2);
+        ctx.arc(x2, y2, rad, angle - Math.PI/2, angle + Math.PI/2);
+        ctx.closePath(); ctx.stroke();
+    }
+</script>
+</body>
+</html>
